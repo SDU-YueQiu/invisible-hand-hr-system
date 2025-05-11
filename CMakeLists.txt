@@ -9,11 +9,18 @@ cmake_minimum_required (VERSION 3.30)
 #   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 # endif()
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 project ("invisible-hand-hr-system" VERSION 0.1)
 
 find_package(Crow CONFIG REQUIRED)
 
-add_executable (invisible-hand-hr-system "invisible-hand-hr-system.cpp" "invisible-hand-hr-system.h")
+file(GLOB_RECURSE SERVER_SOURCES 
+    "${CMAKE_CURRENT_SOURCE_DIR}/code/server/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/code/server/*.h"
+)
+
+add_executable (invisible-hand-hr-system ${SERVER_SOURCES})
 
 target_link_libraries(invisible-hand-hr-system PRIVATE Crow::Crow asio::asio)
 
