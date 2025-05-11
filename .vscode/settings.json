@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.asm": "asm-collection",
+        "vector": "cpp"
+    },
+    "liveServer.settings.port": 5527
+}
