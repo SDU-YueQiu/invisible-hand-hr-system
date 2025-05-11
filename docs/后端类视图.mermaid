@@ -1,0 +1,368 @@
+classDiagram
+    %% 主要分层
+    class CrowApplication {
+        +main()
+        +setupRoutes()
+        +configureMiddleware()
+        +run()
+    }
+    
+    %% API路由与控制器层
+    namespace API层 {
+        class ApiRouter {
+            +setupRoutes(Crow::App)
+        }
+        
+        class AuthController {
+            +registerIndividual(request, response)
+            +loginIndividual(request, response)
+            +registerEnterprise(request, response)
+            +loginEnterprise(request, response)
+            +loginAdmin(request, response)
+            +logout(request, response)
+            +forgotPassword(request, response)
+            +resetPassword(request, response)
+        }
+        
+        class UserController {
+            +getCurrentUserInfo(request, response)
+            +updateUserInfo(request, response)
+            +changePassword(request, response)
+            +getResumes(request, response)
+            +getApplications(request, response)
+        }
+        
+        class ResumeController {
+            +createResume(request, response)
+            +getResume(request, response)
+            +updateResume(request, response)
+            +deleteResume(request, response)
+        }
+        
+        class JobController {
+            +getJobs(request, response)
+            +getJobDetails(request, response)
+            +applyForJob(request, response)
+        }
+        
+        class EnterpriseController {
+            +getEnterpriseInfo(request, response)
+            +updateEnterpriseInfo(request, response)
+            +getPostedJobs(request, response)
+            +postNewJob(request, response)
+            +updateJob(request, response)
+            +deleteJob(request, response)
+            +getApplicants(request, response)
+            +updateApplicationStatus(request, response)
+        }
+        
+        class AdminController {
+            +getUsers(request, response)
+            +updateUserStatus(request, response)
+            +getEnterprises(request, response)
+            +approveEnterprise(request, response)
+            +rejectEnterprise(request, response)
+            +getJobs(request, response)
+            +updateJobStatus(request, response)
+            +getFeedbacks(request, response)
+            +processFeedback(request, response)
+            +getAnnouncements(request, response)
+            +createAnnouncement(request, response)
+            +updateAnnouncement(request, response)
+            +deleteAnnouncement(request, response)
+        }
+        
+        class FeedbackController {
+            +submitFeedback(request, response)
+            +getFeedbacks(request, response)
+        }
+    }
+    
+    %% 中间件层
+    namespace 中间件层 {
+        class AuthMiddleware {
+            +verifyToken(request, response, next)
+            +checkRole(roles[])
+        }
+        
+        class ErrorHandlingMiddleware {
+            +handleErrors(exception, request, response)
+        }
+        
+        class LoggingMiddleware {
+            +logRequest(request, response, next)
+        }
+        
+        class ValidationMiddleware {
+            +validateRequest(schema)
+        }
+    }
+    
+    %% 业务逻辑服务层
+    namespace 服务层 {
+        class AuthService {
+            +registerIndividual(userData)
+            +loginIndividual(username, password)
+            +registerEnterprise(enterpriseData)
+            +loginEnterprise(username, password)
+            +loginAdmin(username, password)
+            +generateToken(userId, role)
+            +verifyToken(token)
+            +requestPasswordReset(email)
+            +resetPassword(token, newPassword)
+        }
+        
+        class IndividualUserService {
+            +getUserById(userId)
+            +updateUserInfo(userId, userData)
+            +changePassword(userId, oldPassword, newPassword)
+        }
+        
+        class ResumeService {
+            +createResume(userId, resumeData)
+            +getResumeById(resumeId)
+            +getResumesByUserId(userId)
+            +updateResume(resumeId, resumeData)
+            +deleteResume(resumeId)
+        }
+        
+        class JobSearchService {
+            +searchJobs(criteria)
+            +getJobById(jobId)
+            +getRelatedJobs(jobId)
+        }
+        
+        class ApplicationService {
+            +applyForJob(userId, resumeId, jobId)
+            +getUserApplications(userId)
+            +getApplicationById(applicationId)
+            +updateApplicationStatus(applicationId, status)
+        }
+        
+        class EnterpriseUserService {
+            +getEnterpriseById(enterpriseId)
+            +updateEnterpriseInfo(enterpriseId, enterpriseData)
+            +changePassword(enterpriseId, oldPassword, newPassword)
+        }
+        
+        class JobPostingService {
+            +createJob(enterpriseId, jobData)
+            +getJobById(jobId)
+            +getJobsByEnterpriseId(enterpriseId)
+            +updateJob(jobId, jobData)
+            +deleteJob(jobId)
+            +toggleJobStatus(jobId, status)
+        }
+        
+        class TalentSearchService {
+            +getApplicantsByJobId(jobId)
+            +searchResumes(criteria)
+        }
+        
+        class AdminService {
+            +getUsers(filter)
+            +updateUserStatus(userId, status)
+            +getEnterprises(filter)
+            +approveEnterprise(enterpriseId, opinion)
+            +rejectEnterprise(enterpriseId, opinion)
+            +getAllJobs(filter)
+            +updateJobStatus(jobId, status)
+        }
+        
+        class FeedbackService {
+            +submitFeedback(feedbackData)
+            +getFeedbacks(filter)
+            +processFeedback(feedbackId, reply)
+        }
+        
+        class AnnouncementService {
+            +createAnnouncement(announcementData)
+            +getAnnouncements(filter)
+            +updateAnnouncement(announcementId, data)
+            +deleteAnnouncement(announcementId)
+        }
+    }
+    
+    %% 数据访问层
+    namespace 数据访问层 {
+        class DatabaseManager {
+            -dbConnection
+            +initializeDb()
+            +getConnection()
+            +executeQuery(sql, params)
+            +executeTransaction(queries)
+        }
+        
+        class IndividualUserDAO {
+            +findById(id)
+            +findByUsername(username)
+            +findByEmail(email)
+            +create(userData)
+            +update(id, userData)
+            +updatePassword(id, passwordHash)
+            +updateStatus(id, status)
+        }
+        
+        class ResumeDAO {
+            +findById(id)
+            +findByUserId(userId)
+            +create(resumeData)
+            +update(id, resumeData)
+            +delete(id)
+        }
+        
+        class EnterpriseUserDAO {
+            +findById(id)
+            +findByUsername(username)
+            +findByCreditCode(creditCode)
+            +create(enterpriseData)
+            +update(id, enterpriseData)
+            +updatePassword(id, passwordHash)
+            +updateStatus(id, status)
+        }
+        
+        class JobPostingDAO {
+            +findById(id)
+            +findByEnterpriseId(enterpriseId)
+            +findByCriteria(criteria)
+            +create(jobData)
+            +update(id, jobData)
+            +delete(id)
+            +updateStatus(id, status)
+        }
+        
+        class JobApplicationDAO {
+            +findById(id)
+            +findByUserIdAndJobId(userId, jobId)
+            +findByUserId(userId)
+            +findByJobId(jobId)
+            +create(applicationData)
+            +updateStatus(id, status)
+        }
+        
+        class AdminUserDAO {
+            +findById(id)
+            +findByUsername(username)
+            +update(id, adminData)
+            +updatePassword(id, passwordHash)
+        }
+        
+        class FeedbackDAO {
+            +findById(id)
+            +findAll(filter)
+            +create(feedbackData)
+            +update(id, feedbackData)
+        }
+        
+        class AnnouncementDAO {
+            +findById(id)
+            +findAll(filter)
+            +create(announcementData)
+            +update(id, announcementData)
+            +delete(id)
+        }
+    }
+    
+    %% 工具层
+    namespace 工具层 {
+        class SecurityUtils {
+            +hashPassword(password)
+            +verifyPassword(password, hash)
+            +generateJWT(payload)
+            +verifyJWT(token)
+        }
+        
+        class ValidationUtils {
+            +validateEmail(email)
+            +validatePhone(phone)
+            +validateUsername(username)
+            +validateSchema(data, schema)
+        }
+        
+        class Logger {
+            +info(message)
+            +error(message, error)
+            +debug(message)
+            +warn(message)
+        }
+        
+        class ConfigManager {
+            -config
+            +loadConfig(filepath)
+            +getValue(key)
+        }
+    }
+    
+    %% 关系定义
+    
+    %% 主应用与各层的关系
+    CrowApplication --> ApiRouter
+    CrowApplication --> AuthMiddleware
+    CrowApplication --> ErrorHandlingMiddleware
+    CrowApplication --> LoggingMiddleware
+    CrowApplication --> DatabaseManager
+    CrowApplication --> ConfigManager
+    
+    %% API控制器之间的关系
+    ApiRouter --> AuthController
+    ApiRouter --> UserController
+    ApiRouter --> ResumeController
+    ApiRouter --> JobController
+    ApiRouter --> EnterpriseController
+    ApiRouter --> AdminController
+    ApiRouter --> FeedbackController
+    
+    %% 控制器与服务层的关系
+    AuthController --> AuthService
+    UserController --> IndividualUserService
+    ResumeController --> ResumeService
+    JobController --> JobSearchService
+    JobController --> ApplicationService
+    EnterpriseController --> EnterpriseUserService
+    EnterpriseController --> JobPostingService
+    EnterpriseController --> TalentSearchService
+    AdminController --> AdminService
+    AdminController --> FeedbackService
+    AdminController --> AnnouncementService
+    FeedbackController --> FeedbackService
+    
+    %% 服务层与数据访问层的关系
+    AuthService --> IndividualUserDAO
+    AuthService --> EnterpriseUserDAO
+    AuthService --> AdminUserDAO
+    AuthService --> SecurityUtils
+    IndividualUserService --> IndividualUserDAO
+    ResumeService --> ResumeDAO
+    JobSearchService --> JobPostingDAO
+    ApplicationService --> JobApplicationDAO
+    ApplicationService --> ResumeDAO
+    EnterpriseUserService --> EnterpriseUserDAO
+    JobPostingService --> JobPostingDAO
+    TalentSearchService --> JobApplicationDAO
+    TalentSearchService --> ResumeDAO
+    AdminService --> IndividualUserDAO
+    AdminService --> EnterpriseUserDAO
+    AdminService --> JobPostingDAO
+    FeedbackService --> FeedbackDAO
+    AnnouncementService --> AnnouncementDAO
+    
+    %% 数据访问层与数据库管理器的关系
+    IndividualUserDAO --> DatabaseManager
+    ResumeDAO --> DatabaseManager
+    EnterpriseUserDAO --> DatabaseManager
+    JobPostingDAO --> DatabaseManager
+    JobApplicationDAO --> DatabaseManager
+    AdminUserDAO --> DatabaseManager
+    FeedbackDAO --> DatabaseManager
+    AnnouncementDAO --> DatabaseManager
+    
+    %% 工具类的使用关系
+    AuthService --> SecurityUtils
+    AuthService --> ValidationUtils
+    IndividualUserService --> ValidationUtils
+    EnterpriseUserService --> ValidationUtils
+    ResumeService --> ValidationUtils
+    JobPostingService --> ValidationUtils
+    DatabaseManager --> Logger
+    AuthMiddleware --> SecurityUtils
+    ValidationMiddleware --> ValidationUtils

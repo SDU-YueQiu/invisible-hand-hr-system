@@ -3,7 +3,7 @@
 **项目名称：** 无形大手 人才招聘系统
 **版本：** 1.0
 **日期：** 2025年5月12日
-**编制：** (根据您的团队名称填写，例如：AI助手辅助)
+**编制：** 住在村里真不错
 
 ---
 
@@ -122,7 +122,7 @@
 
 这种架构有助于实现关注点分离，提高模块化程度，便于独立开发、测试和维护。
 
-## 3.2 高层架构图 (组件图)
+## 3.2 高层架构图
 
 ```plantuml
 @startuml
@@ -469,7 +469,7 @@ AdminUser "1" -- "0..*" JobPosting : Manages (Implicit)
 TODO:待实现
 
 ## 5.2 后端组件 (C++/Crow)
-后端API服务按功能模块组织。
+后端API服务按功能模块组织。具体类设计见[后端组件设计](后端组件设计.md)
 
 ### 5.2.1 API路由与控制器 (Crow `CROW_ROUTE` 宏)
 *   定义RESTful API端点，将HTTP请求映射到相应的服务处理函数。
@@ -522,44 +522,43 @@ actor "个人用户" as PU
 actor "企业用户" as EU
 actor "客服管理员" as Admin
 
-rectangle "人才招聘系统" {
+rectangle "人才招聘系统边界" {
   usecase "用户注册/登录" as UC_Auth
   usecase "简历管理" as UC_Resume
   usecase "职位查询与申请" as UC_JobSearchApply
-  usecase "求职管理" as UC_ApplicationTrack
+  usecase "求职进度跟踪" as UC_ApplicationTrack
+  usecase "密码管理（注册/重置）" as UC_Password
+  usecase "退出登录" as UC_Logout
 
   usecase "企业信息管理" as UC_EntProfile
-  usecase "岗位信息管理" as UC_JobPost
-  usecase "人才查询" as UC_TalentSearch
+  usecase "岗位发布与管理（上下线/修改）" as UC_JobPost
+  usecase "人才简历筛选" as UC_TalentSearch
 
-  usecase "会员审核管理" as UC_MemberAudit
-  usecase "留言管理" as UC_FeedbackManage
-  usecase "密码设置" as UC_Password
-  usecase "退出登录" as UC_Logout
-  usecase "系统公告管理" as UC_Announcement (optional)
+  usecase "会员资质审核" as UC_MemberAudit
+  usecase "用户留言处理" as UC_FeedbackManage
+  usecase "系统公告管理（可选）" as UC_Announcement
 }
 
-PU -- UC_Auth
-PU -- UC_Resume
-PU -- UC_JobSearchApply
-PU -- UC_ApplicationTrack
-PU -- UC_Password
-PU -- UC_Logout
+PU --> UC_Auth
+PU --> UC_Resume
+PU --> UC_JobSearchApply
+PU --> UC_ApplicationTrack
+PU --> UC_Password
+PU --> UC_Logout
 
-EU -- UC_Auth
-EU -- UC_EntProfile
-EU -- UC_JobPost
-EU -- UC_TalentSearch
-EU -- UC_Password
-EU -- UC_Logout
+EU --> UC_Auth
+EU --> UC_EntProfile
+EU --> UC_JobPost
+EU --> UC_TalentSearch
+EU --> UC_Password
+EU --> UC_Logout
 
-Admin -- UC_Auth
-Admin -- UC_MemberAudit
-Admin -- UC_FeedbackManage
-Admin -- UC_Password
-Admin -- UC_Logout
-Admin -- UC_Announcement
-
+Admin --> UC_Auth
+Admin --> UC_MemberAudit
+Admin --> UC_FeedbackManage
+Admin --> UC_Password
+Admin --> UC_Logout
+Admin --> UC_Announcement
 @enduml
 ```
 
@@ -576,7 +575,7 @@ Admin -- UC_Announcement
 后端通过Crow框架提供RESTful API供前端Vue.js应用调用。数据交换格式为JSON。
 所有API应有版本控制，例如 `/api/v1/...`。
 
-**核心API端点示例 (非详尽列表):**
+**核心API端点:**
 
 *   **认证 (Auth):**
     *   `POST /api/v1/auth/individual/register` (个人用户注册)
