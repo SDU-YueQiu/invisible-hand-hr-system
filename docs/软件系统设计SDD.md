@@ -505,7 +505,7 @@ TODO:待实现
 ### 5.2.6 数据库交互模块 (DAL)
 *   封装所有对SQLite数据库的直接操作 (SQL语句执行)。
 *   提供清晰的接口供业务逻辑服务调用，如 `findUserByUsername()`, `saveResume()`, `getJobsByCriteria()`。
-*   使用SQLite C/C++ API或一个轻量级的C++ SQLite包装库 (如 `sqlite_modern_cpp` 或自研简单封装)。
+*   使用SQLitCpp库封装的SQLite，方便编码
 *   负责数据库连接管理 (虽然SQLite是文件数据库，也需要打开和关闭句柄)。
 *   处理SQL注入防护 (使用参数化查询/预处理语句)。
 
