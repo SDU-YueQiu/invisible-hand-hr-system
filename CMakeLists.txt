@@ -14,6 +14,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project ("invisible-hand-hr-system" VERSION 0.1)
 
 find_package(Crow CONFIG REQUIRED)
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
+find_package(SQLiteCpp CONFIG REQUIRED)
 
 file(GLOB_RECURSE SERVER_SOURCES 
     "${CMAKE_CURRENT_SOURCE_DIR}/code/server/*.cpp"
@@ -22,7 +24,7 @@ file(GLOB_RECURSE SERVER_SOURCES
 
 add_executable (invisible-hand-hr-system ${SERVER_SOURCES})
 
-target_link_libraries(invisible-hand-hr-system PRIVATE Crow::Crow asio::asio)
+target_link_libraries(invisible-hand-hr-system PRIVATE Crow::Crow asio::asio unofficial::sqlite3::sqlite3 SQLiteCpp)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET invisible-hand-hr-system PROPERTY CXX_STANDARD 20)

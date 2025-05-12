@@ -108,7 +108,8 @@
                 "CMAKE_C_COMPILER": "clang",
                 "CMAKE_CXX_COMPILER": "clang++",
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_TOOLCHAIN_FILE": "C:/Scoop/apps/vcpkg/current/scripts/buildsystems/vcpkg.cmake"
+                "CMAKE_TOOLCHAIN_FILE": "C:/Scoop/apps/vcpkg/current/scripts/buildsystems/vcpkg.cmake",
+                "CMAKE_RUNTIME_OUTPUT_DIRECTORY":"${sourceDir}/build/bin"
             }
         }
     ]

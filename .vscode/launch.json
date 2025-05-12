@@ -8,9 +8,9 @@
             "type": "lldb",
             "request": "launch",
             "name": "lldb:Launch",
-            "program": "${workspaceFolder}/build/clang-debug/invisible-hand-hr-system.exe",
+            "program": "${workspaceFolder}/build/bin/invisible-hand-hr-system.exe",
             "args": [],
-            "cwd": "${workspaceFolder}/build/clang-debug/"
+            "cwd": "${workspaceFolder}/build/bin/"
         }
     ]
 }

@@ -12,6 +12,7 @@
 
 - vcpkg
 - llvm/clang
+- sqlite
 
 #### vscode插件
 

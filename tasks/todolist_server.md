@@ -1,3 +1,7 @@
+# todolist
+
+本待办列表仅表示实现工作，测试会在后续进行
+
 # 中间件层
 
 - [ ] AuthMiddleware
@@ -9,7 +13,7 @@
 
 - [ ] SecurityUtils
 - [ ] ValidationUtils
-- [ ] Logger
+- [x] Logger (crow logging)
 - [ ] ConfigManager
 
 # API层
