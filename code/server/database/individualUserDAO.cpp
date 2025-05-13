@@ -18,6 +18,43 @@ namespace DAL
 {
     using namespace Model;
 
+    std::optional<IndividualUser> createUserFromRow(DAL::DbRow &row)
+    {
+        try
+        {
+            // 提取时间字段并增加空值检查
+            auto getTimeFromRow = [&](const std::string &key) -> time_t {
+                auto strVal = std::get<std::string>(row.at(key));
+                if (strVal.empty()) return 0;// 处理空值情况
+                return static_cast<time_t>(std::stoll(strVal));
+            };
+
+            return IndividualUser(
+                    std::get<int64_t>(row.at("UserID")),
+                    std::get<std::string>(row.at("Username")),
+                    std::get<std::string>(row.at("PasswordHash")),
+                    std::get<std::string>(row.at("PhoneNumber")),
+                    std::get<std::string>(row.at("Email")),
+                    getTimeFromRow("RegistrationDate"),// 使用稳健转换函数
+                    getTimeFromRow("LastLoginDate"),   // 使用稳健转换函数
+                    std::get<std::string>(row.at("AccountStatus")),
+                    std::get<std::string>(row.at("AvatarURL")));
+        } catch (const std::bad_variant_access &e)
+        {
+            CROW_LOG_ERROR << "Error creating user from row: " << e.what()
+                           << " 可能原因：字段类型与预期不匹配，请检查DbRow字段类型定义";
+            return std::nullopt;
+        } catch (const std::invalid_argument &e)// 新增对stoll转换错误的捕获
+        {
+            CROW_LOG_ERROR << "时间字段转换失败: " << e.what();
+            return std::nullopt;
+        } catch (const std::out_of_range &e)// 新增对字段不存在的捕获
+        {
+            CROW_LOG_ERROR << "字段不存在: " << e.what();
+            return std::nullopt;
+        }
+    }
+
     /**
      * @brief 根据用户ID查询个人用户信息
      * @param id 用户ID
@@ -29,26 +66,11 @@ namespace DAL
         const std::string sql = "SELECT * FROM IndividualUsers WHERE userId = ?";
         auto result = dbManager.executeQuery(sql, {std::to_string(id)});
 
-        if (!result || result->empty()) {
+        if (!result || result->empty())
+        {
             return std::nullopt;
         }
-
-        const auto &row = result->front();
-        try {
-            return IndividualUser(
-                    std::get<int>(row.at("userId")),
-                    std::get<std::string>(row.at("username")),
-                    std::get<std::string>(row.at("passwordHash")),
-                    std::get<std::string>(row.at("phoneNumber")),
-                    std::get<std::string>(row.at("email")),
-                    static_cast<time_t>(std::get<long long>(row.at("registrationDate"))),
-                    static_cast<time_t>(std::get<long long>(row.at("lastLoginDate"))),
-                    std::get<std::string>(row.at("accountStatus")),
-                    std::get<std::string>(row.at("avatarURL")));
-        } catch (const std::bad_variant_access &e) {
-            // 字段类型不匹配时返回空
-            return std::nullopt;
-        }
+        return createUserFromRow(result->front());
     }
 
     /**
@@ -63,10 +85,11 @@ namespace DAL
         const std::string sql = "SELECT * FROM IndividualUsers WHERE username = ?";
         auto result = dbManager.executeQuery(sql, {username});
 
-        if (!result || result->empty()) {
+        if (!result || result->empty())
+        {
             return std::nullopt;
         }
-        return findById(std::get<int>(result->front().at("userId")));// 复用findById逻辑
+        return createUserFromRow(result->front());
     }
 
     /**
@@ -81,18 +104,19 @@ namespace DAL
         const std::string sql = "SELECT * FROM IndividualUsers WHERE email = ?";
         auto result = dbManager.executeQuery(sql, {email});
 
-        if (!result || result->empty()) {
+        if (!result || result->empty())
+        {
             return std::nullopt;
         }
-        return findById(std::get<int>(result->front().at("userId")));// 复用findById逻辑
+        return createUserFromRow(result->front());
     }
 
     /**
      * @brief 插入新的个人用户记录
      * @param userData 待插入的用户对象（userId会被数据库自增生成，无需传入）
-     * @return bool 插入成功返回true，否则返回false
+     * @return 插入成功返回对象id，否则返回-1
      */
-    bool IndividualUserDAO::create(const IndividualUser &userData)
+    int IndividualUserDAO::create(const IndividualUser &userData)
     {
         CROW_LOG_INFO << "Attempting to create user with username: " << userData.getUsername();
 

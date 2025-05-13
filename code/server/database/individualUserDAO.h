@@ -45,7 +45,7 @@ namespace DAL {
          * @param userData 待插入的用户对象
          * @return bool 插入成功返回true，否则返回false
          */
-        bool create(const Model::IndividualUser& userData);
+        int create(const Model::IndividualUser& userData);
 
         /**
          * @brief 更新指定ID的个人用户信息

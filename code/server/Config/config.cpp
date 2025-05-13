@@ -24,7 +24,6 @@ namespace Config
 
         crow::json::wvalue defaultConfig;
         defaultConfig["DB_PATH"] = "./db/hr_system.db";
-        defaultConfig["DB_INIT_PATH"] = "./db/databaseInit.sql";
         defaultConfig["IS_DB_INIT"] = false;
         defaultConfig["PORT"] = 8080;
 

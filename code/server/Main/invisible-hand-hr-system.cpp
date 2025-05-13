@@ -15,8 +15,9 @@ void quickTest()
 {
     auto &dbm = DAL::DatabaseManager::getInstance();
     DAL::IndividualUserDAO iudao;
-    iudao.create(Model::IndividualUser(123, "testuser", "123", "", "123@123.mail", time(nullptr), time(nullptr), "testing", ""));
-    auto user = iudao.findById(123);
+    int id=iudao.create(Model::IndividualUser(-1, "testuser", "123", "", "123@123.mail", time(nullptr), time(nullptr), "testing", ""));
+    auto user = iudao.findByUsername("123");
+    auto user2=iudao.findById(id);
     return;
 }
 

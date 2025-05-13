@@ -21,9 +21,9 @@ namespace Model
     public:
         // 构造函数
         IndividualUser() = default;
-        IndividualUser(int userId, const std::string &username, const std::string &passwordHash,
-                       const std::string &phoneNumber, const std::string &email, time_t registrationDate,
-                       time_t lastLoginDate, const std::string &accountStatus, const std::string &avatarURL)
+        IndividualUser(int64_t userId, const std::string &username, const std::string &passwordHash,
+                       const std::string &phoneNumber, const std::string &email, time_t registrationDate = 0,
+                       time_t lastLoginDate = 0, const std::string &accountStatus = "", const std::string &avatarURL = "")
             : userId(userId), username(username), passwordHash(passwordHash), phoneNumber(phoneNumber),
               email(email), registrationDate(registrationDate), lastLoginDate(lastLoginDate),
               accountStatus(accountStatus), avatarURL(avatarURL) {}
@@ -57,7 +57,7 @@ namespace Model
         void setAvatarURL(const std::string &avatarURL) { this->avatarURL = avatarURL; }
 
     private:
-        int userId;               // 用户ID（主键）
+        int64_t userId;           // 用户ID（主键）
         std::string username;     // 用户名
         std::string passwordHash; // 密码哈希
         std::string phoneNumber;  // 联系电话

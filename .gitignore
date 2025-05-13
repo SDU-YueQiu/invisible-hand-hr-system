@@ -16,3 +16,4 @@ build
 .cache
 packges
 .trae
+vscTest.session.sql
