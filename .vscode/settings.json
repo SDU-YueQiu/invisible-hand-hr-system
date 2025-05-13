@@ -87,7 +87,23 @@
         "numeric": "cpp",
         "queue": "cpp",
         "set": "cpp",
-        "unordered_set": "cpp"
+        "unordered_set": "cpp",
+        "memory_resource": "cpp",
+        "string_view": "cpp",
+        "numbers": "cpp",
+        "ranges": "cpp",
+        "semaphore": "cpp",
+        "span": "cpp",
+        "text_encoding": "cpp"
     },
-    "liveServer.settings.port": 5527
+    "liveServer.settings.port": 5527,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "vscTest",
+            "database": "${workspaceFolder:invisible-hand-hr-system}/build/bin/db/hr_system.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }

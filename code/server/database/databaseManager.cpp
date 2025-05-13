@@ -34,9 +34,11 @@ namespace DAL
 
     DatabaseManager::~DatabaseManager()
     {
-        try {
+        try
+        {
             rollbackTransaction();
-        } catch (...) {
+        } catch (...)
+        {
             // 忽略异常
         }
     }
@@ -46,11 +48,13 @@ namespace DAL
         return getDatabaseManager();
     }
 
-    int DatabaseManager::executeUpdate(const std::string &sql)
+    void DatabaseManager::transactionAddQuery(const std::string &sql)
     {
-        try {
-            return db->exec(sql);
-        } catch (const std::exception &e) {
+        try
+        {
+            db->exec(sql);
+        } catch (const std::exception &e)
+        {
             throw std::runtime_error("Update execution failed: " + std::string(e.what()));
         }
     }
@@ -61,14 +65,18 @@ namespace DAL
         for (size_t i = 0; i < params.size(); ++i)
             query.bind(i + 1, params[i]);
         auto resultSet = std::make_unique<ResultSet>();
-        try {
-            while (query.executeStep()) {// 逐行遍历结果
+        try
+        {
+            while (query.executeStep())
+            {// 逐行遍历结果
                 DbRow currentRow;
-                for (int i = 0; i < query.getColumnCount(); ++i) {// 处理当前行的所有列
+                for (int i = 0; i < query.getColumnCount(); ++i)
+                {// 处理当前行的所有列
                     SQLite::Column col = query.getColumn(i);
                     std::string colName = col.getName();
 
-                    switch (col.getType()) {
+                    switch (col.getType())
+                    {
                         case SQLITE_INTEGER:
                             currentRow[colName] = col.getInt64();
                             break;
@@ -97,7 +105,8 @@ namespace DAL
                 }
                 resultSet->push_back(currentRow);// 添加当前行到结果集
             }
-        } catch (const std::exception &e) {
+        } catch (const std::exception &e)
+        {
             throw std::runtime_error("Parameterized query failed: " + std::string(e.what()));
         }
         return resultSet;
@@ -137,14 +146,16 @@ namespace DAL
 
     void initDatabase()
     {
-        try {
+        try
+        {
             // 获取数据库管理器实例
             DatabaseManager &dbManager = getDatabaseManager();
 
             auto query = dbManager.executeQuery("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'");
 
             // 执行查询并获取结果
-            if (!query->empty()) {
+            if (!query->empty())
+            {
                 CROW_LOG_INFO << "Database isn't empty.";
                 return;
             }
@@ -152,7 +163,8 @@ namespace DAL
             CROW_LOG_INFO << "Initializing database...";
             // 打开并读取DatabaseInit.sql文件
             std::ifstream sqlFile(Config::globalConfig["DB_INIT_PATH"].s());
-            if (!sqlFile.is_open()) {
+            if (!sqlFile.is_open())
+            {
                 throw std::runtime_error("Failed to open DatabaseInit.sql");
             }
 
@@ -164,27 +176,33 @@ namespace DAL
             // 逐行读取并执行SQL语句
             std::string line;
             std::string sqlStatement;
-            while (std::getline(sqlFile, line)) {
+            while (std::getline(sqlFile, line))
+            {
                 // 处理多行注释状态
-                if (inMultiLineComment) {
+                if (inMultiLineComment)
+                {
                     size_t endComment = line.find("*/");
-                    if (endComment != std::string::npos) {
+                    if (endComment != std::string::npos)
+                    {
                         inMultiLineComment = false;
                         line = line.substr(endComment + 2);// 保留注释结束后的内容
-                    } else {
+                    } else
+                    {
                         continue;// 仍在多行注释中，跳过当前行
                     }
                 }
 
                 // 移除单行注释（-- 之后的内容）
                 size_t singleComment = line.find("--");
-                if (singleComment != std::string::npos) {
+                if (singleComment != std::string::npos)
+                {
                     line = line.substr(0, singleComment);
                 }
 
                 // 检查是否进入新的多行注释
                 size_t startComment = line.find("/*");
-                if (startComment != std::string::npos) {
+                if (startComment != std::string::npos)
+                {
                     inMultiLineComment = true;
                     line = line.substr(0, startComment);// 保留注释开始前的内容
                 }
@@ -204,9 +222,10 @@ namespace DAL
 
                 // 处理可能跨多行的完整SQL语句（支持分号在任意行结尾）
                 size_t semicolonPos;
-                while ((semicolonPos = sqlStatement.find(';')) != std::string::npos) {
+                while ((semicolonPos = sqlStatement.find(';')) != std::string::npos)
+                {
                     std::string currentStmt = sqlStatement.substr(0, semicolonPos + 1);
-                    dbManager.executeUpdate(currentStmt);
+                    dbManager.transactionAddQuery(currentStmt);
                     sqlStatement = sqlStatement.substr(semicolonPos + 1);
                 }
             }
@@ -214,7 +233,8 @@ namespace DAL
             // 提交事务
             dbManager.commitTransaction();
 
-        } catch (const std::exception &e) {
+        } catch (const std::exception &e)
+        {
             CROW_LOG_ERROR << "Database initialization failed: " << e.what();
         }
     }

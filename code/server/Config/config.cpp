@@ -7,10 +7,11 @@
 */
 
 #include "config.h"
-#include "sstream"
 #include "crow/logging.h"
+#include "sstream"
 #include <crow/json.h>
 #include <fstream>
+
 
 
 namespace Config
@@ -24,6 +25,7 @@ namespace Config
         crow::json::wvalue defaultConfig;
         defaultConfig["DB_PATH"] = "./db/hr_system.db";
         defaultConfig["DB_INIT_PATH"] = "./db/databaseInit.sql";
+        defaultConfig["IS_DB_INIT"] = false;
         defaultConfig["PORT"] = 8080;
 
         std::ofstream configFile("config.json");
@@ -35,7 +37,7 @@ namespace Config
 
     void loadConfig()
     {
-        CROW_LOG_INFO <<"Loading config file...";
+        CROW_LOG_INFO << "Loading config file...";
 
         std::ifstream configFile("config.json");
         if (!configFile.is_open())

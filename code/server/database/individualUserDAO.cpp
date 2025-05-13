@@ -1,0 +1,181 @@
+/**
+ * @file individualUserDAO.cpp
+ * @brief 个人用户数据访问对象类实现，封装IndividualUsers表的数据库操作
+ * @author SDU-YueQiu
+ * @date 2025/5/12
+ * @version 1.0
+ */
+
+#include "individualUserDAO.h"
+#include "../Model/individualUser.h"
+#include "databaseManager.h"
+#include <crow/logging.h>
+#include <ctime>
+#include <stdexcept>
+
+
+namespace DAL
+{
+    using namespace Model;
+
+    /**
+     * @brief 根据用户ID查询个人用户信息
+     * @param id 用户ID
+     * @return std::optional<IndividualUser> 存在则返回用户对象，否则返回std::nullopt
+     */
+    std::optional<IndividualUser> IndividualUserDAO::findById(int id)
+    {
+        CROW_LOG_INFO << "Attempting to find user by ID: " << id;
+        const std::string sql = "SELECT * FROM IndividualUsers WHERE userId = ?";
+        auto result = dbManager.executeQuery(sql, {std::to_string(id)});
+
+        if (!result || result->empty()) {
+            return std::nullopt;
+        }
+
+        const auto &row = result->front();
+        try {
+            return IndividualUser(
+                    std::get<int>(row.at("userId")),
+                    std::get<std::string>(row.at("username")),
+                    std::get<std::string>(row.at("passwordHash")),
+                    std::get<std::string>(row.at("phoneNumber")),
+                    std::get<std::string>(row.at("email")),
+                    static_cast<time_t>(std::get<long long>(row.at("registrationDate"))),
+                    static_cast<time_t>(std::get<long long>(row.at("lastLoginDate"))),
+                    std::get<std::string>(row.at("accountStatus")),
+                    std::get<std::string>(row.at("avatarURL")));
+        } catch (const std::bad_variant_access &e) {
+            // 字段类型不匹配时返回空
+            return std::nullopt;
+        }
+    }
+
+    /**
+     * @brief 根据用户名查询个人用户信息
+     * @param username 用户名
+     * @return std::optional<IndividualUser> 存在则返回用户对象，否则返回std::nullopt
+     */
+    std::optional<IndividualUser> IndividualUserDAO::findByUsername(const std::string &username)
+    {
+        CROW_LOG_INFO << "Attempting to find user by username: " << username;
+
+        const std::string sql = "SELECT * FROM IndividualUsers WHERE username = ?";
+        auto result = dbManager.executeQuery(sql, {username});
+
+        if (!result || result->empty()) {
+            return std::nullopt;
+        }
+        return findById(std::get<int>(result->front().at("userId")));// 复用findById逻辑
+    }
+
+    /**
+     * @brief 根据邮箱查询个人用户信息
+     * @param email 邮箱地址
+     * @return std::optional<IndividualUser> 存在则返回用户对象，否则返回std::nullopt
+     */
+    std::optional<IndividualUser> IndividualUserDAO::findByEmail(const std::string &email)
+    {
+        CROW_LOG_INFO << "Attempting to find user by email: " << email;
+
+        const std::string sql = "SELECT * FROM IndividualUsers WHERE email = ?";
+        auto result = dbManager.executeQuery(sql, {email});
+
+        if (!result || result->empty()) {
+            return std::nullopt;
+        }
+        return findById(std::get<int>(result->front().at("userId")));// 复用findById逻辑
+    }
+
+    /**
+     * @brief 插入新的个人用户记录
+     * @param userData 待插入的用户对象（userId会被数据库自增生成，无需传入）
+     * @return bool 插入成功返回true，否则返回false
+     */
+    bool IndividualUserDAO::create(const IndividualUser &userData)
+    {
+        CROW_LOG_INFO << "Attempting to create user with username: " << userData.getUsername();
+
+        const std::string sql = R"(
+            INSERT INTO IndividualUsers (
+                username, passwordHash, phoneNumber, email, 
+                registrationDate, lastLoginDate, accountStatus, avatarURL
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        )";
+
+        std::vector<std::string> params = {
+                userData.getUsername(),
+                userData.getPasswordHash(),
+                userData.getPhoneNumber(),
+                userData.getEmail(),
+                std::to_string(userData.getRegistrationDate()),
+                std::to_string(userData.getLastLoginDate()),
+                userData.getAccountStatus(),
+                userData.getAvatarURL()};
+
+        auto result = dbManager.executeQuery(sql, params);
+        return result != nullptr;// 执行成功则返回true（假设无结果集表示执行成功）
+    }
+
+    /**
+     * @brief 更新指定ID的个人用户信息（全字段更新）
+     * @param id 用户ID
+     * @param userData 包含新信息的用户对象（需包含所有要更新的字段）
+     * @return bool 更新成功返回true，否则返回false
+     */
+    bool IndividualUserDAO::update(int id, const IndividualUser &userData)
+    {
+        CROW_LOG_INFO << "Attempting to update user with ID: " << id;
+
+        const std::string sql = R"(
+            UPDATE IndividualUsers SET
+                username = ?, passwordHash = ?, phoneNumber = ?, email = ?,
+                registrationDate = ?, lastLoginDate = ?, accountStatus = ?, avatarURL = ?
+            WHERE userId = ?
+        )";
+
+        std::vector<std::string> params = {
+                userData.getUsername(),
+                userData.getPasswordHash(),
+                userData.getPhoneNumber(),
+                userData.getEmail(),
+                std::to_string(userData.getRegistrationDate()),
+                std::to_string(userData.getLastLoginDate()),
+                userData.getAccountStatus(),
+                userData.getAvatarURL(),
+                std::to_string(id)};
+
+        auto result = dbManager.executeQuery(sql, params);
+        return result != nullptr;
+    }
+
+    /**
+     * @brief 更新指定ID的用户密码哈希
+     * @param id 用户ID
+     * @param passwordHash 新的密码哈希值
+     * @return bool 更新成功返回true，否则返回false
+     */
+    bool IndividualUserDAO::updatePassword(int id, const std::string &passwordHash)
+    {
+        CROW_LOG_INFO << "Attempting to update password for user with ID: " << id;
+
+        const std::string sql = "UPDATE IndividualUsers SET passwordHash = ? WHERE userId = ?";
+        auto result = dbManager.executeQuery(sql, {passwordHash, std::to_string(id)});
+        return result != nullptr;
+    }
+
+    /**
+     * @brief 更新指定ID的用户账户状态
+     * @param id 用户ID
+     * @param status 新的账户状态（如"正常"/"冻结"）
+     * @return bool 更新成功返回true，否则返回false
+     */
+    bool IndividualUserDAO::updateStatus(int id, const std::string &status)
+    {
+        CROW_LOG_INFO << "Attempting to update status for user with ID: " << id;
+
+        const std::string sql = "UPDATE IndividualUsers SET accountStatus = ? WHERE userId = ?";
+        auto result = dbManager.executeQuery(sql, {status, std::to_string(id)});
+        return result != nullptr;
+    }
+}// namespace DAL

@@ -43,9 +43,9 @@ namespace DAL
         bool beginTransaction();
 
         /**
-         * @brief 执行更新SQL，一般用于事务，返回影响行数
+         * @brief 执行添加事务SQL
          */
-        int executeUpdate(const std::string &sql);
+        void transactionAddQuery(const std::string &sql);
 
         /**
          * @brief 提交事务
