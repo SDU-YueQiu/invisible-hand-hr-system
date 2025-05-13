@@ -10,15 +10,19 @@
 #include "SQLiteCpp/SQLiteCpp.h"
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 
 
 namespace DAL
 {
+    using DbValue = std::variant<std::nullptr_t, int, long long, double, std::string, std::vector<unsigned char>>;
+    using DbRow = std::map<std::string, DbValue>;
+    using ResultSet = std::vector<DbRow>;
 
     /**
      * @brief 类DatabaseManager，用于链接和操作数据库。
-     * @details 该类提供了执行查询和更新SQL语句的方法，以及管理事务的功能，是系统与sqlite数据库的唯一接口。
+     * @details 该类提供了执行查询和更新SQL语句的方法，以及管理事务的功能，是系统与sqlite数据库或者说其封装SQLiteCpp的唯一接口。
      */
     class DatabaseManager
     {
@@ -26,22 +30,31 @@ namespace DAL
         DatabaseManager(const std::string dbPath);
         ~DatabaseManager();
 
-        // 执行查询SQL，返回结果集
-        std::unique_ptr<SQLite::Statement> executeQuery(const std::string &sql);
+        static DatabaseManager &getInstance();
 
-        // 执行更新SQL，返回影响行数
-        int executeUpdate(const std::string &sql);
+        /**
+         * @brief 执行带参数的SQL，返回结果集
+         */
+        std::unique_ptr<ResultSet> executeQuery(const std::string &sql, const std::vector<std::string> &params = {});
 
-        // 执行带参数的SQL
-        int executeWithParams(const std::string &sql, const std::vector<std::string> &params);
-
-        // 开始事务
+        /**
+         * @brief 开始事务
+         */
         bool beginTransaction();
 
-        // 提交事务
+        /**
+         * @brief 执行更新SQL，一般用于事务，返回影响行数
+         */
+        int executeUpdate(const std::string &sql);
+
+        /**
+         * @brief 提交事务
+         */
         bool commitTransaction();
 
-        // 回滚事务
+        /**
+         * @brief 回滚事务
+         */
         bool rollbackTransaction();
 
     private:
@@ -49,12 +62,6 @@ namespace DAL
         bool inTransaction = false;
         std::unique_ptr<SQLite::Transaction> transaction;
     };
-
-    /**
-     * @brief 获取数据库管理器实例，线程独立。
-     * @return DatabaseManager& 数据库管理器实例
-     */
-    DatabaseManager &getDatabaseManager();
 
     /**
      * @brief 初始化数据库配置，创建表。

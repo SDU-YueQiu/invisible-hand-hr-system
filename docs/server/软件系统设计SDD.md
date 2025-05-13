@@ -108,7 +108,7 @@
 ## 2.3 技术栈
 *   **前端：** Vue.js (响应式Web界面)
 *   **后端：** C++17 (或更高) 与 Crow 微框架 (RESTful API服务)
-*   **数据库：** SQLite 3.x (轻量级文件数据库)
+*   **数据库：** SQLite 3.x & SQLiteCpp (轻量级文件数据库)
 *   **操作系统：** Linux (推荐) 或 Windows
 *   **Web服务器：** Crow内建服务器 (开发/小型部署)，可考虑Nginx/Apache反向代理 (生产)
 
@@ -118,7 +118,7 @@
 本系统采用经典的三层/N层架构，结合前后端分离的设计模式。
 *   **表现层 (Presentation Layer)：** 基于Vue.js构建的单页面应用 (SPA)，运行在用户浏览器中，负责用户界面的展示和用户交互。
 *   **应用层/业务逻辑层 (Application/Business Logic Layer)：** 基于C++/Crow框架构建的后端API服务。负责处理HTTP请求，执行业务逻辑，数据验证，与数据访问层交互。
-*   **数据访问层 (Data Access Layer)：** 封装对SQLite数据库的CRUD操作。后端服务通过此层与数据库通信。
+*   **数据访问层 (Data Access Layer)：** 使用SQLiteCpp封装对SQLite数据库的CRUD操作。后端服务通过此层与数据库通信。
 
 这种架构有助于实现关注点分离，提高模块化程度，便于独立开发、测试和维护。
 
