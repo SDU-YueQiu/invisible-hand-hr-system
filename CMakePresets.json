@@ -105,11 +105,11 @@
             "description": "Use Clang with debug info",
             "binaryDir": "${sourceDir}/build/clang-debug",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_C_COMPILER": "C:/Scoop/apps/llvm/current/bin/clang.exe",
+                "CMAKE_CXX_COMPILER": "C:/Scoop/apps/llvm/current/bin/clang++.exe",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_TOOLCHAIN_FILE": "C:/Scoop/apps/vcpkg/current/scripts/buildsystems/vcpkg.cmake",
-                "CMAKE_RUNTIME_OUTPUT_DIRECTORY":"${sourceDir}/build/bin"
+                "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/bin"
             }
         }
     ]

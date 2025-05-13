@@ -1,7 +1,6 @@
 {
   "dependencies": [
     "crow",
-    "sqlite3",
     "sqlitecpp"
   ]
 }

@@ -10,12 +10,11 @@ cmake_minimum_required (VERSION 3.30)
 # endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(VCPKG_TARGET_TRIPLET "x64-mingw-static" CACHE STRING "" FORCE)
 
 project ("invisible-hand-hr-system" VERSION 0.1)
-add_compile_options(-fstandalone-debug)
 
 find_package(Crow CONFIG REQUIRED)
-find_package(unofficial-sqlite3 CONFIG REQUIRED)
 find_package(SQLiteCpp CONFIG REQUIRED)
 
 file(GLOB_RECURSE SERVER_SOURCES 
@@ -27,7 +26,7 @@ add_executable (invisible-hand-hr-system ${SERVER_SOURCES})
 
 target_compile_definitions(invisible-hand-hr-system PRIVATE CROW_USE_LOCALTIMEZONE)
 
-target_link_libraries(invisible-hand-hr-system PRIVATE Crow::Crow asio::asio unofficial::sqlite3::sqlite3 SQLiteCpp)
+target_link_libraries(invisible-hand-hr-system PRIVATE Crow::Crow asio::asio SQLiteCpp)
 
 # 添加构建后自定义命令：创建目录并复制SQL文件
 add_custom_command(
@@ -41,5 +40,5 @@ add_custom_command(
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET invisible-hand-hr-system PROPERTY CXX_STANDARD 20)
+  set_property(TARGET invisible-hand-hr-system PROPERTY CXX_STANDARD 17)
 endif()
