@@ -5,12 +5,13 @@
             "name": "windows-base",
             "hidden": true,
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/build/install/${presetName}",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe",
-                "CMAKE_TOOLCHAIN_FILE": "C:/Scoop/apps/vcpkg/current/scripts/buildsystems/vcpkg.cmake"
+                "CMAKE_TOOLCHAIN_FILE": "C:/Scoop/apps/vcpkg/current/scripts/buildsystems/vcpkg.cmake",
+                "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/bin"
             },
             "condition": {
                 "type": "equals",
@@ -107,6 +108,21 @@
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "C:/Scoop/apps/llvm/current/bin/clang.exe",
                 "CMAKE_CXX_COMPILER": "C:/Scoop/apps/llvm/current/bin/clang++.exe",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_TOOLCHAIN_FILE": "C:/Scoop/apps/vcpkg/current/scripts/buildsystems/vcpkg.cmake",
+                "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/bin"
+            }
+        },
+        {
+            "name": "GCC-debug(弃用)",
+            "displayName": "GCC-debug",
+            "description": "正在使用编译器: C = C:\\Scoop\\apps\\mingw\\current\\bin\\gcc.exe, CXX = C:\\Scoop\\apps\\mingw\\current\\bin\\g++.exe",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/${presetName}",
+                "CMAKE_C_COMPILER": "C:/Scoop/apps/mingw/current/bin/gcc.exe",
+                "CMAKE_CXX_COMPILER": "C:/Scoop/apps/mingw/current/bin/g++.exe",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_TOOLCHAIN_FILE": "C:/Scoop/apps/vcpkg/current/scripts/buildsystems/vcpkg.cmake",
                 "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/bin"
