@@ -43,6 +43,6 @@
 
 # 数据访问层DAL
 
-- [ ] `DatabaseManager`: 中央数据库连接管理器，提供连接池和事务支持各种DAO（数据访问对象）: 如`IndividualUserDAO`、`ResumeDAO`等，每个DAO负责特定实体的CRUD操作
+- [x] `DatabaseManager`: 中央数据库连接管理器，提供连接池和事务支持各种DAO（数据访问对象）: 如`IndividualUserDAO`、`ResumeDAO`等，每个DAO负责特定实体的CRUD操作
 
   
