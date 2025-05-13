@@ -129,20 +129,54 @@ namespace DAL
             // 开始事务
             dbManager.beginTransaction();
 
+            // 优化：增加多行注释状态跟踪和注释内容过滤
+            bool inMultiLineComment = false;
             // 逐行读取并执行SQL语句
             std::string line;
             std::string sqlStatement;
             while (std::getline(sqlFile, line)) {
-                // 跳过注释和空行
-                if (line.empty() || line.find("--") == 0 || line.find("/*") == 0)
-                    continue;
+                // 处理多行注释状态
+                if (inMultiLineComment) {
+                    size_t endComment = line.find("*/");
+                    if (endComment != std::string::npos) {
+                        inMultiLineComment = false;
+                        line = line.substr(endComment + 2); // 保留注释结束后的内容
+                    } else {
+                        continue; // 仍在多行注释中，跳过当前行
+                    }
+                }
+
+                // 移除单行注释（-- 之后的内容）
+                size_t singleComment = line.find("--");
+                if (singleComment != std::string::npos) {
+                    line = line.substr(0, singleComment);
+                }
+
+                // 检查是否进入新的多行注释
+                size_t startComment = line.find("/*");
+                if (startComment != std::string::npos) {
+                    inMultiLineComment = true;
+                    line = line.substr(0, startComment); // 保留注释开始前的内容
+                }
+
+                // 去除行首尾空白字符
+                line.erase(line.begin(), std::find_if(line.begin(), line.end(), [](int ch) {
+                    return !std::isspace(ch);
+                }));
+                line.erase(std::find_if(line.rbegin(), line.rend(), [](int ch) {
+                    return !std::isspace(ch);
+                }).base(), line.end());
+
+                if (line.empty()) continue; // 处理后无有效内容则跳过
 
                 sqlStatement += line;
 
-                // 如果行以分号结尾，表示一个完整的SQL语句
-                if (line.find(';') != std::string::npos) {
-                    dbManager.executeUpdate(sqlStatement);
-                    sqlStatement.clear();
+                // 处理可能跨多行的完整SQL语句（支持分号在任意行结尾）
+                size_t semicolonPos;
+                while ((semicolonPos = sqlStatement.find(';')) != std::string::npos) {
+                    std::string currentStmt = sqlStatement.substr(0, semicolonPos + 1);
+                    dbManager.executeUpdate(currentStmt);
+                    sqlStatement = sqlStatement.substr(semicolonPos + 1);
                 }
             }
 
