@@ -151,7 +151,7 @@ namespace DAL
             // 获取数据库管理器实例
             DatabaseManager &dbManager = getDatabaseManager();
 
-            auto query = dbManager.executeQuery("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'");
+            auto query = dbManager.executeQuery("SELECT 1 FROM sqlite_master WHERE type = 'table'");
 
             // 执行查询并获取结果
             if (!query->empty())
