@@ -2,7 +2,6 @@
   "dependencies": [
     "crow",
     "sqlite3",
-    "sqlitecpp",
-    "gtest"
+    "sqlitecpp"
   ]
 }
