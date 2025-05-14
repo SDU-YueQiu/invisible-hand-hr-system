@@ -18,6 +18,8 @@ project ("invisible-hand-hr-system" VERSION 0.1)
 find_package(Crow CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 find_package(SQLiteCpp CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
+find_package(jwt-cpp CONFIG REQUIRED)
 
 file(GLOB_RECURSE SERVER_SOURCES 
     "${CMAKE_CURRENT_SOURCE_DIR}/code/server/*.h"
@@ -28,13 +30,13 @@ add_executable (invisible-hand-hr-system ${SERVER_SOURCES})
 
 target_compile_definitions(invisible-hand-hr-system PRIVATE CROW_USE_LOCALTIMEZONE)
 
-target_link_libraries(invisible-hand-hr-system PRIVATE Crow::Crow asio::asio unofficial::sqlite3::sqlite3 SQLiteCpp)
+target_link_libraries(invisible-hand-hr-system PRIVATE Crow::Crow asio::asio unofficial::sqlite3::sqlite3 SQLiteCpp OpenSSL::SSL OpenSSL::Crypto jwt-cpp::jwt-cpp)
 
 # 添加构建后自定义命令：创建目录并复制SQL文件
 add_custom_command(
     TARGET invisible-hand-hr-system
     POST_BUILD
-    # 创建 build/bin/db 目录（CMAKE_BINARY_DIR 指向构建根目录，通常为 build）
+    # 创建 build/bin/db 目录
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/db"
     # 复制 databaseInit.sql 到目标目录
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/code/server/Database/databaseInit.sql" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/db/"

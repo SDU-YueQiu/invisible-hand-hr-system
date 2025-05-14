@@ -3,6 +3,7 @@
     "crow",
     "sqlite3",
     "sqlitecpp",
+    "openssl",
     "jwt-cpp"
   ]
 }

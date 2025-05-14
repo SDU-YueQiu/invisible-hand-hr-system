@@ -85,14 +85,6 @@ classDiagram
             +checkRole(roles[])
         }
         
-        class ErrorHandlingMiddleware {
-            +handleErrors(exception, request, response)
-        }
-        
-        class LoggingMiddleware {
-            +logRequest(request, response, next)
-        }
-        
         class ValidationMiddleware {
             +validateRequest(schema)
         }
@@ -278,19 +270,6 @@ classDiagram
             +validateUsername(username)
             +validateSchema(data, schema)
         }
-        
-        class Logger {
-            +info(message)
-            +error(message, error)
-            +debug(message)
-            +warn(message)
-        }
-        
-        class ConfigManager {
-            -config
-            +loadConfig(filepath)
-            +getValue(key)
-        }
     }
     
     %% 关系定义
@@ -298,10 +277,7 @@ classDiagram
     %% 主应用与各层的关系
     CrowApplication --> ApiRouter
     CrowApplication --> AuthMiddleware
-    CrowApplication --> ErrorHandlingMiddleware
-    CrowApplication --> LoggingMiddleware
     CrowApplication --> DatabaseManager
-    CrowApplication --> ConfigManager
     
     %% API控制器之间的关系
     ApiRouter --> AuthController
@@ -363,6 +339,6 @@ classDiagram
     EnterpriseUserService --> ValidationUtils
     ResumeService --> ValidationUtils
     JobPostingService --> ValidationUtils
-    DatabaseManager --> Logger
+    DatabaseManager --> SqliteDatabase
     AuthMiddleware --> SecurityUtils
     ValidationMiddleware --> ValidationUtils

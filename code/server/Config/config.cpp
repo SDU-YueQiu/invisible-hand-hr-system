@@ -13,7 +13,6 @@
 #include <fstream>
 
 
-
 namespace Config
 {
     crow::json::rvalue globalConfig;
@@ -21,11 +20,12 @@ namespace Config
     void loadDefaultConfig()
     {
         CROW_LOG_INFO << "Start to load default config file";
-
+        
         crow::json::wvalue defaultConfig;
         defaultConfig["DB_PATH"] = "./db/hr_system.db";
         defaultConfig["IS_DB_INIT"] = false;
         defaultConfig["PORT"] = 8080;
+        defaultConfig["JWT_SECRET"] = "165732496815674651651";
 
         std::ofstream configFile("config.json");
         configFile << defaultConfig.dump();

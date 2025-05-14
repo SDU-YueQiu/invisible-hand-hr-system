@@ -7,6 +7,7 @@
  */
 
 #include "../Config/config.h"
+#include "../Database/databaseManager.h"
 #include <crow.h>
 
 
@@ -14,6 +15,7 @@ void init()
 {
     // 初始化全局配置
     Config::loadConfig();
+    DAL::initDatabase();
 }
 
 int main()
