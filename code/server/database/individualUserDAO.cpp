@@ -2,7 +2,7 @@
  * @file individualUserDAO.cpp
  * @brief 个人用户数据访问对象类实现，封装IndividualUsers表的数据库操作
  * @author SDU-YueQiu
- * @date 2025/5/12
+ * @date 2025/5/13
  * @version 1.0
  */
 
@@ -10,6 +10,7 @@
 #include "../Model/individualUser.h"
 #include "databaseManager.h"
 #include <crow/logging.h>
+#include <cstdint>
 #include <ctime>
 #include <stdexcept>
 
@@ -29,7 +30,7 @@ namespace DAL
                 return static_cast<time_t>(std::stoll(strVal));
             };
 
-            return IndividualUser(
+            return IndividualUser{
                     std::get<int64_t>(row.at("UserID")),
                     std::get<std::string>(row.at("Username")),
                     std::get<std::string>(row.at("PasswordHash")),
@@ -38,7 +39,7 @@ namespace DAL
                     getTimeFromRow("RegistrationDate"),// 使用稳健转换函数
                     getTimeFromRow("LastLoginDate"),   // 使用稳健转换函数
                     std::get<std::string>(row.at("AccountStatus")),
-                    std::get<std::string>(row.at("AvatarURL")));
+                    std::get<std::string>(row.at("AvatarURL"))};
         } catch (const std::bad_variant_access &e)
         {
             CROW_LOG_ERROR << "Error creating user from row: " << e.what()
@@ -114,11 +115,11 @@ namespace DAL
     /**
      * @brief 插入新的个人用户记录
      * @param userData 待插入的用户对象（userId会被数据库自增生成，无需传入）
-     * @return 插入成功返回对象id，否则返回-1
+     * @return 插入成功返回true，否则返回false
      */
-    int IndividualUserDAO::create(const IndividualUser &userData)
+    bool IndividualUserDAO::create(const IndividualUser &userData)
     {
-        CROW_LOG_INFO << "Attempting to create user with username: " << userData.getUsername();
+        CROW_LOG_INFO << "Attempting to create user with username: " << userData.username;
 
         const std::string sql = R"(
             INSERT INTO IndividualUsers (
@@ -128,17 +129,17 @@ namespace DAL
         )";
 
         std::vector<std::string> params = {
-                userData.getUsername(),
-                userData.getPasswordHash(),
-                userData.getPhoneNumber(),
-                userData.getEmail(),
-                std::to_string(userData.getRegistrationDate()),
-                std::to_string(userData.getLastLoginDate()),
-                userData.getAccountStatus(),
-                userData.getAvatarURL()};
+                userData.username,
+                userData.passwordHash,
+                userData.phoneNumber,
+                userData.email,
+                std::to_string(userData.registrationDate),
+                std::to_string(userData.lastLoginDate),
+                userData.accountStatus,
+                userData.avatarURL};
 
         auto result = dbManager.executeQuery(sql, params);
-        return result != nullptr;// 执行成功则返回true（假设无结果集表示执行成功）
+        return !result->empty();
     }
 
     /**
@@ -159,14 +160,14 @@ namespace DAL
         )";
 
         std::vector<std::string> params = {
-                userData.getUsername(),
-                userData.getPasswordHash(),
-                userData.getPhoneNumber(),
-                userData.getEmail(),
-                std::to_string(userData.getRegistrationDate()),
-                std::to_string(userData.getLastLoginDate()),
-                userData.getAccountStatus(),
-                userData.getAvatarURL(),
+                userData.username,
+                userData.passwordHash,
+                userData.phoneNumber,
+                userData.email,
+                std::to_string(userData.registrationDate),
+                std::to_string(userData.lastLoginDate),
+                userData.accountStatus,
+                userData.avatarURL,
                 std::to_string(id)};
 
         auto result = dbManager.executeQuery(sql, params);

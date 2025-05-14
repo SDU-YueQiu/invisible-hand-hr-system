@@ -2,7 +2,7 @@
  * @file individualUserDAO.h
  * @brief 个人用户数据访问对象类，封装IndividualUsers表的数据库操作
  * @author SDU-YueQiu
- * @date 2025/5/12
+ * @date 2025/5/13
  * @version 1.0
  */
 
@@ -10,6 +10,7 @@
 
 #include "../Model/individualUser.h"
 #include "databaseManager.h"
+#include <cstdint>
 #include <optional>
 #include <vector>
 
@@ -43,9 +44,9 @@ namespace DAL {
         /**
          * @brief 插入新的个人用户记录
          * @param userData 待插入的用户对象
-         * @return bool 插入成功返回true，否则返回false
+         * @return 插入成功返回true，否则返回false
          */
-        int create(const Model::IndividualUser& userData);
+        bool create(const Model::IndividualUser& userData);
 
         /**
          * @brief 更新指定ID的个人用户信息

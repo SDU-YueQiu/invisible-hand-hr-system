@@ -19,6 +19,7 @@ BraceWrapping:
   AfterCaseLabel: false
   AfterClass: true
   AfterControlStatement: Always  # 修改: 控制语句后的大括号换行
+  AfterStruct: true  # 新增: struct 定义后的大括号换行
   AfterEnum: true
   AfterFunction: true
   AfterNamespace: true

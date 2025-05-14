@@ -107,7 +107,7 @@ namespace DAL
             }
         } catch (const std::exception &e)
         {
-            throw std::runtime_error("Parameterized query failed: " + std::string(e.what()));
+            CROW_LOG_ERROR << "Query execution failed: " << e.what();
         }
         return resultSet;
     }
