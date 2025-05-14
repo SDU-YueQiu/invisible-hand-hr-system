@@ -17,6 +17,8 @@
 
 using namespace Utils;
 
+std::string SecurityUtils::JWT_SECRET = "";
+
 std::string SecurityUtils::hashPassword(const std::string &password)
 {
     // 生成随机盐值

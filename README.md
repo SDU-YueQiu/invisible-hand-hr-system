@@ -1,34 +1,90 @@
-# invisible-hand-hr-system
 
-## 开发环境
+好的，我现在需要帮用户生成一份简要的README文件，基于提供的后端开发文档和项目信息。首先，我需要整理用户提供的相关信息，包括项目名称、技术栈、主要模块、API接口示例以及构建说明等。
 
-#### 通用部分
+首先，项目名称是“无形大手 人才招聘系统”，用户提到使用Crow框架，数据库是SQLite3（通过SQLiteCpp封装），认证使用JWT，依赖包括Crow、SQLiteCpp、OpenSSL、jwt-cpp等。这些信息需要在README中说明技术栈部分。
 
-- scoop (**可选/推荐**)
-- PlantUML
-- git
+接下来，用户提供的API接口文档中提到了简历模块、职位模块、企业用户模块、管理员模块等，需要简要概括主要功能模块。例如，个人用户的简历管理（获取列表、详情、创建、修改），职位的公开查询和企业用户的职位管理，管理员对企业和职位的管理等。
 
-#### 后端部分
+然后，构建说明部分需要参考用户提供的CMakeLists.txt内容。CMakeLists.txt中配置了项目依赖、源文件收集、构建后命令（创建db和resources目录，复制初始化SQL文件），以及C++标准设置。因此，构建步骤应包括安装依赖（通过vcpkg或包管理器）、使用CMake构建项目等。
 
-- vcpkg
-- llvm/clang
-- sqlite
+另外，用户的代码规范中提到了命名规范、注释规范和代码结构，这些可以作为开发规范的简要说明，但用户要求的是“简要”的README，所以可能需要简化。
 
-#### vscode插件
+还需要注意项目的目标，根据API接口文档的引言部分，项目旨在提供人才招聘的前后端交互系统，所以概述部分需要说明项目的核心目标。
 
-后端部分
-
-- C/C++ & Extension Pack
-- clangd
-- CodeLLDB
-
-通用部分
-
-- Markdown Preview Enhanced
-- Mermaid Chart
-- Todo Tree (**可选/推荐**)
-- Material Icon Theme (**可选/推荐**)
-- Lingma - Alibaba Cloud AI Coding Assistant (**可选/其他代替如cursor、Trae、copilot等同样推荐**)
+最后，整理这些信息，结构大致如下：项目概述、技术栈、主要功能模块、构建说明、目录结构（可选）、开发规范（简要）等。需要确保内容简洁，覆盖用户关心的关键点，同时基于提供的上下文，不添加未提及的信息。
 
 
 
+          
+# 无形大手 人才招聘系统 后端项目 README
+
+## 项目概述
+本项目为“无形大手 人才招聘系统”的后端服务，基于C++语言开发，提供RESTful API接口，支持个人用户简历管理、企业职位发布与管理、职位公开查询、管理员审核等核心功能，旨在为招聘场景提供高效、安全的服务端支持。
+
+---
+
+## 技术栈
+- **Web框架**：Crow（轻量级C++ Web框架）
+- **数据库**：SQLite3（通过SQLiteCpp库封装，支持事务管理）
+- **认证**：JWT（JSON Web Tokens）实现用户身份验证
+- **依赖库**：
+  - Crow（Web路由与请求处理）
+  - SQLiteCpp（SQLite3数据库操作封装）
+  - OpenSSL（加密与安全通信）
+  - jwt-cpp（JWT生成与校验）
+  - asio（异步I/O支持）
+
+---
+
+## 核心功能模块
+### 1. 个人用户模块
+- **简历管理**：支持获取当前用户简历列表（`GET /users/me/resumes`）、获取简历详情（`GET /users/me/resumes/{resumeId}`）、创建简历（`POST /users/me/resumes`）及修改简历（`PUT /users/me/resumes/{resumeId}`）。
+- 认证方式：JWT（仅个人用户可操作）。
+
+### 2. 职位模块（公开查询）
+- **职位列表查询**：公开接口（`GET /jobs`），支持筛选（如职位名称、地点）和分页。
+- **职位详情获取**：公开接口（`GET /jobs/{jobId}`），返回职位详细信息及企业简要信息。
+
+### 3. 企业用户模块
+- **职位管理**：企业用户可获取已发布职位列表（`GET /enterprises/me/jobs`），支持按状态筛选（如“招聘中”“待审核”）。
+- 认证方式：JWT（仅企业用户可操作）。
+
+### 4. 管理员模块
+- **企业用户管理**：获取企业列表（`GET /admin/enterprises`），支持按名称、信用代码、状态筛选。
+- **职位审核**：管理所有职位（`GET /admin/jobs`），支持按职位名称、企业名称、状态筛选。
+
+---
+
+## 构建与运行
+### 环境要求
+- CMake ≥ 3.30
+- C++17 (Clang之外编译器未测试)
+- 依赖库（通过vcpkg或系统包管理器安装）：
+  - Crow
+  - SQLite3
+  - SQLiteCpp
+  - OpenSSL
+  - jwt-cpp
+
+### 构建说明
+
+1.项目默认使用vcpkg管理依赖，vcpkg相关json已配置好，保证cmake工具链正确即可构建。
+2.项目cmake默认使用clang-debug配置，其他配置未详尽测试。
+3.如同样使用vscode系ide和clang，为clangd插件正常工作，你可能需要在根目录下使用（管理员）powershell建立compile_commands.json的符号链接文件：
+```bash
+
+New-Item -ItemType SymbolicLink -Path .\compile_commands.json -Value build\clang-debug\compile_commands.json
+
+```
+
+### 运行前准备
+构建完成后，自动生成以下目录及文件：
+- `build/bin/db`：存放数据库初始化脚本`databaseInit.sql`（首次运行时自动创建数据库）。
+- `build/bin/resources/resume`：用于存储用户上传的简历文件（如PDF）。
+
+---
+
+## 文档索引
+- API接口详情：`docs/server/API接口文档.md`
+- 需求规格说明：`docs/server/软件需求规格说明书 (SRS).md`
+- 代码规范：`docs/server/后端代码规范.md`

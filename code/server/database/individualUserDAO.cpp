@@ -109,7 +109,7 @@ namespace DAL
      */
     bool IndividualUserDAO::create(const IndividualUser &userData)
     {
-        CROW_LOG_INFO << "Attempting to create user with username: " << userData.username;
+        CROW_LOG_INFO << "Attempting to create user with username: " << userData.Username;
 
         const std::string sql = R"(
             INSERT INTO IndividualUsers (
@@ -119,14 +119,14 @@ namespace DAL
         )";
 
         std::vector<std::string> params = {
-                userData.username,
-                userData.passwordHash,
-                userData.phoneNumber,
-                userData.email,
-                std::to_string(userData.registrationDate),
-                std::to_string(userData.lastLoginDate),
-                userData.accountStatus,
-                userData.avatarURL};
+                userData.Username,
+                userData.PasswordHash,
+                userData.PhoneNumber,
+                userData.Email,
+                std::to_string(userData.RegistrationDate),
+                std::to_string(userData.LastLoginDate),
+                userData.AccountStatus,
+                userData.AvatarURL};
 
         auto result = dbManager.executeQuery(sql, params);
         return !result->empty();
@@ -144,20 +144,20 @@ namespace DAL
 
         const std::string sql = R"(
             UPDATE IndividualUsers SET
-                username = ?, passwordHash = ?, phoneNumber = ?, email = ?,
-                registrationDate = ?, lastLoginDate = ?, accountStatus = ?, avatarURL = ?
-            WHERE userId = ?
+                Username = ?, PasswordHash = ?, PhoneNumber = ?, Email = ?,
+                RegistrationDate = ?, LastLoginDate = ?, AccountStatus = ?, AvatarURL = ?
+            WHERE UserID = ?
         )";
 
         std::vector<std::string> params = {
-                userData.username,
-                userData.passwordHash,
-                userData.phoneNumber,
-                userData.email,
-                std::to_string(userData.registrationDate),
-                std::to_string(userData.lastLoginDate),
-                userData.accountStatus,
-                userData.avatarURL,
+                userData.Username,
+                userData.PasswordHash,
+                userData.PhoneNumber,
+                userData.Email,
+                std::to_string(userData.RegistrationDate),
+                std::to_string(userData.LastLoginDate),
+                userData.AccountStatus,
+                userData.AvatarURL,
                 std::to_string(id)};
 
         auto result = dbManager.executeQuery(sql, params);
