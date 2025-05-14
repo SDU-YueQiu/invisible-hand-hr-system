@@ -54,7 +54,7 @@ API将使用标准的HTTP状态码来指示请求的结果：
 
 ### 1.7 约定
 
-以下约定由前端校验。
+以下约定由前端校验，后端则负责进行用户名唯一性校验。
 
 - 用户名规则: 4-20个字符，只能包含字母、数字和下划线
 - 密码规则: 至少6个字符，包含字母和数字
@@ -217,48 +217,7 @@ API将使用标准的HTTP状态码来指示请求的结果：
     ```
     *注: 后端通常将JWT加入黑名单或前端直接清除JWT即可。*
 
-### 2.7 忘记密码 (请求重置)
-*   **Endpoint:** `POST /auth/forgot-password`
-*   **描述:** 用户请求重置密码，系统发送验证码/链接到其注册邮箱/手机。
-*   **认证:** 无需
-*   **请求体:**
-    ```json
-    {
-      "identifier": "string (required, email or phone number)",
-      "userType": "string (required, 'individual' or 'enterprise')"
-    }
-    ```
-*   **成功响应 (200 OK):**
-    ```json
-    {
-      "success": true,
-      "data": null,
-      "message": "如果账户存在，密码重置指令已发送至您的注册邮箱/手机。"
-    }
-    ```
-    *注: 为安全起见，不明确提示账户是否存在。*
-
-### 2.8 重置密码
-*   **Endpoint:** `POST /auth/reset-password`
-*   **描述:** 用户使用验证码/重置令牌设置新密码。
-*   **认证:** 无需
-*   **请求体:**
-    ```json
-    {
-      "resetToken": "string (required, from email/sms)", // 或 "verificationCode"
-      "newPassword": "string (required, min_length: 6)",
-      "userType": "string (required, 'individual' or 'enterprise')"
-    }
-    ```
-*   **成功响应 (200 OK):**
-    ```json
-    {
-      "success": true,
-      "data": null,
-      "message": "密码重置成功，请使用新密码登录。"
-    }
-    ```
-*   **失败响应:** `400 Bad Request` (令牌无效/过期, 密码不符合要求)
+### 2.7 忘记密码 (涉及验证码没法搞，让用户提反馈feedback，该接口不实现)
 
 ---
 

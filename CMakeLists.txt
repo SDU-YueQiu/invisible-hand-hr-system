@@ -38,6 +38,8 @@ add_custom_command(
     POST_BUILD
     # 创建 build/bin/db 目录
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/db"
+    # 创建 build/bin/resources/resume目录
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources/resume"
     # 复制 databaseInit.sql 到目标目录
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/code/server/Database/databaseInit.sql" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/db/"
     COMMENT "Creating db directory and copying database initialization SQL..."
