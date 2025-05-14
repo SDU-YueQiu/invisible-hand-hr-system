@@ -10,6 +10,9 @@
 
 #include <string>
 #include <crow/json.h>
+#include "../Database/adminUserDAO.h"
+#include "../Database/enterpriseUserDAO.h"
+#include "../Database/individualUserDAO.h"
 
 namespace Utils {
     /**

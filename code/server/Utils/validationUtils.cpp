@@ -43,13 +43,16 @@ bool ValidationUtils::validatePhone(const std::string &phone)
 
 bool ValidationUtils::validateUsername(const std::string &username)
 {
-    // 用户名规则: 4-20个字符，只能包含字母、数字和下划线
-    const std::regex pattern(
-            R"(^[a-zA-Z0-9_]{4,20}$)");
+    // 检查用户名是否存在于三种用户表中
+    auto adminUser = DAL::AdminUserDAO::getInstance().findByUsername(username);
+    auto enterpriseUser = DAL::EnterpriseUserDAO::getInstance().findByLoginUsername(username);
+    auto individualUser = DAL::IndividualUserDAO::getInstance().findByUsername(username);
 
-    if (!std::regex_match(username, pattern))
+    if (adminUser.AdminID != -1 ||
+        enterpriseUser.EnterpriseID != -1 ||
+        individualUser.UserID != -1)
     {
-        CROW_LOG_WARNING << "用户名格式验证失败: " << username;
+        CROW_LOG_WARNING << "用户名已存在: " << username;
         return false;
     }
     return true;
