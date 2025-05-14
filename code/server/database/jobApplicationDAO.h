@@ -11,9 +11,21 @@
 #include "databaseManager.h"
 #include <crow/logging.h>
 
-namespace DAL {
-    class JobApplicationDAO {
+namespace DAL
+{
+    class JobApplicationDAO
+    {
     public:
+        /**
+         * @brief 获取JobApplicationDAO单例实例（线程安全）
+         * @return JobApplicationDAO& JobApplicationDAO实例
+         */
+        static JobApplicationDAO &getInstance()
+        {
+            thread_local static JobApplicationDAO instance;
+            return instance;
+        }
+
         /**
          * @brief 根据申请ID查询职位申请记录
          * @param applicationId 申请记录ID
@@ -60,7 +72,7 @@ namespace DAL {
 
     private:
         DatabaseManager &dbManager = DatabaseManager::getInstance();
-        
+
         /**
          * @brief 从数据库行创建JobApplication对象
          * @param row 数据库行
@@ -68,4 +80,4 @@ namespace DAL {
          */
         Model::JobApplication createFromRow(DbRow &row);
     };
-}
+}// namespace DAL

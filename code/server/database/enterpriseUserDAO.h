@@ -28,6 +28,14 @@ namespace DAL
     {
     public:
         /**
+         * @brief 获取EnterpriseUserDAO单例实例（线程安全）
+         * @return EnterpriseUserDAO& EnterpriseUserDAO实例
+         */
+        static EnterpriseUserDAO& getInstance() {
+            thread_local static EnterpriseUserDAO instance;
+            return instance;
+        }
+        /**
      * @brief 根据企业ID查询企业用户信息
      * @param enterpriseId 企业唯一标识
      * @return Model::EnterpriseUser 企业用户对象（若不存在则返回空对象）
@@ -64,6 +72,7 @@ namespace DAL
         bool deleteById(int64_t enterpriseId);
 
     private:
+        EnterpriseUserDAO() = default;
         DatabaseManager &dbManager = DatabaseManager::getInstance();// 获取数据库管理器单例
     };
 

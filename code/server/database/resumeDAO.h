@@ -19,7 +19,6 @@
 
 namespace DAL
 {
-
     /**
   * @brief 简历数据访问对象，负责简历表的CRUD操作
   * @note 使用SQLiteCpp库封装，通过DatabaseManager获取数据库连接
@@ -27,6 +26,16 @@ namespace DAL
     class ResumeDAO
     {
     public:
+        /**
+     * @brief 获取ResumeDAO单例实例（线程安全）
+     * @return ResumeDAO& ResumeDAO实例
+     */
+        static ResumeDAO &getInstance()
+        {
+            thread_local static ResumeDAO instance;// 线程局部静态变量
+            return instance;
+        }
+
         /**
       * @brief 根据简历ID查询简历信息
       * @param resumeId 简历唯一标识

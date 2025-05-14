@@ -17,7 +17,15 @@ namespace DAL {
      * @brief 管理员用户数据访问对象类
      */
     class AdminUserDAO {
-    public:
+public:
+    /**
+     * @brief 获取AdminUserDAO单例实例（线程安全）
+     * @return AdminUserDAO& AdminUserDAO实例
+     */
+    static AdminUserDAO& getInstance() {
+        thread_local static AdminUserDAO instance;
+        return instance;
+    }
         /**
          * @brief 根据管理员ID查询管理员信息
          * @param adminId 管理员ID
@@ -64,6 +72,7 @@ namespace DAL {
         bool updateStatus(int64_t adminId, const std::string& status);
 
     private:
+        AdminUserDAO() = default;
         DatabaseManager& dbManager = DatabaseManager::getInstance(); // 获取数据库管理器单例
     };
 }

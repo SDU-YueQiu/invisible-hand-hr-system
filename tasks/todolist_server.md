@@ -44,7 +44,7 @@
 ### 数据访问层DAL
 
 - [x] `DatabaseManager`: 中央数据库连接管理器
-- [ ] `DAOs`：如`IndividualUserDAO`、`ResumeDAO`等，每个DAO负责特定实体的CRUD操作
+- [x] `DAOs`：如`IndividualUserDAO`、`ResumeDAO`等，每个DAO负责特定实体的CRUD操作
 
 ## 测试
 

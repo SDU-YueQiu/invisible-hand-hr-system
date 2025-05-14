@@ -12,9 +12,28 @@
 #include "databaseManager.h"
 #include <vector>
 
-namespace DAL {
-    class AnnouncementDAO {
+namespace DAL
+{
+    class AnnouncementDAO
+    {
     public:
+        /**
+     * @brief 获取 AnnouncementDAO 单例实例
+     * @return AnnouncementDAO& AnnouncementDAO 单例实例的引用
+     */
+        static AnnouncementDAO &getInstance()
+        {
+            thread_local static AnnouncementDAO instance;
+            return instance;
+        }
+
+    private:
+        // 私有构造函数，防止外部实例化
+        AnnouncementDAO() = default;
+        // 禁止拷贝构造函数
+        AnnouncementDAO(const AnnouncementDAO &) = delete;
+        // 禁止赋值运算符
+        AnnouncementDAO &operator=(const AnnouncementDAO &) = delete;
         /**
          * @brief 根据公告ID查询公告信息
          * @param announcementId 公告ID
@@ -27,14 +46,14 @@ namespace DAL {
          * @param filter 筛选条件
          * @return std::vector<Model::Announcement> 公告列表
          */
-        std::vector<Model::Announcement> findAll(const std::string& filter = "");
+        std::vector<Model::Announcement> findAll(const std::string &filter = "");
 
         /**
          * @brief 创建新的公告记录
          * @param announcementData 公告数据
          * @return bool 创建成功返回true
          */
-        bool create(const Model::Announcement& announcementData);
+        bool create(const Model::Announcement &announcementData);
 
         /**
          * @brief 更新公告信息
@@ -42,7 +61,7 @@ namespace DAL {
          * @param announcementData 更新后的公告数据
          * @return bool 更新成功返回true
          */
-        bool update(int64_t announcementId, const Model::Announcement& announcementData);
+        bool update(int64_t announcementId, const Model::Announcement &announcementData);
 
         /**
          * @brief 删除公告记录
@@ -52,6 +71,6 @@ namespace DAL {
         bool deleteById(int64_t announcementId);
 
     private:
-        DatabaseManager& dbManager = DatabaseManager::getInstance();
+        DatabaseManager &dbManager = DatabaseManager::getInstance();
     };
-}
+}// namespace DAL

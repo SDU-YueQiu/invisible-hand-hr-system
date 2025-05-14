@@ -22,6 +22,14 @@ namespace DAL
     {
     public:
         /**
+         * @brief 获取IndividualUserDAO单例实例（线程安全）
+         * @return IndividualUserDAO& IndividualUserDAO实例
+         */
+        static IndividualUserDAO& getInstance() {
+            thread_local static IndividualUserDAO instance;
+            return instance;
+        }
+        /**
          * @brief 根据用户ID查询个人用户信息
          * @param id 用户ID
          * @return IndividualUser 存在则返回用户对象，否则返回空对象
@@ -74,6 +82,7 @@ namespace DAL
         bool updateStatus(int id, const std::string &status);
 
     private:
+        IndividualUserDAO() = default;
         DatabaseManager &dbManager = DatabaseManager::getInstance();// 获取数据库管理器单例
     };
 }// namespace DAL
