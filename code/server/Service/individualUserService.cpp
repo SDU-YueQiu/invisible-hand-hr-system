@@ -1,6 +1,6 @@
 /**
  * @file individualUserService.cpp
- * @brief 个人用户服务类实现，处理个人用户相关的业务逻辑
+ * @brief 个人用户服务类实现，处理个人用户相关业务逻辑
  * @author SDU-YueQiu
  * @date 2025/5/15
  * @version 1.0
@@ -8,97 +8,74 @@
 
 #include "individualUserService.h"
 #include <crow/logging.h>
-#include "../Utils/securityUtils.h"
 
 namespace Service
 {
-    crow::json::wvalue IndividualUserService::getUserById(int userId)
+    Model::IndividualUser IndividualUserService::getUserById(int userId)
     {
-        CROW_LOG_INFO << "Getting user info for ID: " << userId;
-        
-        auto user = userDao.findById(userId);
+        CROW_LOG_INFO << "Getting user by ID: " << userId;
+
+        // 通过DAO层获取用户信息
+        auto user = userDAO.findById(userId);
+
         if (user.UserID == -1)
         {
-            return crow::json::wvalue{
-                {"success", false},
-                {"message", "用户不存在"}
-            };
+            CROW_LOG_WARNING << "User not found with ID: " << userId;
         }
 
-        return crow::json::wvalue{
-            {"success", true},
-            {"data", {
-                {"userId", user.UserID},
-                {"username", user.Username},
-                {"phoneNumber", user.PhoneNumber},
-                {"email", user.Email},
-                {"registrationDate", user.RegistrationDate},
-                {"lastLoginDate", user.LastLoginDate},
-                {"accountStatus", user.AccountStatus},
-                {"avatarURL", user.AvatarURL}
-            }},
-            {"message", "获取用户信息成功"}
-        };
+        return user;
     }
 
-    crow::json::wvalue IndividualUserService::updateUserInfo(int userId, const crow::json::rvalue& userData)
+    bool IndividualUserService::updateUserInfo(int userId, const Model::IndividualUser &userData)
     {
         CROW_LOG_INFO << "Updating user info for ID: " << userId;
-        
-        auto user = userDao.findById(userId);
-        if (user.UserID == -1)
+
+        // 验证用户ID是否匹配
+        if (userData.UserID != userId)
         {
-            return crow::json::wvalue{
-                {"success", false},
-                {"message", "用户不存在"}
-            };
+            CROW_LOG_WARNING << "User ID mismatch in update request";
+            return false;
         }
 
-        // 更新可修改字段
-        if (userData.has("phoneNumber")) 
-            user.PhoneNumber = userData["phoneNumber"].s();
-        if (userData.has("email"))
-            user.Email = userData["email"].s();
-        if (userData.has("avatarURL"))
-            user.AvatarURL = userData["avatarURL"].s();
+        // 获取现有用户信息
+        auto existingUser = userDAO.findById(userId);
+        if (existingUser.UserID == -1)
+        {
+            CROW_LOG_WARNING << "User not found for update, ID: " << userId;
+            return false;
+        }
 
-        bool success = userDao.update(userId, user);
-        return crow::json::wvalue{
-            {"success", success},
-            {"message", success ? "更新成功" : "更新失败"}
-        };
+        // 确保用户名不能被修改
+        if (existingUser.Username != userData.Username)
+        {
+            CROW_LOG_WARNING << "Username cannot be modified";
+            return false;
+        }
+
+        // 通过DAO层更新用户信息
+        return userDAO.update(userId, userData);
     }
 
-    crow::json::wvalue IndividualUserService::changePassword(int userId, 
-        const std::string& oldPassword, const std::string& newPassword)
+    bool IndividualUserService::changePassword(int userId, const std::string &oldPassword, const std::string &newPassword)
     {
         CROW_LOG_INFO << "Changing password for user ID: " << userId;
-        
-        auto user = userDao.findById(userId);
+
+        // 获取用户信息
+        auto user = userDAO.findById(userId);
         if (user.UserID == -1)
         {
-            return crow::json::wvalue{
-                {"success", false},
-                {"message", "用户不存在"}
-            };
+            CROW_LOG_WARNING << "User not found with ID: " << userId;
+            return false;
         }
 
-        // 验证旧密码
-        if (!Utils::SecurityUtils::verifyPassword(oldPassword, user.PasswordHash))
+        // 验证旧密码是否正确
+        if (user.PasswordHash != oldPassword)
         {
-            return crow::json::wvalue{
-                {"success", false},
-                {"message", "旧密码不正确"}
-            };
+            CROW_LOG_WARNING << "Old password verification failed for user ID: " << userId;
+            return false;
         }
 
-        // 更新为新密码
-        std::string newHash = Utils::SecurityUtils::hashPassword(newPassword);
-        bool success = userDao.updatePassword(userId, newHash);
-        
-        return crow::json::wvalue{
-            {"success", success},
-            {"message", success ? "密码修改成功" : "密码修改失败"}
-        };
+        // 通过DAO层更新密码
+        return userDAO.updatePassword(userId, newPassword);
     }
-}
+}// namespace Service

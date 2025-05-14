@@ -82,9 +82,7 @@ New-Item -ItemType SymbolicLink -Path .\compile_commands.json -Value build\clang
 - `build/bin/db`：存放数据库初始化脚本`databaseInit.sql`（首次运行时自动创建数据库）。
 - `build/bin/resources/resume`：用于存储用户上传的简历文件（如PDF）。
 
----
+## 注意
 
-## 文档索引
-- API接口详情：`docs/server/API接口文档.md`
-- 需求规格说明：`docs/server/软件需求规格说明书 (SRS).md`
-- 代码规范：`docs/server/后端代码规范.md`
+由于时间紧任务重，项目中存在许多未完善的地方，包括但不限于：
+- 日志系统与Crow架构集成耦合，没有单独解耦出来的日志工具，不过这部分都是流式输出到宏中，如果你需要更换web架构，请重新定义日志输出宏或依次替换。
