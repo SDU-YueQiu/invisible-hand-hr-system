@@ -2,6 +2,7 @@
   "dependencies": [
     "crow",
     "sqlite3",
-    "sqlitecpp"
+    "sqlitecpp",
+    "jwt-cpp"
   ]
 }
