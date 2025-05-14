@@ -18,7 +18,7 @@ namespace Model
      */
     struct IndividualUser
     {
-        int64_t userId;           // 用户ID（主键）
+        int64_t userId = -1;      // 用户ID（主键）
         std::string username;     // 用户名
         std::string passwordHash; // 密码哈希
         std::string phoneNumber;  // 联系电话

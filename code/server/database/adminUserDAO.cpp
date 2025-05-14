@@ -15,7 +15,7 @@
 namespace DAL {
     using namespace Model;
 
-    std::optional<AdminUser> createAdminFromRow(DbRow &row) {
+    AdminUser createAdminFromRow(DbRow &row) {
         try {
             return AdminUser{
                 std::get<int64_t>(row.at("AdminID")),
@@ -28,33 +28,30 @@ namespace DAL {
                 std::get<std::string>(row.at("LastLoginTime")),
                 std::get<std::string>(row.at("CreateTime"))
             };
-        } catch (const std::bad_variant_access &e) {
-            CROW_LOG_ERROR << "管理员字段类型不匹配: " << e.what();
-            return std::nullopt;
-        } catch (const std::out_of_range &e) {
-            CROW_LOG_ERROR << "管理员字段缺失: " << e.what();
-            return std::nullopt;
+        } catch (const std::exception& e) {
+            CROW_LOG_ERROR << "创建管理员对象失败: " << e.what();
+            return AdminUser{};
         }
     }
 
-    std::optional<AdminUser> AdminUserDAO::findById(int64_t adminId) {
+    AdminUser AdminUserDAO::findById(int64_t adminId) {
         CROW_LOG_INFO << "查询管理员信息，ID: " << adminId;
         const std::string sql = "SELECT * FROM AdminUsers WHERE AdminID = ?";
         auto result = dbManager.executeQuery(sql, {std::to_string(adminId)});
 
         if (!result || result->empty()) {
-            return std::nullopt;
+            return AdminUser{};
         }
         return createAdminFromRow(result->front());
     }
 
-    std::optional<AdminUser> AdminUserDAO::findByUsername(const std::string& username) {
+    AdminUser AdminUserDAO::findByUsername(const std::string& username) {
         CROW_LOG_INFO << "查询管理员信息，用户名: " << username;
         const std::string sql = "SELECT * FROM AdminUsers WHERE Username = ?";
         auto result = dbManager.executeQuery(sql, {username});
 
         if (!result || result->empty()) {
-            return std::nullopt;
+            return AdminUser{};
         }
         return createAdminFromRow(result->front());
     }

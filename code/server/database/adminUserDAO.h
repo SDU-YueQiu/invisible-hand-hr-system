@@ -11,7 +11,6 @@
 #include "../Model/adminUser.h"
 #include "databaseManager.h"
 #include <crow/logging.h>
-#include <optional>
 
 namespace DAL {
     /**
@@ -22,16 +21,16 @@ namespace DAL {
         /**
          * @brief 根据管理员ID查询管理员信息
          * @param adminId 管理员ID
-         * @return std::optional<Model::AdminUser> 存在则返回管理员对象，否则返回std::nullopt
+         * @return Model::AdminUser 存在则返回管理员对象，否则返回std::nullopt
          */
-        std::optional<Model::AdminUser> findById(int64_t adminId);
+        Model::AdminUser findById(int64_t adminId);
 
         /**
          * @brief 根据用户名查询管理员信息
          * @param username 用户名
-         * @return std::optional<Model::AdminUser> 存在则返回管理员对象，否则返回std::nullopt
+         * @return Model::AdminUser 存在则返回管理员对象，否则返回std::nullopt
          */
-        std::optional<Model::AdminUser> findByUsername(const std::string& username);
+        Model::AdminUser findByUsername(const std::string& username);
 
         /**
          * @brief 创建新的管理员账户

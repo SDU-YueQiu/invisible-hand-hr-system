@@ -19,7 +19,7 @@ namespace DAL
 {
     using namespace Model;
 
-    std::optional<IndividualUser> createUserFromRow(DAL::DbRow &row)
+    IndividualUser createUserFromRow(DAL::DbRow &row)
     {
         try
         {
@@ -40,28 +40,23 @@ namespace DAL
                     getTimeFromRow("LastLoginDate"),   // 使用稳健转换函数
                     std::get<std::string>(row.at("AccountStatus")),
                     std::get<std::string>(row.at("AvatarURL"))};
-        } catch (const std::bad_variant_access &e)
+        } catch (const std::exception &e)
         {
-            CROW_LOG_ERROR << "Error creating user from row: " << e.what()
-                           << " 可能原因：字段类型与预期不匹配，请检查DbRow字段类型定义";
-            return std::nullopt;
-        } catch (const std::invalid_argument &e)// 新增对stoll转换错误的捕获
+            CROW_LOG_ERROR << "在从数据库行创建用户对象时发生异常: " << e.what();
+            return IndividualUser{};
+        } catch (...)
         {
-            CROW_LOG_ERROR << "时间字段转换失败: " << e.what();
-            return std::nullopt;
-        } catch (const std::out_of_range &e)// 新增对字段不存在的捕获
-        {
-            CROW_LOG_ERROR << "字段不存在: " << e.what();
-            return std::nullopt;
+            CROW_LOG_ERROR << "在从数据库行创建用户对象时发生未知异常";
+            return IndividualUser{};
         }
     }
 
     /**
      * @brief 根据用户ID查询个人用户信息
      * @param id 用户ID
-     * @return std::optional<IndividualUser> 存在则返回用户对象，否则返回std::nullopt
+     * @return IndividualUser 存在则返回用户对象，否则返回std::nullopt
      */
-    std::optional<IndividualUser> IndividualUserDAO::findById(int id)
+    IndividualUser IndividualUserDAO::findById(int id)
     {
         CROW_LOG_INFO << "Attempting to find user by ID: " << id;
         const std::string sql = "SELECT * FROM IndividualUsers WHERE userId = ?";
@@ -69,7 +64,7 @@ namespace DAL
 
         if (!result || result->empty())
         {
-            return std::nullopt;
+            return IndividualUser{};
         }
         return createUserFromRow(result->front());
     }
@@ -77,9 +72,9 @@ namespace DAL
     /**
      * @brief 根据用户名查询个人用户信息
      * @param username 用户名
-     * @return std::optional<IndividualUser> 存在则返回用户对象，否则返回std::nullopt
+     * @return IndividualUser 存在则返回用户对象，否则返回std::nullopt
      */
-    std::optional<IndividualUser> IndividualUserDAO::findByUsername(const std::string &username)
+    IndividualUser IndividualUserDAO::findByUsername(const std::string &username)
     {
         CROW_LOG_INFO << "Attempting to find user by username: " << username;
 
@@ -88,7 +83,7 @@ namespace DAL
 
         if (!result || result->empty())
         {
-            return std::nullopt;
+            return IndividualUser{};
         }
         return createUserFromRow(result->front());
     }
@@ -96,9 +91,9 @@ namespace DAL
     /**
      * @brief 根据邮箱查询个人用户信息
      * @param email 邮箱地址
-     * @return std::optional<IndividualUser> 存在则返回用户对象，否则返回std::nullopt
+     * @return IndividualUser 存在则返回用户对象，否则返回std::nullopt
      */
-    std::optional<IndividualUser> IndividualUserDAO::findByEmail(const std::string &email)
+    IndividualUser IndividualUserDAO::findByEmail(const std::string &email)
     {
         CROW_LOG_INFO << "Attempting to find user by email: " << email;
 
@@ -107,7 +102,7 @@ namespace DAL
 
         if (!result || result->empty())
         {
-            return std::nullopt;
+            return IndividualUser{};
         }
         return createUserFromRow(result->front());
     }
