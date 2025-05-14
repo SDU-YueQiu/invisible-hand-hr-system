@@ -12,7 +12,8 @@
 #include <crow/logging.h>
 #include <stdexcept>
 
-namespace DAL {
+namespace DAL
+{
     using namespace Model;
 
     /**
@@ -20,31 +21,30 @@ namespace DAL {
      * @param row 数据库结果行（DbRow类型）
      * @return Model::JobPosting 招聘岗位对象（字段不匹配时返回空对象）
      */
-    Model::JobPosting createJobPostingFromRow(DbRow &row) {
-        try {
+    Model::JobPosting createJobPostingFromRow(DbRow &row)
+    {
+        try
+        {
             return Model::JobPosting{
-                std::get<int64_t>(row.at("JobID")),
-                std::get<int64_t>(row.at("EnterpriseID")),
-                std::get<std::string>(row.at("JobTitle")),
-                std::get<std::string>(row.at("JobCategory")),
-                std::get<int32_t>(row.at("RecruitmentCount")),
-                std::get<std::string>(row.at("WorkLocation")),
-                std::get<std::string>(row.at("SalaryRange")),
-                std::get<std::string>(row.at("Responsibilities")),
-                std::get<std::string>(row.at("Requirements")),
-                std::get<std::string>(row.at("ExperienceRequired")),
-                std::get<std::string>(row.at("EducationRequired")),
-                std::get<std::string>(row.at("Benefits")),
-                std::get<std::string>(row.at("PublishDate")),
-                std::get<std::string>(row.at("UpdateDate")),
-                std::get<std::string>(row.at("DeadlineDate")),
-                std::get<std::string>(row.at("JobStatus"))
-            };
-        } catch (const std::bad_variant_access &e) {
-            CROW_LOG_ERROR << "招聘岗位字段类型不匹配: " << e.what();
-            return Model::JobPosting{};
-        } catch (const std::out_of_range &e) {
-            CROW_LOG_ERROR << "招聘岗位字段缺失: " << e.what();
+                    std::get<int64_t>(row.at("JobID")),
+                    std::get<int64_t>(row.at("EnterpriseID")),
+                    std::get<std::string>(row.at("JobTitle")),
+                    std::get<std::string>(row.at("JobCategory")),
+                    std::get<int32_t>(row.at("RecruitmentCount")),
+                    std::get<std::string>(row.at("WorkLocation")),
+                    std::get<std::string>(row.at("SalaryRange")),
+                    std::get<std::string>(row.at("Responsibilities")),
+                    std::get<std::string>(row.at("Requirements")),
+                    std::get<std::string>(row.at("ExperienceRequired")),
+                    std::get<std::string>(row.at("EducationRequired")),
+                    std::get<std::string>(row.at("Benefits")),
+                    std::get<std::string>(row.at("PublishDate")),
+                    std::get<std::string>(row.at("UpdateDate")),
+                    std::get<std::string>(row.at("DeadlineDate")),
+                    std::get<std::string>(row.at("JobStatus"))};
+        } catch (const std::exception &e)
+        {
+            CROW_LOG_ERROR << "创建招聘岗位对象失败: " << e.what();
             return Model::JobPosting{};
         }
     }
@@ -54,12 +54,14 @@ namespace DAL {
      * @param jobId 岗位唯一标识
      * @return Model::JobPosting 招聘岗位对象（若不存在则返回空对象）
      */
-    Model::JobPosting JobPostingDAO::findById(int64_t jobId) {
+    Model::JobPosting JobPostingDAO::findById(int64_t jobId)
+    {
         CROW_LOG_INFO << "查询招聘岗位，ID: " << jobId;
         const std::string sql = "SELECT * FROM JobPostings WHERE JobID = ?";
         auto result = dbManager.executeQuery(sql, {std::to_string(jobId)});
 
-        if (!result || result->empty()) {
+        if (!result || result->empty())
+        {
             CROW_LOG_WARNING << "未找到招聘岗位，ID: " << jobId;
             return Model::JobPosting{};
         }
@@ -71,7 +73,8 @@ namespace DAL {
      * @param enterpriseId 发布企业ID
      * @return std::vector<Model::JobPosting> 招聘岗位列表
      */
-    std::vector<Model::JobPosting> JobPostingDAO::findByEnterpriseId(int64_t enterpriseId) {
+    std::vector<Model::JobPosting> JobPostingDAO::findByEnterpriseId(int64_t enterpriseId)
+    {
         CROW_LOG_INFO << "查询企业发布的招聘岗位，企业ID: " << enterpriseId;
         const std::string sql = "SELECT * FROM JobPostings WHERE EnterpriseID = ?";
         auto result = dbManager.executeQuery(sql, {std::to_string(enterpriseId)});
@@ -79,7 +82,8 @@ namespace DAL {
         std::vector<Model::JobPosting> jobPostings;
         if (!result) return jobPostings;
 
-        for (auto &row : *result) {
+        for (auto &row: *result)
+        {
             jobPostings.push_back(createJobPostingFromRow(row));
         }
         return jobPostings;
@@ -90,7 +94,8 @@ namespace DAL {
      * @param jobData 待插入的招聘岗位数据
      * @return 插入成功返回true，否则返回false
      */
-    bool JobPostingDAO::create(const Model::JobPosting &jobData) {
+    bool JobPostingDAO::create(const Model::JobPosting &jobData)
+    {
         CROW_LOG_INFO << "创建新招聘岗位，企业ID: " << jobData.EnterpriseID;
         const std::string sql = R"(
             INSERT INTO JobPostings (
@@ -102,22 +107,21 @@ namespace DAL {
         )";
 
         std::vector<std::string> params = {
-            std::to_string(jobData.EnterpriseID),
-            jobData.JobTitle,
-            jobData.JobCategory,
-            std::to_string(jobData.RecruitmentCount),
-            jobData.WorkLocation,
-            jobData.SalaryRange,
-            jobData.Responsibilities,
-            jobData.Requirements,
-            jobData.ExperienceRequired,
-            jobData.EducationRequired,
-            jobData.Benefits,
-            jobData.PublishDate,
-            jobData.UpdateDate,
-            jobData.DeadlineDate,
-            jobData.JobStatus
-        };
+                std::to_string(jobData.EnterpriseID),
+                jobData.JobTitle,
+                jobData.JobCategory,
+                std::to_string(jobData.RecruitmentCount),
+                jobData.WorkLocation,
+                jobData.SalaryRange,
+                jobData.Responsibilities,
+                jobData.Requirements,
+                jobData.ExperienceRequired,
+                jobData.EducationRequired,
+                jobData.Benefits,
+                jobData.PublishDate,
+                jobData.UpdateDate,
+                jobData.DeadlineDate,
+                jobData.JobStatus};
 
         auto result = dbManager.executeQuery(sql, params);
         return !result->empty();
@@ -129,7 +133,8 @@ namespace DAL {
      * @param jobData 更新后的招聘岗位数据
      * @return bool 更新成功返回true，否则返回false
      */
-    bool JobPostingDAO::update(int64_t jobId, const Model::JobPosting &jobData) {
+    bool JobPostingDAO::update(int64_t jobId, const Model::JobPosting &jobData)
+    {
         CROW_LOG_INFO << "更新招聘岗位，ID: " << jobId;
         const std::string sql = R"(
             UPDATE JobPostings SET
@@ -141,23 +146,22 @@ namespace DAL {
         )";
 
         std::vector<std::string> params = {
-            std::to_string(jobData.EnterpriseID),
-            jobData.JobTitle,
-            jobData.JobCategory,
-            std::to_string(jobData.RecruitmentCount),
-            jobData.WorkLocation,
-            jobData.SalaryRange,
-            jobData.Responsibilities,
-            jobData.Requirements,
-            jobData.ExperienceRequired,
-            jobData.EducationRequired,
-            jobData.Benefits,
-            jobData.PublishDate,
-            jobData.UpdateDate,
-            jobData.DeadlineDate,
-            jobData.JobStatus,
-            std::to_string(jobId)
-        };
+                std::to_string(jobData.EnterpriseID),
+                jobData.JobTitle,
+                jobData.JobCategory,
+                std::to_string(jobData.RecruitmentCount),
+                jobData.WorkLocation,
+                jobData.SalaryRange,
+                jobData.Responsibilities,
+                jobData.Requirements,
+                jobData.ExperienceRequired,
+                jobData.EducationRequired,
+                jobData.Benefits,
+                jobData.PublishDate,
+                jobData.UpdateDate,
+                jobData.DeadlineDate,
+                jobData.JobStatus,
+                std::to_string(jobId)};
 
         auto result = dbManager.executeQuery(sql, params);
         return result != nullptr;
@@ -168,10 +172,11 @@ namespace DAL {
      * @param jobId 待删除的岗位ID
      * @return bool 删除成功返回true，否则返回false
      */
-    bool JobPostingDAO::deleteById(int64_t jobId) {
+    bool JobPostingDAO::deleteById(int64_t jobId)
+    {
         CROW_LOG_INFO << "删除招聘岗位，ID: " << jobId;
         const std::string sql = "DELETE FROM JobPostings WHERE JobID = ?";
         auto result = dbManager.executeQuery(sql, {std::to_string(jobId)});
         return result != nullptr;
     }
-} // namespace DAL
+}// namespace DAL

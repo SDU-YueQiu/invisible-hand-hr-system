@@ -108,6 +108,7 @@ namespace DAL
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "Query execution failed: " << e.what();
+            return nullptr;
         }
         return resultSet;
     }

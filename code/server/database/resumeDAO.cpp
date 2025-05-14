@@ -41,14 +41,10 @@ namespace DAL
                     std::get<std::string>(row.at("LastUpdateTime")),
                     std::get<std::string>(row.at("VisibilityStatus")),
                     std::get<std::string>(row.at("AttachmentPath"))};
-        } catch (const std::bad_variant_access &e)
+        } catch (const std::exception &e)
         {
-            CROW_LOG_ERROR << "简历字段类型不匹配: " << e.what();
-            return Model::Resume{};// 返回空对象
-        } catch (const std::out_of_range &e)
-        {
-            CROW_LOG_ERROR << "简历字段缺失: " << e.what();
-            return Model::Resume{};// 返回空对象
+            CROW_LOG_ERROR << "创建简历对象失败: " << e.what();
+            return Model::Resume{};
         }
     }
 

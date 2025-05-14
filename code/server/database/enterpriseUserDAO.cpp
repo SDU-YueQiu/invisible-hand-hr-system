@@ -13,7 +13,8 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace DAL {
+namespace DAL
+{
     using namespace Model;
 
     /**
@@ -21,31 +22,31 @@ namespace DAL {
      * @param row 数据库结果行（DbRow类型）
      * @return Model::EnterpriseUser 构造的企业用户对象（字段不匹配时返回空对象）
      */
-    Model::EnterpriseUser createEnterpriseUserFromRow(DbRow &row) {
-        try {
+    Model::EnterpriseUser createEnterpriseUserFromRow(DbRow &row)
+    {
+        try
+        {
             return Model::EnterpriseUser{
-                static_cast<int64_t>(std::get<int64_t>(row.at("EnterpriseID"))),
-                std::get<std::string>(row.at("LoginUsername")),
-                std::get<std::string>(row.at("PasswordHash")),
-                std::get<std::string>(row.at("EnterpriseName")),
-                std::get<std::string>(row.at("CreditCode")),
-                std::get<std::string>(row.at("Description")),
-                std::get<std::string>(row.at("Industry")),
-                std::get<std::string>(row.at("Scale")),
-                std::get<std::string>(row.at("Address")),
-                std::get<std::string>(row.at("ContactPerson")),
-                std::get<std::string>(row.at("ContactPhone")),
-                std::get<std::string>(row.at("ContactEmail")),
-                std::get<std::string>(row.at("LogoURL")),
-                std::get<std::string>(row.at("LicenseImageURL")),
-                std::get<std::string>(row.at("RegistrationDate")),
-                std::get<std::string>(row.at("AccountStatus")),
-                std::get<std::string>(row.at("AuditOpinion"))};
-        } catch (const std::bad_variant_access &e) {
-            CROW_LOG_ERROR << "企业用户字段类型不匹配: " << e.what();
-            return Model::EnterpriseUser{};
-        } catch (const std::out_of_range &e) {
-            CROW_LOG_ERROR << "企业用户字段缺失: " << e.what();
+                    static_cast<int64_t>(std::get<int64_t>(row.at("EnterpriseID"))),
+                    std::get<std::string>(row.at("LoginUsername")),
+                    std::get<std::string>(row.at("PasswordHash")),
+                    std::get<std::string>(row.at("EnterpriseName")),
+                    std::get<std::string>(row.at("CreditCode")),
+                    std::get<std::string>(row.at("Description")),
+                    std::get<std::string>(row.at("Industry")),
+                    std::get<std::string>(row.at("Scale")),
+                    std::get<std::string>(row.at("Address")),
+                    std::get<std::string>(row.at("ContactPerson")),
+                    std::get<std::string>(row.at("ContactPhone")),
+                    std::get<std::string>(row.at("ContactEmail")),
+                    std::get<std::string>(row.at("LogoURL")),
+                    std::get<std::string>(row.at("LicenseImageURL")),
+                    std::get<std::string>(row.at("RegistrationDate")),
+                    std::get<std::string>(row.at("AccountStatus")),
+                    std::get<std::string>(row.at("AuditOpinion"))};
+        } catch (const std::exception &e)
+        {
+            CROW_LOG_ERROR << "创建企业用户对象失败: " << e.what();
             return Model::EnterpriseUser{};
         }
     }
@@ -55,12 +56,14 @@ namespace DAL {
      * @param enterpriseId 企业唯一标识
      * @return Model::EnterpriseUser 企业用户对象（若不存在则返回空对象）
      */
-    Model::EnterpriseUser EnterpriseUserDAO::findById(int64_t enterpriseId) {
+    Model::EnterpriseUser EnterpriseUserDAO::findById(int64_t enterpriseId)
+    {
         CROW_LOG_INFO << "查询企业用户，ID: " << enterpriseId;
         const std::string sql = "SELECT * FROM EnterpriseUsers WHERE EnterpriseID = ?";
         auto result = dbManager.executeQuery(sql, {std::to_string(enterpriseId)});
 
-        if (!result || result->empty()) {
+        if (!result || result->empty())
+        {
             CROW_LOG_WARNING << "未找到企业用户，ID: " << enterpriseId;
             return Model::EnterpriseUser{};
         }
@@ -72,12 +75,14 @@ namespace DAL {
      * @param loginUsername 企业登录用户名
      * @return Model::EnterpriseUser 企业用户对象（若不存在则返回空对象）
      */
-    Model::EnterpriseUser EnterpriseUserDAO::findByLoginUsername(const std::string& loginUsername) {
+    Model::EnterpriseUser EnterpriseUserDAO::findByLoginUsername(const std::string &loginUsername)
+    {
         CROW_LOG_INFO << "查询企业用户，登录用户名: " << loginUsername;
         const std::string sql = "SELECT * FROM EnterpriseUsers WHERE LoginUsername = ?";
         auto result = dbManager.executeQuery(sql, {loginUsername});
 
-        if (!result || result->empty()) {
+        if (!result || result->empty())
+        {
             CROW_LOG_WARNING << "未找到企业用户，登录用户名: " << loginUsername;
             return Model::EnterpriseUser{};
         }
@@ -89,7 +94,8 @@ namespace DAL {
      * @param enterpriseData 待插入的企业用户数据
      * @return 插入成功返回true，否则返回false
      */
-    bool EnterpriseUserDAO::create(const Model::EnterpriseUser &enterpriseData) {
+    bool EnterpriseUserDAO::create(const Model::EnterpriseUser &enterpriseData)
+    {
         CROW_LOG_INFO << "创建新企业用户，登录用户名: " << enterpriseData.LoginUsername;
         const std::string sql = R"(
             INSERT INTO EnterpriseUsers (
@@ -101,22 +107,22 @@ namespace DAL {
         )";
 
         std::vector<std::string> params = {
-            enterpriseData.LoginUsername,
-            enterpriseData.PasswordHash,
-            enterpriseData.EnterpriseName,
-            enterpriseData.CreditCode,
-            enterpriseData.Description,
-            enterpriseData.Industry,
-            enterpriseData.Scale,
-            enterpriseData.Address,
-            enterpriseData.ContactPerson,
-            enterpriseData.ContactPhone,
-            enterpriseData.ContactEmail,
-            enterpriseData.LogoURL,
-            enterpriseData.LicenseImageURL,
-            enterpriseData.RegistrationDate,
-            enterpriseData.AccountStatus,
-            enterpriseData.AuditOpinion};
+                enterpriseData.LoginUsername,
+                enterpriseData.PasswordHash,
+                enterpriseData.EnterpriseName,
+                enterpriseData.CreditCode,
+                enterpriseData.Description,
+                enterpriseData.Industry,
+                enterpriseData.Scale,
+                enterpriseData.Address,
+                enterpriseData.ContactPerson,
+                enterpriseData.ContactPhone,
+                enterpriseData.ContactEmail,
+                enterpriseData.LogoURL,
+                enterpriseData.LicenseImageURL,
+                enterpriseData.RegistrationDate,
+                enterpriseData.AccountStatus,
+                enterpriseData.AuditOpinion};
 
         auto result = dbManager.executeQuery(sql, params);
         return !result->empty();
@@ -128,7 +134,8 @@ namespace DAL {
      * @param enterpriseData 更新后的企业用户数据
      * @return bool 更新成功返回true，否则返回false
      */
-    bool EnterpriseUserDAO::update(int64_t enterpriseId, const Model::EnterpriseUser &enterpriseData) {
+    bool EnterpriseUserDAO::update(int64_t enterpriseId, const Model::EnterpriseUser &enterpriseData)
+    {
         CROW_LOG_INFO << "更新企业用户，ID: " << enterpriseId;
         const std::string sql = R"(
             UPDATE EnterpriseUsers SET
@@ -141,23 +148,23 @@ namespace DAL {
         )";
 
         std::vector<std::string> params = {
-            enterpriseData.LoginUsername,
-            enterpriseData.PasswordHash,
-            enterpriseData.EnterpriseName,
-            enterpriseData.CreditCode,
-            enterpriseData.Description,
-            enterpriseData.Industry,
-            enterpriseData.Scale,
-            enterpriseData.Address,
-            enterpriseData.ContactPerson,
-            enterpriseData.ContactPhone,
-            enterpriseData.ContactEmail,
-            enterpriseData.LogoURL,
-            enterpriseData.LicenseImageURL,
-            enterpriseData.RegistrationDate,
-            enterpriseData.AccountStatus,
-            enterpriseData.AuditOpinion,
-            std::to_string(enterpriseId)};
+                enterpriseData.LoginUsername,
+                enterpriseData.PasswordHash,
+                enterpriseData.EnterpriseName,
+                enterpriseData.CreditCode,
+                enterpriseData.Description,
+                enterpriseData.Industry,
+                enterpriseData.Scale,
+                enterpriseData.Address,
+                enterpriseData.ContactPerson,
+                enterpriseData.ContactPhone,
+                enterpriseData.ContactEmail,
+                enterpriseData.LogoURL,
+                enterpriseData.LicenseImageURL,
+                enterpriseData.RegistrationDate,
+                enterpriseData.AccountStatus,
+                enterpriseData.AuditOpinion,
+                std::to_string(enterpriseId)};
 
         auto result = dbManager.executeQuery(sql, params);
         return result != nullptr;
@@ -168,11 +175,12 @@ namespace DAL {
      * @param enterpriseId 待删除的企业ID
      * @return bool 删除成功返回true，否则返回false
      */
-    bool EnterpriseUserDAO::deleteById(int64_t enterpriseId) {
+    bool EnterpriseUserDAO::deleteById(int64_t enterpriseId)
+    {
         CROW_LOG_INFO << "删除企业用户，ID: " << enterpriseId;
         const std::string sql = "DELETE FROM EnterpriseUsers WHERE EnterpriseID = ?";
         auto result = dbManager.executeQuery(sql, {std::to_string(enterpriseId)});
         return result != nullptr;
     }
 
-} // namespace DAL"}}}
+}// namespace DAL

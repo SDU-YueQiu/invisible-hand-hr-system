@@ -28,11 +28,8 @@ namespace DAL {
                 std::get<std::string>(row.at("Feedback")),
                 std::get<std::string>(row.at("UpdateTime"))
             };
-        } catch (const std::bad_variant_access &e) {
-            CROW_LOG_ERROR << "职位申请字段类型不匹配: " << e.what();
-            return JobApplication{};
-        } catch (const std::out_of_range &e) {
-            CROW_LOG_ERROR << "职位申请字段缺失: " << e.what();
+        } catch (const std::exception& e) {
+            CROW_LOG_ERROR << "创建职位申请对象失败: " << e.what();
             return JobApplication{};
         }
     }

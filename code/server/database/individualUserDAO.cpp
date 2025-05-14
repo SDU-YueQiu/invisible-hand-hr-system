@@ -40,13 +40,8 @@ namespace DAL
                     getTimeFromRow("LastLoginDate"),   // 使用稳健转换函数
                     std::get<std::string>(row.at("AccountStatus")),
                     std::get<std::string>(row.at("AvatarURL"))};
-        } catch (const std::exception &e)
-        {
-            CROW_LOG_ERROR << "在从数据库行创建用户对象时发生异常: " << e.what();
-            return IndividualUser{};
-        } catch (...)
-        {
-            CROW_LOG_ERROR << "在从数据库行创建用户对象时发生未知异常";
+        } catch (const std::exception& e) {
+            CROW_LOG_ERROR << "创建用户对象失败: " << e.what();
             return IndividualUser{};
         }
     }
