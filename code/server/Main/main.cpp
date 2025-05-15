@@ -1,31 +1,44 @@
 /**
  * @file main.cpp
- * @brief 主应用入口文件，负责初始化和启动Crow应用
+ * @brief Crow应用主入口，负责初始化并启动整个HR系统后端服务
  * @author SDU-YueQiu
- * @date 2025/5/14
+ * @date 2025/5/16
  * @version 1.0
  */
 
 #include "../Config/config.h"
 #include "../Database/databaseManager.h"
+#include "../Middleware/authMiddleware.h"
+#include "../Middleware/validationMiddleware.h"
+#include "../Routers/apiRouter.h"
 #include <crow.h>
-
-
-void init()
-{
-    // 初始化全局配置
-    Config::loadConfig();
-    DAL::initDatabase();
-}
+#include <crow/middlewares/cors.h>
 
 int main()
 {
-    init();
+    // 初始化配置
+    Config::loadConfig();
+    DAL::initDatabase();
+    Utils::SecurityUtils::init();
 
-    // 初始化Crow应用
-    crow::SimpleApp app;
+    // 创建Crow应用并配置中间件
+    crow::App<crow::CORSHandler, Middleware::AuthMiddleware, Middleware::ValidationMiddleware> app;
 
-    // 启动应用
+
+    // 配置CORS
+    auto &cors = app.get_middleware<crow::CORSHandler>();
+    cors
+            .global()
+            .headers("Content-Type", "Authorization")
+            .methods("GET"_method, "POST"_method, "PUT"_method, "DELETE"_method);
+
+    // 设置API路由
+    Routers::ApiRouter::setupRoutes(app);
+
+    // 配置日志级别
+    crow::logger::setLogLevel(crow::LogLevel::Info);
+
+    // 启动服务器
     app.port(Config::globalConfig["PORT"].i())
             .multithreaded()
             .run();

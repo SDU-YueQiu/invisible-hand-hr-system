@@ -24,10 +24,10 @@ namespace Middleware
     struct AuthMiddleware
     {
         /**
-         * @struct Context
+         * @struct context
          * @brief AuthMiddleware的自定义上下文，用于在请求处理链中传递认证信息
          */
-        struct Context
+        struct context
         {
             std::string userId;  ///< 从JWT中解析出的用户ID
             std::string userRole;///< 从JWT中解析出的用户角色
@@ -36,7 +36,7 @@ namespace Middleware
         /**
          * @brief 构造函数，初始化安全工具
          */
-        AuthMiddleware();
+        AuthMiddleware() = default;
 
         /**
          * @brief 请求处理前的钩子函数，执行JWT验证
@@ -44,7 +44,7 @@ namespace Middleware
          * @param res Crow响应对象
          * @param ctx 中间件的自定义上下文
          */
-        void before_handle(crow::request &req, crow::response &res, Context &ctx);
+        void before_handle(crow::request &req, crow::response &res, context &ctx);
 
         /**
          * @brief 请求处理后的钩子函数（占位）
@@ -52,7 +52,7 @@ namespace Middleware
          * @param res Crow响应对象
          * @param ctx 中间件的自定义上下文
          */
-        void after_handle(crow::request &req, crow::response &res, Context &ctx);
+        void after_handle(crow::request &req, crow::response &res, context &ctx) {};
     };
 
     /**

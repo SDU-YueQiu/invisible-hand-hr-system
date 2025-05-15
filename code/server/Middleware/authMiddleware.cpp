@@ -15,7 +15,7 @@
 namespace Middleware
 {
 
-    void AuthMiddleware::before_handle(crow::request &req, crow::response &res, Context &ctx)
+    void AuthMiddleware::before_handle(crow::request &req, crow::response &res, context &ctx)
     {
         // 从请求头获取Authorization字段
         auto authHeader = req.get_header_value("Authorization");
@@ -58,7 +58,7 @@ namespace Middleware
     auto requireRole(const std::vector<std::string> &requiredRoles)
     {
         return [requiredRoles](const crow::request &req, crow::response &res,
-                               AuthMiddleware::Context &ctx) {
+                               AuthMiddleware::context &ctx) {
             // 检查用户角色是否在允许的角色列表中
             bool hasPermission = false;
             for (const auto &role: requiredRoles)

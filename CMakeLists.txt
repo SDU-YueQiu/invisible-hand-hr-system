@@ -22,7 +22,6 @@ find_package(OpenSSL REQUIRED)
 find_package(jwt-cpp CONFIG REQUIRED)
 
 file(GLOB_RECURSE SERVER_SOURCES 
-    "${CMAKE_CURRENT_SOURCE_DIR}/code/server/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/code/server/*.cpp"
 )
 
