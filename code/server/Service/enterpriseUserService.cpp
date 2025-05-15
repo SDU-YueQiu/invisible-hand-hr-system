@@ -52,8 +52,23 @@ namespace Service
             return false;
         }
 
+        // 只更新非默认值的字段
+        if (!enterpriseData.EnterpriseName.empty()) existingEnterprise.EnterpriseName = enterpriseData.EnterpriseName;
+        if (!enterpriseData.CreditCode.empty()) existingEnterprise.CreditCode = enterpriseData.CreditCode;
+        if (!enterpriseData.Description.empty()) existingEnterprise.Description = enterpriseData.Description;
+        if (!enterpriseData.Industry.empty()) existingEnterprise.Industry = enterpriseData.Industry;
+        if (!enterpriseData.Scale.empty()) existingEnterprise.Scale = enterpriseData.Scale;
+        if (!enterpriseData.Address.empty()) existingEnterprise.Address = enterpriseData.Address;
+        if (!enterpriseData.ContactPerson.empty()) existingEnterprise.ContactPerson = enterpriseData.ContactPerson;
+        if (!enterpriseData.ContactPhone.empty()) existingEnterprise.ContactPhone = enterpriseData.ContactPhone;
+        if (!enterpriseData.ContactEmail.empty()) existingEnterprise.ContactEmail = enterpriseData.ContactEmail;
+        if (!enterpriseData.LogoURL.empty()) existingEnterprise.LogoURL = enterpriseData.LogoURL;
+        if (!enterpriseData.LicenseImageURL.empty()) existingEnterprise.LicenseImageURL = enterpriseData.LicenseImageURL;
+        if (!enterpriseData.AccountStatus.empty()) existingEnterprise.AccountStatus = enterpriseData.AccountStatus;
+        if (!enterpriseData.AuditOpinion.empty()) existingEnterprise.AuditOpinion = enterpriseData.AuditOpinion;
+
         // 通过DAO层更新企业信息
-        return enterpriseDAO.update(enterpriseId, enterpriseData);
+        return enterpriseDAO.update(enterpriseId, existingEnterprise);
     }
 
     bool EnterpriseUserService::changePassword(int64_t enterpriseId, const std::string &oldPassword, const std::string &newPassword)

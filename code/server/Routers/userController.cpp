@@ -7,19 +7,21 @@
  */
 
 #include "userController.h"
+#include "../Service/applicationService.h"
 #include "../Utils/securityUtils.h"
 #include <crow/json.h>
 
+
 namespace Router
 {
-    void UserController::getCurrentUserInfo(const crow::request& request, crow::response& response)
+    void UserController::getCurrentUserInfo(const crow::request &request, crow::response &response)
     {
         try
         {
             // 从JWT令牌中获取用户ID
             std::string token = request.get_header_value("Authorization");
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (userId.empty())
             {
                 response.code = 401;
@@ -47,8 +49,7 @@ namespace Router
 
             response.code = 200;
             response.write(result.dump());
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取用户信息失败: " << e.what();
             response.code = 500;
@@ -56,14 +57,14 @@ namespace Router
         }
     }
 
-    void UserController::updateUserInfo(const crow::request& request, crow::response& response)
+    void UserController::updateUserInfo(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取用户ID
             std::string token = request.get_header_value("Authorization");
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (userId.empty())
             {
                 response.code = 401;
@@ -89,7 +90,7 @@ namespace Router
 
             // 调用服务层更新用户信息
             bool success = Service::IndividualUserService::getInstance().updateUserInfo(
-                std::stoi(userId), userData);
+                    std::stoi(userId), userData);
 
             if (!success)
             {
@@ -100,8 +101,7 @@ namespace Router
 
             response.code = 200;
             response.write("用户信息更新成功");
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "更新用户信息失败: " << e.what();
             response.code = 500;
@@ -109,14 +109,14 @@ namespace Router
         }
     }
 
-    void UserController::changePassword(const crow::request& request, crow::response& response)
+    void UserController::changePassword(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取用户ID
             std::string token = request.get_header_value("Authorization");
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (userId.empty())
             {
                 response.code = 401;
@@ -135,9 +135,9 @@ namespace Router
 
             // 调用服务层修改密码
             bool success = Service::IndividualUserService::getInstance().changePassword(
-                std::stoi(userId), 
-                body["oldPassword"].s(), 
-                body["newPassword"].s());
+                    std::stoi(userId),
+                    body["oldPassword"].s(),
+                    body["newPassword"].s());
 
             if (!success)
             {
@@ -148,8 +148,7 @@ namespace Router
 
             response.code = 200;
             response.write("密码修改成功");
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "修改密码失败: " << e.what();
             response.code = 500;
@@ -157,14 +156,14 @@ namespace Router
         }
     }
 
-    void UserController::getApplications(const crow::request& request, crow::response& response)
+    void UserController::getApplications(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取用户ID
             std::string token = request.get_header_value("Authorization");
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (userId.empty())
             {
                 response.code = 401;
@@ -172,15 +171,32 @@ namespace Router
                 return;
             }
 
-            // TODO: 实现获取用户申请记录的逻辑
-            response.code = 501;
-            response.write("功能暂未实现");
-        }
-        catch (const std::exception& e)
+            // 调用服务层获取申请记录
+            auto applications = Service::ApplicationService::getInstance().getUserApplications(std::stoll(userId));
+
+            // 构建响应JSON数组
+            crow::json::wvalue::list applicationList;
+            for (const auto &app: applications)
+            {
+                crow::json::wvalue item;
+                item["applicationId"] = app.ApplicationID;
+                item["jobId"] = app.JobID;
+                item["enterpriseId"] = app.EnterpriseID;
+                item["resumeId"] = app.ResumeID;
+                item["applicationTime"] = app.ApplicationTime;
+                item["status"] = app.Status;
+                item["feedback"] = app.Feedback;
+                item["updateTime"] = app.UpdateTime;
+                applicationList.push_back(item);
+            }
+
+            response.code = 200;
+            response.write(crow::json::wvalue(applicationList).dump());
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取申请记录失败: " << e.what();
             response.code = 500;
             response.write("服务器内部错误");
         }
     }
-} // namespace Router
+}// namespace Router
