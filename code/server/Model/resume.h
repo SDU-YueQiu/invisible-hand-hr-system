@@ -22,7 +22,7 @@ namespace Model
     struct Resume
     {
         int64_t ResumeID = -1;          ///< 简历唯一标识（主键，自增）
-        int64_t UserID;                 ///< 所属用户ID（外键到IndividualUsers）
+        int64_t UserID = -1;            ///< 所属用户ID（外键到IndividualUsers）
         std::string ResumeTitle;        ///< 简历标题
         std::string BasicInfo;          ///< 基本信息（JSON格式：姓名、性别、出生日期等）
         std::string JobIntent;          ///< 求职意向（JSON格式：期望行业、职位、薪资等）

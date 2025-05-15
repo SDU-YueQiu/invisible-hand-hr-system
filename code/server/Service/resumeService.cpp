@@ -11,10 +11,10 @@
 
 namespace Service
 {
-    bool ResumeService::createResume(int userId, const Model::Resume& resumeData)
+    bool ResumeService::createResume(int userId, const Model::Resume &resumeData)
     {
         CROW_LOG_INFO << "Creating resume for user ID: " << userId;
-        
+
         // 验证用户ID是否匹配
         if (resumeData.UserID != userId)
         {
@@ -37,10 +37,10 @@ namespace Service
         return resumeDAO.findByUserId(userId);
     }
 
-    bool ResumeService::updateResume(int resumeId, const Model::Resume& resumeData)
+    bool ResumeService::updateResume(int resumeId, const Model::Resume &resumeData)
     {
         CROW_LOG_INFO << "Updating resume ID: " << resumeId;
-        
+
         // 先获取现有简历验证用户ID
         auto existingResume = resumeDAO.findById(resumeId);
         if (existingResume.ResumeID == -1)
@@ -56,7 +56,19 @@ namespace Service
             return false;
         }
 
-        return resumeDAO.update(resumeId, resumeData);
+        // 只更新非空的字段
+        if (!resumeData.ResumeTitle.empty()) existingResume.ResumeTitle = resumeData.ResumeTitle;
+        if (!resumeData.BasicInfo.empty()) existingResume.BasicInfo = resumeData.BasicInfo;
+        if (!resumeData.JobIntent.empty()) existingResume.JobIntent = resumeData.JobIntent;
+        if (!resumeData.EducationExperience.empty()) existingResume.EducationExperience = resumeData.EducationExperience;
+        if (!resumeData.WorkExperience.empty()) existingResume.WorkExperience = resumeData.WorkExperience;
+        if (!resumeData.ProjectExperience.empty()) existingResume.ProjectExperience = resumeData.ProjectExperience;
+        if (!resumeData.SkillsCertificates.empty()) existingResume.SkillsCertificates = resumeData.SkillsCertificates;
+        if (!resumeData.SelfDescription.empty()) existingResume.SelfDescription = resumeData.SelfDescription;
+        if (!resumeData.VisibilityStatus.empty()) existingResume.VisibilityStatus = resumeData.VisibilityStatus;
+        if (!resumeData.AttachmentPath.empty()) existingResume.AttachmentPath = resumeData.AttachmentPath;
+
+        return resumeDAO.update(resumeId, existingResume);
     }
 
     bool ResumeService::deleteResume(int resumeId)
@@ -64,4 +76,4 @@ namespace Service
         CROW_LOG_INFO << "Deleting resume ID: " << resumeId;
         return resumeDAO.deleteById(resumeId);
     }
-} // namespace Service
+}// namespace Service

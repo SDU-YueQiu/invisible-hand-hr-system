@@ -10,10 +10,12 @@
 
 #include <string>
 
-namespace Model {
-    struct Announcement {
+namespace Model
+{
+    struct Announcement
+    {
         int64_t AnnouncementID = -1;
-        int64_t AdminID;
+        int64_t AdminID = -1;
         std::string Title;
         std::string Content;
         std::string PublishTime;
@@ -21,4 +23,4 @@ namespace Model {
         std::string ExpireTime;
         bool IsTop = false;
     };
-}
+}// namespace Model
