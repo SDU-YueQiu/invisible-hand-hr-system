@@ -62,6 +62,8 @@ namespace Service
          */
         bool updateApplicationStatus(int64_t applicationId, const std::string& status);
 
+        
+
     private:
         DAL::JobApplicationDAO& applicationDAO = DAL::JobApplicationDAO::getInstance();
     };

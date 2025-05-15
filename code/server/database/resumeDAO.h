@@ -72,6 +72,13 @@ namespace DAL
       */
         bool deleteById(int resumeId);
 
+        /**
+      * @brief 根据筛选条件查询简历列表
+      * @param filter SQL筛选条件字符串（如"UserID=123 AND VisibilityStatus='Public'"）
+      * @return std::vector<Model::Resume> 符合条件的简历列表
+      */
+        std::vector<Model::Resume> findByFilter(const std::string &filter);
+
     private:
         DatabaseManager &dbManager = DatabaseManager::getInstance();// 获取数据库管理器单例
     };

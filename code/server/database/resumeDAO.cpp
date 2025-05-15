@@ -173,4 +173,24 @@ namespace DAL
         return result != nullptr;
     }
 
+    std::vector<Model::Resume> ResumeDAO::findByFilter(const std::string &filter)
+    {
+        CROW_LOG_INFO << "查询简历列表，筛选条件: " << (filter.empty() ? "无" : filter);
+        std::string sql = "SELECT * FROM Resumes";
+        if (!filter.empty())
+        {
+            sql += " WHERE " + filter;
+        }
+
+        auto result = dbManager.executeQuery(sql, {});
+        std::vector<Model::Resume> resumes;
+        if (!result) return resumes;
+
+        for (auto &row: *result)
+        {
+            resumes.push_back(createResumeFromRow(row));
+        }
+        return resumes;
+    }
+
 }// namespace DAL

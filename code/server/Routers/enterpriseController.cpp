@@ -7,19 +7,21 @@
  */
 
 #include "enterpriseController.h"
+#include "../Service/applicationService.h"
 #include "../Utils/securityUtils.h"
 #include <crow/json.h>
 
+
 namespace Router
 {
-    void EnterpriseController::getEnterpriseInfo(const crow::request& request, crow::response& response)
+    void EnterpriseController::getEnterpriseInfo(const crow::request &request, crow::response &response)
     {
         try
         {
             // 从JWT令牌中获取企业ID
             std::string token = request.get_header_value("Authorization");
             std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (enterpriseId.empty())
             {
                 response.code = 401;
@@ -53,8 +55,7 @@ namespace Router
 
             response.code = 200;
             response.write(result.dump());
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取企业信息失败: " << e.what();
             response.code = 500;
@@ -62,14 +63,14 @@ namespace Router
         }
     }
 
-    void EnterpriseController::updateEnterpriseInfo(const crow::request& request, crow::response& response)
+    void EnterpriseController::updateEnterpriseInfo(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取企业ID
             std::string token = request.get_header_value("Authorization");
             std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (enterpriseId.empty())
             {
                 response.code = 401;
@@ -102,7 +103,7 @@ namespace Router
 
             // 调用服务层更新企业信息
             bool success = Service::EnterpriseUserService::getInstance().updateEnterpriseInfo(
-                std::stoll(enterpriseId), enterpriseData);
+                    std::stoll(enterpriseId), enterpriseData);
 
             if (!success)
             {
@@ -113,8 +114,7 @@ namespace Router
 
             response.code = 200;
             response.write("企业信息更新成功");
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "更新企业信息失败: " << e.what();
             response.code = 500;
@@ -122,14 +122,14 @@ namespace Router
         }
     }
 
-    void EnterpriseController::changePassword(const crow::request& request, crow::response& response)
+    void EnterpriseController::changePassword(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取企业ID
             std::string token = request.get_header_value("Authorization");
             std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (enterpriseId.empty())
             {
                 response.code = 401;
@@ -148,9 +148,9 @@ namespace Router
 
             // 调用服务层修改密码
             bool success = Service::EnterpriseUserService::getInstance().changePassword(
-                std::stoll(enterpriseId), 
-                body["oldPassword"].s(), 
-                body["newPassword"].s());
+                    std::stoll(enterpriseId),
+                    body["oldPassword"].s(),
+                    body["newPassword"].s());
 
             if (!success)
             {
@@ -161,8 +161,7 @@ namespace Router
 
             response.code = 200;
             response.write("密码修改成功");
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "修改密码失败: " << e.what();
             response.code = 500;
@@ -170,14 +169,14 @@ namespace Router
         }
     }
 
-    void EnterpriseController::getPostedJobs(const crow::request& request, crow::response& response)
+    void EnterpriseController::getPostedJobs(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取企业ID
             std::string token = request.get_header_value("Authorization");
             std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (enterpriseId.empty())
             {
                 response.code = 401;
@@ -190,7 +189,7 @@ namespace Router
 
             // 构建响应JSON数组
             crow::json::wvalue::list jobList;
-            for (const auto& job : jobs)
+            for (const auto &job: jobs)
             {
                 crow::json::wvalue item;
                 item["jobId"] = job.JobID;
@@ -207,8 +206,7 @@ namespace Router
 
             response.code = 200;
             response.write(crow::json::wvalue(jobList).dump());
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取职位列表失败: " << e.what();
             response.code = 500;
@@ -216,14 +214,14 @@ namespace Router
         }
     }
 
-    void EnterpriseController::postNewJob(const crow::request& request, crow::response& response)
+    void EnterpriseController::postNewJob(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取企业ID
             std::string token = request.get_header_value("Authorization");
             std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (enterpriseId.empty())
             {
                 response.code = 401;
@@ -259,7 +257,7 @@ namespace Router
 
             // 调用服务层创建职位
             bool success = Service::JobPostingService::getInstance().createJob(
-                std::stoll(enterpriseId), jobData);
+                    std::stoll(enterpriseId), jobData);
 
             if (!success)
             {
@@ -270,8 +268,7 @@ namespace Router
 
             response.code = 200;
             response.write("职位创建成功");
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "创建职位失败: " << e.what();
             response.code = 500;
@@ -279,14 +276,14 @@ namespace Router
         }
     }
 
-    void EnterpriseController::updateJob(const crow::request& request, crow::response& response)
+    void EnterpriseController::updateJob(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取企业ID
             std::string token = request.get_header_value("Authorization");
             std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (enterpriseId.empty())
             {
                 response.code = 401;
@@ -331,7 +328,7 @@ namespace Router
 
             // 调用服务层更新职位
             bool success = Service::JobPostingService::getInstance().updateJob(
-                std::stoll(jobId), jobData);
+                    std::stoll(jobId), jobData);
 
             if (!success)
             {
@@ -342,8 +339,7 @@ namespace Router
 
             response.code = 200;
             response.write("职位更新成功");
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "更新职位失败: " << e.what();
             response.code = 500;
@@ -351,14 +347,14 @@ namespace Router
         }
     }
 
-    void EnterpriseController::deleteJob(const crow::request& request, crow::response& response)
+    void EnterpriseController::deleteJob(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取企业ID
             std::string token = request.get_header_value("Authorization");
             std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (enterpriseId.empty())
             {
                 response.code = 401;
@@ -387,8 +383,7 @@ namespace Router
 
             response.code = 200;
             response.write("职位删除成功");
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "删除职位失败: " << e.what();
             response.code = 500;
@@ -396,14 +391,14 @@ namespace Router
         }
     }
 
-    void EnterpriseController::getApplicants(const crow::request& request, crow::response& response)
+    void EnterpriseController::getApplicants(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取企业ID
             std::string token = request.get_header_value("Authorization");
             std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (enterpriseId.empty())
             {
                 response.code = 401;
@@ -423,8 +418,7 @@ namespace Router
             // TODO: 实现获取职位申请者列表的逻辑
             response.code = 501;
             response.write("功能暂未实现");
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取申请者列表失败: " << e.what();
             response.code = 500;
@@ -432,14 +426,14 @@ namespace Router
         }
     }
 
-    void EnterpriseController::updateApplicationStatus(const crow::request& request, crow::response& response)
+    void EnterpriseController::updateApplicationStatus(const crow::request &request, crow::response &response)
     {
         try
         {
             // 验证请求并获取企业ID
             std::string token = request.get_header_value("Authorization");
             std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (enterpriseId.empty())
             {
                 response.code = 401;
@@ -465,15 +459,25 @@ namespace Router
                 return;
             }
 
-            // TODO: 实现更新申请状态的逻辑
-            response.code = 501;
-            response.write("功能暂未实现");
-        }
-        catch (const std::exception& e)
+            // 调用服务层更新申请状态
+            bool success = Service::ApplicationService::getInstance().updateApplicationStatus(
+                    std::stoll(applicationId),
+                    body["status"].s());
+
+            if (!success)
+            {
+                response.code = 400;
+                response.write("更新申请状态失败");
+                return;
+            }
+
+            response.code = 200;
+            response.write("申请状态更新成功");
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "更新申请状态失败: " << e.what();
             response.code = 500;
             response.write("服务器内部错误");
         }
     }
-} // namespace Router
+}// namespace Router

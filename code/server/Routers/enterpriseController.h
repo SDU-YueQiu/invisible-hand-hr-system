@@ -71,7 +71,7 @@ namespace Router
         static void deleteJob(const crow::request& request, crow::response& response);
 
         /**
-         * @brief 获取职位申请者列表
+         * @brief 获取职位申请者（简历）列表
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
