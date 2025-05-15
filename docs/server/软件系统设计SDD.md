@@ -273,7 +273,9 @@ entity JobPosting {
   JobCategory
   RecruitmentCount
   WorkLocation
-  SalaryRange
+  MaxSalary
+  MinSalary
+  JobDescription
   Responsibilities
   Requirements
   ExperienceRequired

@@ -435,7 +435,8 @@ API将使用标准的HTTP状态码来指示请求的结果：
             "logoURL": "string",        // 冗余企业Logo方便展示
             "jobTitle": "string",
             "workLocation": "string",
-            "salaryRange": "string",
+            "salaryMin": "string",
+            "salaryMax": "string",
             "experienceRequired": "string",
             "educationRequired": "string",
             "publishDate": "datetime string (ISO 8601)"

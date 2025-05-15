@@ -26,7 +26,7 @@ namespace Model
         std::string JobCategory;       ///< 职位类别
         int32_t RecruitmentCount;      ///< 招聘人数
         std::string WorkLocation;      ///< 工作地点
-        std::string SalaryRange;       ///< 薪资范围
+        
         std::string Responsibilities;  ///< 岗位职责（非空）
         std::string Requirements;      ///< 任职要求（非空）
         std::string ExperienceRequired;///< 工作经验要求
