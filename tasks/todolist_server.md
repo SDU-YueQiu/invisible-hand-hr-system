@@ -4,17 +4,17 @@
 
 ### 中间件层
 
-- [ ] AuthMiddleware
-- [ ] ErrorHandlingMiddleware
-- [ ] LoggingMiddleware
-- [ ] ValidationMiddleware
+- [x] AuthMiddleware
+~~- [ ] ErrorHandlingMiddleware~~
+~~- [ ] LoggingMiddleware~~
+- [x] ValidationMiddleware
 
 ### 工具层
 
-- [ ] SecurityUtils
-- [ ] ValidationUtils
-- [x] Logger (crow logging)
-- [ ] ConfigManager
+- [x] SecurityUtils
+- [x] ValidationUtils
+~~- [ ] Logger (crow logging)~~
+~~- [ ] ConfigManager~~
 
 ### API层
 
@@ -29,17 +29,17 @@
 
 ### 服务层
 
-- [ ] `AuthService`: 处理认证和授权逻辑
-- [ ] `IndividualUserService`: 个人用户管理逻辑
-- [ ] `ResumeService`: 简历管理业务逻辑
-- [ ] `JobSearchService`: 职位搜索和查询逻辑
-- [ ] `ApplicationService`: 职位申请处理逻辑
-- [ ] `EnterpriseUserService`: 企业用户管理逻辑
-- [ ] `JobPostingService`: 职位发布和管理逻辑
-- [ ] `TalentSearchService`: 人才搜索和筛选逻辑
-- [ ] `AdminService`: 系统管理功能逻辑
-- [ ] `FeedbackService`: 用户反馈处理逻辑
-- [ ] `AnnouncementService`: 系统公告管理逻辑
+- [x] `AuthService`: 处理认证和授权逻辑
+- [x] `IndividualUserService`: 个人用户管理逻辑
+- [x] `ResumeService`: 简历管理业务逻辑
+- [x] `JobSearchService`: 职位搜索和查询逻辑
+- [x] `ApplicationService`: 职位申请处理逻辑
+- [x] `EnterpriseUserService`: 企业用户管理逻辑
+- [x] `JobPostingService`: 职位发布和管理逻辑
+- [x] `TalentSearchService`: 人才搜索和筛选逻辑
+- [x] `AdminService`: 系统管理功能逻辑
+- [x] `FeedbackService`: 用户反馈处理逻辑
+- [x] `AnnouncementService`: 系统公告管理逻辑
 
 ### 数据访问层DAL
 

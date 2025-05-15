@@ -1,0 +1,186 @@
+/**
+ * @file userController.cpp
+ * @brief 个人用户账户信息管理控制器实现
+ * @author SDU-YueQiu
+ * @date 2025/5/16
+ * @version 1.0
+ */
+
+#include "userController.h"
+#include "../Utils/securityUtils.h"
+#include <crow/json.h>
+
+namespace Router
+{
+    void UserController::getCurrentUserInfo(const crow::request& request, crow::response& response)
+    {
+        try
+        {
+            // 从JWT令牌中获取用户ID
+            std::string token = request.get_header_value("Authorization");
+            std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
+            
+            if (userId.empty())
+            {
+                response.code = 401;
+                response.write("无效的授权令牌");
+                return;
+            }
+
+            // 通过服务层获取用户信息
+            auto user = Service::IndividualUserService::getInstance().getUserById(std::stoi(userId));
+            if (user.UserID == -1)
+            {
+                response.code = 404;
+                response.write("用户不存在");
+                return;
+            }
+
+            // 构建响应JSON
+            crow::json::wvalue result;
+            result["userId"] = user.UserID;
+            result["username"] = user.Username;
+            result["phoneNumber"] = user.PhoneNumber;
+            result["email"] = user.Email;
+            result["accountStatus"] = user.AccountStatus;
+            result["avatarURL"] = user.AvatarURL;
+
+            response.code = 200;
+            response.write(result.dump());
+        }
+        catch (const std::exception& e)
+        {
+            CROW_LOG_ERROR << "获取用户信息失败: " << e.what();
+            response.code = 500;
+            response.write("服务器内部错误");
+        }
+    }
+
+    void UserController::updateUserInfo(const crow::request& request, crow::response& response)
+    {
+        try
+        {
+            // 验证请求并获取用户ID
+            std::string token = request.get_header_value("Authorization");
+            std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
+            
+            if (userId.empty())
+            {
+                response.code = 401;
+                response.write("无效的授权令牌");
+                return;
+            }
+
+            // 解析请求体
+            auto body = crow::json::load(request.body);
+            if (!body)
+            {
+                response.code = 400;
+                response.write("无效的请求格式");
+                return;
+            }
+
+            // 构建用户更新对象
+            Model::IndividualUser userData;
+            userData.UserID = std::stoi(userId);
+            if (body.has("phoneNumber")) userData.PhoneNumber = body["phoneNumber"].s();
+            if (body.has("email")) userData.Email = body["email"].s();
+            if (body.has("avatarURL")) userData.AvatarURL = body["avatarURL"].s();
+
+            // 调用服务层更新用户信息
+            bool success = Service::IndividualUserService::getInstance().updateUserInfo(
+                std::stoi(userId), userData);
+
+            if (!success)
+            {
+                response.code = 400;
+                response.write("更新用户信息失败");
+                return;
+            }
+
+            response.code = 200;
+            response.write("用户信息更新成功");
+        }
+        catch (const std::exception& e)
+        {
+            CROW_LOG_ERROR << "更新用户信息失败: " << e.what();
+            response.code = 500;
+            response.write("服务器内部错误");
+        }
+    }
+
+    void UserController::changePassword(const crow::request& request, crow::response& response)
+    {
+        try
+        {
+            // 验证请求并获取用户ID
+            std::string token = request.get_header_value("Authorization");
+            std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
+            
+            if (userId.empty())
+            {
+                response.code = 401;
+                response.write("无效的授权令牌");
+                return;
+            }
+
+            // 解析请求体
+            auto body = crow::json::load(request.body);
+            if (!body || !body.has("oldPassword") || !body.has("newPassword"))
+            {
+                response.code = 400;
+                response.write("无效的请求格式");
+                return;
+            }
+
+            // 调用服务层修改密码
+            bool success = Service::IndividualUserService::getInstance().changePassword(
+                std::stoi(userId), 
+                body["oldPassword"].s(), 
+                body["newPassword"].s());
+
+            if (!success)
+            {
+                response.code = 400;
+                response.write("修改密码失败，请检查旧密码是否正确");
+                return;
+            }
+
+            response.code = 200;
+            response.write("密码修改成功");
+        }
+        catch (const std::exception& e)
+        {
+            CROW_LOG_ERROR << "修改密码失败: " << e.what();
+            response.code = 500;
+            response.write("服务器内部错误");
+        }
+    }
+
+    void UserController::getApplications(const crow::request& request, crow::response& response)
+    {
+        try
+        {
+            // 验证请求并获取用户ID
+            std::string token = request.get_header_value("Authorization");
+            std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
+            
+            if (userId.empty())
+            {
+                response.code = 401;
+                response.write("无效的授权令牌");
+                return;
+            }
+
+            // TODO: 实现获取用户申请记录的逻辑
+            response.code = 501;
+            response.write("功能暂未实现");
+        }
+        catch (const std::exception& e)
+        {
+            CROW_LOG_ERROR << "获取申请记录失败: " << e.what();
+            response.code = 500;
+            response.write("服务器内部错误");
+        }
+    }
+} // namespace Router

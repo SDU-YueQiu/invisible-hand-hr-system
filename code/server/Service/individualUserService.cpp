@@ -52,8 +52,15 @@ namespace Service
             return false;
         }
 
+        // 只更新非默认值的字段
+        if (!userData.PhoneNumber.empty()) existingUser.PhoneNumber = userData.PhoneNumber;
+        if (!userData.Email.empty()) existingUser.Email = userData.Email;
+        if (!userData.AccountStatus.empty()) existingUser.AccountStatus = userData.AccountStatus;
+        if (!userData.AvatarURL.empty()) existingUser.AvatarURL = userData.AvatarURL;
+        if (userData.LastLoginDate != 0) existingUser.LastLoginDate = userData.LastLoginDate;
+
         // 通过DAO层更新用户信息
-        return userDAO.update(userId, userData);
+        return userDAO.update(userId, existingUser);
     }
 
     bool IndividualUserService::changePassword(int userId, const std::string &oldPassword, const std::string &newPassword)
