@@ -62,21 +62,21 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void updateJob(const crow::request &request, crow::response &response);
+        static void updateJob(const crow::request &request, crow::response &response, int jobID);
 
         /**
          * @brief 删除职位
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void deleteJob(const crow::request &request, crow::response &response);
+        static void deleteJob(const crow::request &request, crow::response &response, int jobID);
 
         /**
          * @brief 获取职位申请者（简历）列表
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void getApplicants(const crow::request &request, crow::response &response);
+        static void getApplicants(const crow::request &request, crow::response &response, int jobID);
 
         /**
          * @brief 更新申请状态
@@ -84,5 +84,19 @@ namespace Router
          * @param response Crow响应对象
          */
         static void updateApplicationStatus(const crow::request &request, crow::response &response);
+
+        /**
+         * @brief 获取职位详细信息
+         * @param request Crow请求对象
+         * @param response Crow响应对象
+         */
+        static void getPostedJobDetail(const crow::request &request, crow::response &response, int jobID);
+
+        /**
+         * @brief 搜索符合条件的简历
+         * @param request Crow请求对象
+         * @param response Crow响应对象
+         */
+        static void searchResumes(const crow::request &request, crow::response &response);
     };
 }// namespace Router

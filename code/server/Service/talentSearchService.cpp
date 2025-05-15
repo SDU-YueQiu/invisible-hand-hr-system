@@ -39,6 +39,9 @@ namespace Service
         // 构建筛选条件
         std::vector<std::string> conditions;
         
+        //只搜索公开简历
+        conditions.push_back("VisibilityStatus = 'PUBLIC'");
+
         // 关键词搜索（技能、教育经历等）
         if (!criteria.keyword.empty())
         {
@@ -65,16 +68,6 @@ namespace Service
         if (!criteria.location.empty())
         {
             conditions.push_back("JobIntent LIKE '%" + criteria.location + "%'");
-        }
-        
-        // 薪资范围筛选
-        if (criteria.minSalary > 0)
-        {
-            conditions.push_back("JobIntent LIKE '%" + std::to_string(criteria.minSalary) + "%'");
-        }
-        if (criteria.maxSalary > 0)
-        {
-            conditions.push_back("JobIntent LIKE '%" + std::to_string(criteria.maxSalary) + "%'");
         }
         
         // 组合所有条件

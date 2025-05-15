@@ -47,11 +47,13 @@ classDiagram
             +getEnterpriseInfo(request, response)
             +updateEnterpriseInfo(request, response)
             +getPostedJobs(request, response)
+            +getJobDetails(request, response)
             +postNewJob(request, response)
             +updateJob(request, response)
             +deleteJob(request, response)
             +getApplicants(request, response)
             +updateApplicationStatus(request, response)
+            +searchResumes(request, response)
         }
         
         class AdminController {
@@ -65,6 +67,7 @@ classDiagram
             +getFeedbacks(request, response)
             +processFeedback(request, response)
             +getAnnouncements(request, response)
+            +getAnnouncementDetail(request, response)
             +createAnnouncement(request, response)
             +updateAnnouncement(request, response)
             +deleteAnnouncement(request, response)

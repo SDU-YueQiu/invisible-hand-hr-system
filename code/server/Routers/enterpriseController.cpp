@@ -10,6 +10,7 @@
 #include "../Service/applicationService.h"
 #include "../Utils/securityUtils.h"
 #include <crow/json.h>
+#include <string>
 
 
 namespace Router
@@ -276,7 +277,7 @@ namespace Router
         }
     }
 
-    void EnterpriseController::updateJob(const crow::request &request, crow::response &response)
+    void EnterpriseController::updateJob(const crow::request &request, crow::response &response, int jobID)
     {
         try
         {
@@ -292,7 +293,7 @@ namespace Router
             }
 
             // 获取路径参数中的职位ID
-            std::string jobId = request.url_params.get("jobId");
+            std::string jobId = std::to_string(jobID);
             if (jobId.empty())
             {
                 response.code = 400;
@@ -347,7 +348,7 @@ namespace Router
         }
     }
 
-    void EnterpriseController::deleteJob(const crow::request &request, crow::response &response)
+    void EnterpriseController::deleteJob(const crow::request &request, crow::response &response, int jobID)
     {
         try
         {
@@ -363,7 +364,7 @@ namespace Router
             }
 
             // 获取路径参数中的职位ID
-            std::string jobId = request.url_params.get("jobId");
+            std::string jobId = std::to_string(jobID);
             if (jobId.empty())
             {
                 response.code = 400;
@@ -391,7 +392,7 @@ namespace Router
         }
     }
 
-    void EnterpriseController::getApplicants(const crow::request &request, crow::response &response)
+    void EnterpriseController::getApplicants(const crow::request &request, crow::response &response, int jobID)
     {
         try
         {
@@ -407,7 +408,7 @@ namespace Router
             }
 
             // 获取路径参数中的职位ID
-            std::string jobId = request.url_params.get("jobId");
+            std::string jobId = std::to_string(jobID);
             if (jobId.empty())
             {
                 response.code = 400;
@@ -496,4 +497,128 @@ namespace Router
             response.write("服务器内部错误");
         }
     }
+
+    void EnterpriseController::getPostedJobDetail(const crow::request &request, crow::response &response, int jobID)
+    {
+        try
+        {
+            // 验证请求并获取企业ID
+            std::string token = request.get_header_value("Authorization");
+            std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
+
+            if (enterpriseId.empty())
+            {
+                response.code = 401;
+                response.write("无效的授权令牌");
+                return;
+            }
+
+            // 调用服务层获取职位详情
+            auto job = Service::JobPostingService::getInstance().getJobById(jobID);
+            if (job.JobID == -1)
+            {
+                response.code = 404;
+                response.write("职位不存在");
+                return;
+            }
+
+            // 验证职位是否属于当前企业
+            if (job.EnterpriseID != std::stoll(enterpriseId))
+            {
+                response.code = 403;
+                response.write("无权访问此职位");
+                return;
+            }
+
+            // 构建响应JSON
+            crow::json::wvalue result;
+            result["jobId"] = job.JobID;
+            result["jobTitle"] = job.JobTitle;
+            result["enterpriseId"] = job.EnterpriseID;
+            result["jobCategory"] = job.JobCategory;
+            result["recruitmentCount"] = job.RecruitmentCount;
+            result["workLocation"] = job.WorkLocation;
+            result["minSalary"] = job.MinSalary;
+            result["maxSalary"] = job.MaxSalary;
+            result["responsibilities"] = job.Responsibilities;
+            result["requirements"] = job.Requirements;
+            result["experienceRequired"] = job.ExperienceRequired;
+            result["educationRequired"] = job.EducationRequired;
+            result["benefits"] = job.Benefits;
+            result["publishDate"] = job.PublishDate;
+            result["deadlineDate"] = job.DeadlineDate;
+            result["jobStatus"] = job.JobStatus;
+
+            response.code = 200;
+            response.write(result.dump());
+        } catch (const std::exception &e)
+        {
+            CROW_LOG_ERROR << "获取职位详情失败: " << e.what();
+            response.code = 500;
+            response.write("服务器内部错误");
+        }
+    }
+
+
+    void EnterpriseController::searchResumes(const crow::request &request, crow::response &response)
+    {
+        try
+        {
+            // 验证请求并获取企业ID
+            std::string token = request.get_header_value("Authorization");
+            std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
+
+            if (enterpriseId.empty())
+            {
+                response.code = 401;
+                response.write("无效的授权令牌");
+                return;
+            }
+
+            // 构建搜索条件
+            Service::ResumeSearchCriteria criteria;
+
+            // 从查询参数填充搜索条件
+            if (request.url_params.get("keyword"))
+                criteria.keyword = request.url_params.get("keyword");
+            if (request.url_params.get("education"))
+                criteria.education = request.url_params.get("education");
+            if (request.url_params.get("experience"))
+                criteria.experience = request.url_params.get("experience");
+            if (request.url_params.get("location"))
+                criteria.location = request.url_params.get("location");
+            if (request.url_params.get("sortBy"))
+                criteria.sortBy = request.url_params.get("sortBy");
+            if (request.url_params.get("sortOrder"))
+                criteria.sortOrder = request.url_params.get("sortOrder");
+            if (request.url_params.get("returnSize"))
+                criteria.returnSize = std::stoi(request.url_params.get("returnSize"));
+
+            // 调用服务层搜索简历
+            auto resumes = Service::TalentSearchService::getInstance().searchResumes(criteria);
+
+            // 构建响应JSON数组
+            crow::json::wvalue::list resumeList;
+            for (const auto &resume: resumes)
+            {
+                crow::json::wvalue item;
+                item["resumeId"] = resume.ResumeID;
+                item["userId"] = resume.UserID;
+                item["resumeTitle"] = resume.ResumeTitle;
+                item["lastUpdateTime"] = resume.LastUpdateTime;
+                item["visibilityStatus"] = resume.VisibilityStatus;
+                item["attachmentPath"] = resume.AttachmentPath;
+                resumeList.push_back(item);
+            }
+
+            response.code = 200;
+            response.write(crow::json::wvalue(resumeList).dump());
+        } catch (const std::exception &e)
+        {
+            CROW_LOG_ERROR << "搜索简历失败: " << e.what();
+            response.code = 500;
+            response.write("服务器内部错误");
+        }
+    }
+
 }// namespace Router

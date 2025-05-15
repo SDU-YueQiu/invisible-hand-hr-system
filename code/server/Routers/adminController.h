@@ -69,7 +69,7 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void updateJobStatus(const crow::request &request, crow::response &response);
+        static void updateJobStatus(const crow::request &request, crow::response &response, int jobID);
 
         /**
          * @brief 获取反馈/留言列表
@@ -112,5 +112,12 @@ namespace Router
          * @param response Crow响应对象
          */
         static void deleteAnnouncement(const crow::request &request, crow::response &response);
+
+        /**
+         * @brief 获取公告详情
+         * @param request Crow请求对象
+         * @param response Crow响应对象
+         */
+        static void getAnnouncementDetail(const crow::request &request, crow::response &response);
     };
 }// namespace Router

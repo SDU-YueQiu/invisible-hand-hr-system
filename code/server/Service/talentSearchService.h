@@ -27,8 +27,6 @@ namespace Service
         std::string education;  ///< 学历要求
         std::string experience; ///< 工作经验要求
         std::string location;   ///< 期望工作地点
-        int32_t minSalary = 0;  ///< 最低期望薪资
-        int32_t maxSalary = 0;  ///< 最高期望薪资
         std::string sortBy;     ///< 排序字段
         std::string sortOrder;  ///< 排序顺序（默认为降序）
         int32_t returnSize = 50;///< 每页显示数量

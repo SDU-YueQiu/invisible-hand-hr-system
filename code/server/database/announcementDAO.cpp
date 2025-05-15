@@ -11,6 +11,7 @@
 #include "databaseManager.h"
 #include <crow/logging.h>
 #include <stdexcept>
+#include <string>
 
 namespace DAL
 {
@@ -25,9 +26,9 @@ namespace DAL
                     std::get<int64_t>(row.at("AdminID")),
                     std::get<std::string>(row.at("Title")),
                     std::get<std::string>(row.at("Content")),
-                    std::get<std::string>(row.at("PublishTime")),
-                    std::get<std::string>(row.at("EffectiveTime")),
-                    std::get<std::string>(row.at("ExpireTime")),
+                    std::get<time_t>(row.at("PublishTime")),
+                    std::get<time_t>(row.at("EffectiveTime")),
+                    std::get<time_t>(row.at("ExpireTime")),
                     static_cast<bool>(std::get<int>(row.at("IsTop")))};
         } catch (const std::exception &e)
         {
@@ -84,9 +85,9 @@ namespace DAL
                 std::to_string(announcementData.AdminID),
                 announcementData.Title,
                 announcementData.Content,
-                announcementData.PublishTime,
-                announcementData.EffectiveTime,
-                announcementData.ExpireTime,
+                std::to_string(announcementData.PublishTime),
+                std::to_string(announcementData.EffectiveTime),
+                std::to_string(announcementData.ExpireTime),
                 announcementData.IsTop ? "1" : "0"};
 
         auto result = dbManager.executeQuery(sql, params);
@@ -108,9 +109,9 @@ namespace DAL
                 std::to_string(announcementData.AdminID),
                 announcementData.Title,
                 announcementData.Content,
-                announcementData.PublishTime,
-                announcementData.EffectiveTime,
-                announcementData.ExpireTime,
+                std::to_string(announcementData.PublishTime),
+                std::to_string(announcementData.EffectiveTime),
+                std::to_string(announcementData.ExpireTime),
                 announcementData.IsTop ? "1" : "0",
                 std::to_string(announcementId)};
 

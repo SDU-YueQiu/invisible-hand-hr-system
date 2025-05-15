@@ -844,7 +844,7 @@ API将使用标准的HTTP状态码来指示请求的结果：
 
 ### 8.1 获取个人用户列表
 *   **Endpoint:** `GET /admin/users`
-*   **查询参数:** `username`, `email`, `phone`, `status`, `page`, `limit`
+*   **查询参数:** `filter`:完整的SQL查询条件
 *   **成功响应 (200 OK):** 返回个人用户列表及分页信息。
 
 ### 8.2 更新个人用户状态
@@ -855,7 +855,7 @@ API将使用标准的HTTP状态码来指示请求的结果：
 
 ### 8.3 获取企业用户列表
 *   **Endpoint:** `GET /admin/enterprises`
-*   **查询参数:** `enterpriseName`, `creditCode`, `status` ('PendingReview', 'Approved', etc.), `page`, `limit`
+*   **查询参数:** `filter`:完整的SQL查询条件
 *   **成功响应 (200 OK):** 返回企业用户列表及分页信息。
 
 ### 8.4 批准企业注册
@@ -870,15 +870,9 @@ API将使用标准的HTTP状态码来指示请求的结果：
 *   **请求体 (必须):** `{"auditOpinion": "string (拒绝理由)"}`
 *   **成功响应 (200 OK):** 企业状态更新为 'Rejected'。
 
-### 8.6 更新企业状态 (通用)
-*   **Endpoint:** `PUT /admin/enterprises/{enterpriseId}/status`
-*   **路径参数:** `enterpriseId` (integer)
-*   **请求体:** `{"newStatus": "string ('Approved', 'Disabled', 'PendingReview')", "auditOpinion": "string (optional)"}`
-*   **成功响应 (200 OK):** 返回更新后的企业状态。
-
-### 8.7 管理所有职位 (若有职位审核流程)
+### 8.7 管理所有职位
 *   **Endpoint:** `GET /admin/jobs`
-*   **查询参数:** `jobTitle`, `enterpriseName`, `status` ('PendingReview', 'Recruiting', etc.), `page`, `limit`
+*   **查询参数:** `filter`:完整的SQL查询条件
 *   **成功响应 (200 OK):** 返回职位列表及分页。
 
 ### 8.8 更新职位状态 (管理员操作)

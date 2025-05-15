@@ -18,9 +18,9 @@ namespace Model
         int64_t AdminID = -1;
         std::string Title;
         std::string Content;
-        std::string PublishTime;
-        std::string EffectiveTime;
-        std::string ExpireTime;
+        time_t PublishTime = 0;
+        time_t EffectiveTime = 0;
+        time_t ExpireTime = 0;
         bool IsTop = false;
     };
 }// namespace Model

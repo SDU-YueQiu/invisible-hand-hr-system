@@ -21,19 +21,19 @@ namespace Model
   */
     struct Resume
     {
-        int64_t ResumeID = -1;          ///< 简历唯一标识（主键，自增）
-        int64_t UserID = -1;            ///< 所属用户ID（外键到IndividualUsers）
-        std::string ResumeTitle;        ///< 简历标题
-        std::string BasicInfo;          ///< 基本信息（JSON格式：姓名、性别、出生日期等）
-        std::string JobIntent;          ///< 求职意向（JSON格式：期望行业、职位、薪资等）
-        std::string EducationExperience;///< 教育经历（JSON数组）
-        std::string WorkExperience;     ///< 工作经历（JSON数组）
-        std::string ProjectExperience;  ///< 项目经验（JSON数组）
-        std::string SkillsCertificates; ///< 技能证书（JSON数组）
-        std::string SelfDescription;    ///< 自我评价
-        std::string LastUpdateTime;     ///< 最后更新时间（默认当前时间）
-        std::string VisibilityStatus;   ///< 公开状态（默认'Private'）
-        std::string AttachmentPath;     ///< 附件简历路径（可选）
+        int64_t ResumeID = -1;                   ///< 简历唯一标识（主键，自增）
+        int64_t UserID = -1;                     ///< 所属用户ID（外键到IndividualUsers）
+        std::string ResumeTitle;                 ///< 简历标题
+        std::string BasicInfo;                   ///< 基本信息（JSON格式：姓名、性别、出生日期等）
+        std::string JobIntent;                   ///< 求职意向（JSON格式：期望行业、职位、薪资等）
+        std::string EducationExperience;         ///< 教育经历（JSON数组）
+        std::string WorkExperience;              ///< 工作经历（JSON数组）
+        std::string ProjectExperience;           ///< 项目经验（JSON数组）
+        std::string SkillsCertificates;          ///< 技能证书（JSON数组）
+        std::string SelfDescription;             ///< 自我评价
+        std::string LastUpdateTime;              ///< 最后更新时间（默认当前时间）
+        std::string VisibilityStatus = "Private";///< 公开状态（默认'Private'）
+        std::string AttachmentPath;              ///< 附件简历路径（可选）
     };
 
 }// namespace Model

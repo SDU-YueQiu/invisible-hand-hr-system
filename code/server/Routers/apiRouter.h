@@ -77,14 +77,14 @@ namespace Router
             // 7.5 企业发布新职位
             CROW_ROUTE(app, "/api/v1/enterprises/me/jobs").methods("POST"_method)(&Router::EnterpriseController::postNewJob);// 新增
             // 7.6 获取企业发布的某个职位详情
-            CROW_ROUTE(app, "/api/v1/enterprises/me/jobs/<int>").methods("GET"_method)(&Router::EnterpriseController::getPostedJobDetail);// {jobId} - 新增
+            CROW_ROUTE(app, "/api/v1/enterprises/me/jobs/<int>").methods("GET"_method)(&Router::EnterpriseController::getPostedJobDetail);
             // 7.7 修改企业发布的职位
-            CROW_ROUTE(app, "/api/v1/enterprises/me/jobs/<int>").methods("PUT"_method)(&Router::EnterpriseController::updatePostedJob);// {jobId} - 新增
+            CROW_ROUTE(app, "/api/v1/enterprises/me/jobs/<int>").methods("PUT"_method)(&Router::EnterpriseController::updateJob);
             // 7.8 删除企业发布的职位
-            CROW_ROUTE(app, "/api/v1/enterprises/me/jobs/<int>").methods("DELETE"_method)(&Router::EnterpriseController::deletePostedJob);// {jobId} - 新增
+            CROW_ROUTE(app, "/api/v1/enterprises/me/jobs/<int>").methods("DELETE"_method)(&Router::EnterpriseController::deleteJob);
 
             // 7.9 获取某职位的申请者列表
-            CROW_ROUTE(app, "/api/v1/enterprises/me/jobs/<int>/applicants").methods("GET"_method)(&Router::EnterpriseController::getJobApplicants);// {jobId} - 路径已修正, 确认Controller方法名和参数
+            CROW_ROUTE(app, "/api/v1/enterprises/me/jobs/<int>/applicants").methods("GET"_method)(&Router::EnterpriseController::getApplicants);
             // 7.10 更新职位申请状态 (企业操作)
             CROW_ROUTE(app, "/api/v1/enterprises/me/applications/<int>/status").methods("PUT"_method)(&Router::EnterpriseController::updateApplicationStatus);// {applicationId}
             // 7.11 搜索符合条件的简历
@@ -99,11 +99,8 @@ namespace Router
             CROW_ROUTE(app, "/api/v1/admin/enterprises/<int>/approve").methods("PUT"_method)(&Router::AdminController::approveEnterprise);// {enterpriseId} - 路径和方法已修正
             // 8.5 拒绝企业注册
             CROW_ROUTE(app, "/api/v1/admin/enterprises/<int>/reject").methods("PUT"_method)(&Router::AdminController::rejectEnterprise);// {enterpriseId} - 路径和方法已修正
-            // 8.6 更新企业状态 (通用)
-            CROW_ROUTE(app, "/api/v1/admin/enterprises/<int>/status").methods("PUT"_method)(&Router::AdminController::updateEnterpriseStatus);// {enterpriseId} - 新增
-
             // 8.7 管理所有职位
-            CROW_ROUTE(app, "/api/v1/admin/jobs").methods("GET"_method)(&Router::AdminController::getAllJobs);// 新增
+            CROW_ROUTE(app, "/api/v1/admin/jobs").methods("GET"_method)(&Router::AdminController::getJobs);// 新增
             // 8.8 更新职位状态 (管理员操作)
             CROW_ROUTE(app, "/api/v1/admin/jobs/<int>/status").methods("PUT"_method)(&Router::AdminController::updateJobStatus);// {jobId} - 新增
 
@@ -117,9 +114,9 @@ namespace Router
 
             // 10. 公告 (Announcements) 模块
             // 10.1 获取公告列表 (公开)
-            CROW_ROUTE(app, "/api/v1/announcements").methods("GET"_method)(&Router::AnnouncementController::getAnnouncements);// 新增 (需要AnnouncementController)
+            CROW_ROUTE(app, "/api/v1/announcements").methods("GET"_method)(&Router::AdminController::getAnnouncements);
             // 10.2 获取公告详情 (公开)
-            CROW_ROUTE(app, "/api/v1/announcements/<int>").methods("GET"_method)(&Router::AnnouncementController::getAnnouncementDetail);// {announcementId} - 新增
+            CROW_ROUTE(app, "/api/v1/announcements/<int>").methods("GET"_method)(&Router::AdminController::getAnnouncementDetail);// {announcementId} - 新增
             // 10.3 管理员创建公告
             CROW_ROUTE(app, "/api/v1/admin/announcements").methods("POST"_method)(&Router::AdminController::createAnnouncement);// 新增 (或AnnouncementAdminController)
             // 10.4 管理员修改公告
