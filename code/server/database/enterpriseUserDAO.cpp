@@ -212,4 +212,29 @@ namespace DAL
         return createEnterpriseUserFromRow(result->front());
     }
 
+    /**
+ * @brief 根据筛选条件查询企业用户信息
+ * @param filter SQL筛选条件字符串
+ * @return std::vector<Model::EnterpriseUser> 符合条件的企业用户列表
+ */
+    std::vector<Model::EnterpriseUser> EnterpriseUserDAO::findByFilter(const std::string &filter)
+    {
+        CROW_LOG_INFO << "查询企业用户，筛选条件: " << (filter.empty() ? "无" : filter);
+        std::string sql = "SELECT * FROM EnterpriseUsers";
+        if (!filter.empty())
+        {
+            sql += " WHERE " + filter;
+        }
+
+        auto result = dbManager.executeQuery(sql, {});
+        std::vector<Model::EnterpriseUser> enterprises;
+        if (!result) return enterprises;
+
+        for (auto &row: *result)
+        {
+            enterprises.push_back(createEnterpriseUserFromRow(row));
+        }
+        return enterprises;
+    }
+
 }// namespace DAL

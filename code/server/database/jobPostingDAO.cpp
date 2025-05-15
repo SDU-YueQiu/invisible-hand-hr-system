@@ -179,4 +179,29 @@ namespace DAL
         auto result = dbManager.executeQuery(sql, {std::to_string(jobId)});
         return result != nullptr;
     }
+
+    /**
+    * @brief 根据筛选条件查询招聘岗位信息
+    * @param filter SQL筛选条件字符串
+    * @return std::vector<Model::JobPosting> 符合条件的招聘岗位列表
+    */
+    std::vector<Model::JobPosting> JobPostingDAO::findByFilter(const std::string &filter)
+    {
+        CROW_LOG_INFO << "查询招聘岗位，筛选条件: " << (filter.empty() ? "无" : filter);
+        std::string sql = "SELECT * FROM JobPostings";
+        if (!filter.empty())
+        {
+            sql += " WHERE " + filter;
+        }
+
+        auto result = dbManager.executeQuery(sql, {});
+        std::vector<Model::JobPosting> jobPostings;
+        if (!result) return jobPostings;
+
+        for (auto &row: *result)
+        {
+            jobPostings.push_back(createJobPostingFromRow(row));
+        }
+        return jobPostings;
+    }
 }// namespace DAL

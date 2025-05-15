@@ -31,7 +31,8 @@ namespace DAL
          * @brief 获取EnterpriseUserDAO单例实例（线程安全）
          * @return EnterpriseUserDAO& EnterpriseUserDAO实例
          */
-        static EnterpriseUserDAO& getInstance() {
+        static EnterpriseUserDAO &getInstance()
+        {
             thread_local static EnterpriseUserDAO instance;
             return instance;
         }
@@ -79,11 +80,18 @@ namespace DAL
         bool update(int64_t enterpriseId, const Model::EnterpriseUser &enterpriseData);
 
         /**
-     * @brief 删除指定ID的企业用户记录
-     * @param enterpriseId 待删除的企业ID
-     * @return bool 删除成功返回true，否则返回false
-     */
+        * @brief 删除指定ID的企业用户记录
+        * @param enterpriseId 待删除的企业ID
+        * @return bool 删除成功返回true，否则返回false
+        */
         bool deleteById(int64_t enterpriseId);
+
+        /**
+        * @brief 根据筛选条件查询企业用户信息
+        * @param filter SQL筛选条件字符串（如"AccountStatus='正常' AND RegistrationDate>'2025-01-01'"）
+        * @return std::vector<Model::EnterpriseUser> 符合条件的企业用户列表
+        */
+        std::vector<Model::EnterpriseUser> findByFilter(const std::string &filter);
 
     private:
         EnterpriseUserDAO() = default;

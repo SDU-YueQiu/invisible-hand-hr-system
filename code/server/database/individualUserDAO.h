@@ -25,7 +25,8 @@ namespace DAL
          * @brief 获取IndividualUserDAO单例实例（线程安全）
          * @return IndividualUserDAO& IndividualUserDAO实例
          */
-        static IndividualUserDAO& getInstance() {
+        static IndividualUserDAO &getInstance()
+        {
             thread_local static IndividualUserDAO instance;
             return instance;
         }
@@ -87,6 +88,13 @@ namespace DAL
          * @return bool 更新成功返回true，否则返回false
          */
         bool updateStatus(int id, const std::string &status);
+
+        /**
+        * @brief 根据筛选条件查询个人用户信息
+        * @param filter SQL筛选条件字符串（如"AccountStatus='正常' AND RegistrationDate>'2025-01-01'"）
+        * @return std::vector<Model::IndividualUser> 符合条件的用户列表
+        */
+        std::vector<Model::IndividualUser> findByFilter(const std::string &filter);
 
     private:
         IndividualUserDAO() = default;

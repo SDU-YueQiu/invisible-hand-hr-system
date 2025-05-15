@@ -214,4 +214,25 @@ namespace DAL
         auto result = dbManager.executeQuery(sql, {status, std::to_string(id)});
         return result != nullptr;
     }
+
+    std::vector<Model::IndividualUser> IndividualUserDAO::findByFilter(const std::string &filter)
+    {
+        CROW_LOG_INFO << "Attempting to find users with filter: " << filter;
+
+        std::string sql = "SELECT * FROM IndividualUsers";
+        if (!filter.empty())
+        {
+            sql += " WHERE " + filter;
+        }
+
+        auto result = dbManager.executeQuery(sql, {});
+        std::vector<Model::IndividualUser> users;
+        if (!result) return users;
+
+        for (auto &row: *result)
+        {
+            users.push_back(createUserFromRow(row));
+        }
+        return users;
+    }
 }// namespace DAL
