@@ -10,6 +10,7 @@
 #include "../Model/jobPosting.h"
 #include "databaseManager.h"
 #include <crow/logging.h>
+#include <cstdint>
 #include <stdexcept>
 
 namespace DAL
@@ -32,7 +33,8 @@ namespace DAL
                     std::get<std::string>(row.at("JobCategory")),
                     std::get<int32_t>(row.at("RecruitmentCount")),
                     std::get<std::string>(row.at("WorkLocation")),
-                    std::get<std::string>(row.at("SalaryRange")),
+                    std::get<int32_t>(row.at("MaxSalary")),
+                    std::get<int32_t>(row.at("MinSalary")),
                     std::get<std::string>(row.at("Responsibilities")),
                     std::get<std::string>(row.at("Requirements")),
                     std::get<std::string>(row.at("ExperienceRequired")),
@@ -100,7 +102,7 @@ namespace DAL
         const std::string sql = R"(
             INSERT INTO JobPostings (
                 EnterpriseID, JobTitle, JobCategory, RecruitmentCount,
-                WorkLocation, SalaryRange, Responsibilities, Requirements,
+                WorkLocation, MaxSalary, MinSalary, Responsibilities, Requirements,
                 ExperienceRequired, EducationRequired, Benefits,
                 PublishDate, UpdateDate, DeadlineDate, JobStatus
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -112,7 +114,8 @@ namespace DAL
                 jobData.JobCategory,
                 std::to_string(jobData.RecruitmentCount),
                 jobData.WorkLocation,
-                jobData.SalaryRange,
+                std::to_string(jobData.MaxSalary),
+                std::to_string(jobData.MinSalary),
                 jobData.Responsibilities,
                 jobData.Requirements,
                 jobData.ExperienceRequired,
@@ -139,7 +142,7 @@ namespace DAL
         const std::string sql = R"(
             UPDATE JobPostings SET
                 EnterpriseID = ?, JobTitle = ?, JobCategory = ?, RecruitmentCount = ?,
-                WorkLocation = ?, SalaryRange = ?, Responsibilities = ?, Requirements = ?,
+                WorkLocation = ?, MaxSalary = ?, MinSalary = ?, Responsibilities = ?, Requirements = ?,
                 ExperienceRequired = ?, EducationRequired = ?, Benefits = ?,
                 PublishDate = ?, UpdateDate = ?, DeadlineDate = ?, JobStatus = ?
             WHERE JobID = ?
@@ -151,7 +154,8 @@ namespace DAL
                 jobData.JobCategory,
                 std::to_string(jobData.RecruitmentCount),
                 jobData.WorkLocation,
-                jobData.SalaryRange,
+                std::to_string(jobData.MaxSalary),
+                std::to_string(jobData.MinSalary),
                 jobData.Responsibilities,
                 jobData.Requirements,
                 jobData.ExperienceRequired,

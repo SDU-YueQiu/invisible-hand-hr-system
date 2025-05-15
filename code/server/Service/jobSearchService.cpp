@@ -44,8 +44,12 @@ namespace Service
             conditions.push_back("WorkLocation = '" + criteria.workLocation + "'");
         }
         
-        if (!criteria.salaryRange.empty()) {
-            conditions.push_back("SalaryRange = '" + criteria.salaryRange + "'");
+        // 薪资范围筛选
+        if (criteria.minSalary > 0) {
+            conditions.push_back("MinSalary >= " + std::to_string(criteria.minSalary));
+        }
+        if (criteria.maxSalary > 0) {
+            conditions.push_back("MaxSalary <= " + std::to_string(criteria.maxSalary));
         }
         
         if (!criteria.experienceRequired.empty()) {
@@ -73,7 +77,8 @@ namespace Service
         if (!criteria.sortBy.empty()) {
             // 验证排序字段是否合法
             const std::vector<std::string> validSortFields = {
-                "PublishDate", "UpdateDate", "DeadlineDate", "JobTitle", "SalaryRange"
+                "PublishDate", "UpdateDate", "DeadlineDate", "JobTitle",
+                "MaxSalary", "MinSalary"
             };
             
             if (std::find(validSortFields.begin(), validSortFields.end(), criteria.sortBy) != validSortFields.end()) {

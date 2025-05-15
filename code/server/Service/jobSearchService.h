@@ -11,6 +11,7 @@
 #include "../Database/jobPostingDAO.h"
 #include "../Model/jobPosting.h"
 #include <crow/logging.h>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -25,13 +26,14 @@ namespace Service
         std::string keyword;           ///< 搜索关键词（职位名称或公司名称）
         std::string jobCategory;       ///< 职位类别
         std::string workLocation;      ///< 工作地点
-        std::string salaryRange;       ///< 薪资范围
+        int32_t maxSalary = 0;         ///< 最大工资
+        int32_t minSalary = 0;         ///< 最小工资
         std::string experienceRequired;///< 工作经验要求
         std::string educationRequired; ///< 学历要求
-        std::string sortBy;            ///< 排序字段（默认为PublishDate）
+        std::string sortBy;            ///< 排序字段
         std::string sortOrder;         ///< 排序顺序（默认为降序）
         std::string jobStatus = "Open";///< 职位状态（默认为Open）
-        int32_t returnSize = 50;         ///< 每页显示数量
+        int32_t returnSize = 50;       ///< 每页显示数量
     };
 
     /**

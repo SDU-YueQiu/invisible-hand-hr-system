@@ -400,7 +400,8 @@ AdminUser "1" -- "0..*" JobPosting : Manages (Implicit)
     *   `JobCategory` (TEXT): 职位类别
     *   `RecruitmentCount` (INTEGER): 招聘人数
     *   `WorkLocation` (TEXT): 工作地点
-    *   `SalaryRange` (TEXT): 薪资范围
+    *   `MaxSalary` (INTEGER): 最高薪资
+    *   `MinSalary` (INTEGER): 最低薪资
     *   `Responsibilities` (TEXT, NOT NULL): 岗位职责
     *   `Requirements` (TEXT, NOT NULL): 任职要求
     *   `ExperienceRequired` (TEXT): 工作经验要求
