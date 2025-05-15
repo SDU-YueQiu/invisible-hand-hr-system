@@ -18,14 +18,14 @@
 
 ### API层
 
-- [ ] `ApiRouter`: 集中管理所有路由配置，将请求映射到对应的控制器方法
-- [ ] `AuthController`: 处理用户认证相关请求（登录、注册、找回密码等）
-- [ ] `UserController`: 处理个人用户信息管理
-- [ ] `ResumeController`: 处理简历的CRUD操作
-- [ ] `JobController`: 处理职位查询和申请
-- [ ] `EnterpriseController`: 处理企业用户信息和职位管理
-- [ ] `AdminController`: 处理管理员的各种管理功能
-- [ ] `FeedbackController`: 处理用户反馈和留言
+- [x] `ApiRouter`: 集中管理所有路由配置，将请求映射到对应的控制器方法
+- [x] `AuthController`: 处理用户认证相关请求（登录、注册、找回密码等）
+- [x] `UserController`: 处理个人用户信息管理
+- [x] `ResumeController`: 处理简历的CRUD操作
+- [x] `JobController`: 处理职位查询和申请
+- [x] `EnterpriseController`: 处理企业用户信息和职位管理
+- [x] `AdminController`: 处理管理员的各种管理功能
+- [x] `FeedbackController`: 处理用户反馈和留言
 
 ### 服务层
 
