@@ -809,7 +809,35 @@ API将使用标准的HTTP状态码来指示请求的结果：
     ```
 *   **失败响应:** `400 Bad Request`, `404 Not Found`
 
----
+
+### 7.11 搜索符合条件的简历
+*   **Endpoint:** `GET /enterprises/me/resumes/search`
+*   **描述:** 企业用户根据条件搜索公开简历库
+*   **认证:** JWT (企业用户)
+*   **查询参数 (Query Parameters):**
+    *   `keyword` (string, optional): 搜索关键词(技能、教育经历等)
+    *   `education` (string, optional): 学历要求
+    *   `experience` (string, optional): 工作经验要求
+    *   `location` (string, optional): 期望工作地点
+    *   `minSalary` (integer, optional): 最低期望薪资
+    *   `maxSalary` (integer, optional): 最高期望薪资
+    *   `sortBy` (string, optional): 排序字段
+    *   `sortOrder` (string, optional): 排序顺序(asc/desc)
+*   **成功响应 (200 OK):**
+    ```json
+    {
+      "success": true,
+      "data": {
+        "resumes": [
+          {
+          }
+        ]
+        }
+      },
+      "message": "简历搜索成功"
+    }
+    ```
+*   **失败响应:** `400 Bad Request` (参数错误), `403 Forbidden` (无权限)
 
 ## 8. 管理员 (Admin) 模块
 **所有管理员接口均需 Admin JWT 认证。**

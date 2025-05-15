@@ -366,6 +366,10 @@ AdminUser "1" -- "0..*" JobPosting : Manages (Implicit)
     *   `BasicInfo` (TEXT, JSON): 基本信息 (姓名、性别、出生日期等)
     *   `JobIntent` (TEXT, JSON): 求职意向 (期望行业、职位、薪资等)
     *   `EducationExperience` (TEXT, JSON Array): 教育经历列表
+        *格式为`[
+            {"school": "山东大学", "degree": "本科", "major": "计算机科学"},
+            {"school": "清华大学", "degree": "硕士", "major": "软件工程"}
+        ]`
     *   `WorkExperience` (TEXT, JSON Array): 工作经历列表
     *   `ProjectExperience` (TEXT, JSON Array): 项目经验列表
     *   `SkillsCertificates` (TEXT, JSON Array): 技能证书列表
