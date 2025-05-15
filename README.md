@@ -50,7 +50,9 @@
 ### 构建说明
 
 1.项目默认使用vcpkg管理依赖，vcpkg相关json已配置好，保证cmake工具链正确即可构建。
+
 2.项目cmake默认使用clang-debug配置，其他配置未详尽测试。
+
 3.如同样使用vscode系ide和clang，为clangd插件正常工作，你可能需要在根目录下使用（管理员）powershell建立compile_commands.json的符号链接文件：
 ```bash
 
