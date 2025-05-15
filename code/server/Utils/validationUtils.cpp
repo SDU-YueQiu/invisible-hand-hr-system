@@ -24,6 +24,23 @@ bool ValidationUtils::validateEmail(const std::string &email)
         CROW_LOG_WARNING << "邮箱格式验证失败: " << email;
         return false;
     }
+
+    // 检查邮箱是否已被个人用户使用
+    auto individualUser = DAL::IndividualUserDAO::getInstance().findByEmail(email);
+    if (individualUser.UserID != -1)
+    {
+        CROW_LOG_WARNING << "邮箱已被个人用户使用: " << email;
+        return false;
+    }
+
+    // 检查邮箱是否已被企业用户使用
+    auto enterpriseUser = DAL::EnterpriseUserDAO::getInstance().findByLoginUsername(email);
+    if (enterpriseUser.EnterpriseID != -1)
+    {
+        CROW_LOG_WARNING << "邮箱已被企业用户使用: " << email;
+        return false;
+    }
+
     return true;
 }
 
@@ -38,6 +55,8 @@ bool ValidationUtils::validatePhone(const std::string &phone)
         CROW_LOG_WARNING << "电话号码格式验证失败: " << phone;
         return false;
     }
+
+
     return true;
 }
 

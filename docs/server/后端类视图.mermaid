@@ -20,14 +20,12 @@ classDiagram
             +loginEnterprise(request, response)
             +loginAdmin(request, response)
             +logout(request, response)
-            +forgotPassword(request, response)
             +resetPassword(request, response)
         }
         
         class UserController {
             +getCurrentUserInfo(request, response)
             +updateUserInfo(request, response)
-            +changePassword(request, response)
             +getResumes(request, response)
             +getApplications(request, response)
         }
@@ -95,19 +93,20 @@ classDiagram
         class AuthService {
             +registerIndividual(userData)
             +loginIndividual(username, password)
+            +loginIndividualByPhoneNumber(phoneNumber, password)
+            +loginIndividualByEmail(email, password)
             +registerEnterprise(enterpriseData)
             +loginEnterprise(username, password)
+            +loginEnterpriseByPhoneNumber(phoneNumber, password)
+            +loginEnterpriseByEmail(email, password)
             +loginAdmin(username, password)
             +generateToken(userId, role)
             +verifyToken(token)
-            +requestPasswordReset(email)
-            +resetPassword(token, newPassword)
         }
         
         class IndividualUserService {
             +getUserById(userId)
             +updateUserInfo(userId, userData)
-            +changePassword(userId, oldPassword, newPassword)
         }
         
         class ResumeService {
@@ -134,7 +133,6 @@ classDiagram
         class EnterpriseUserService {
             +getEnterpriseById(enterpriseId)
             +updateEnterpriseInfo(enterpriseId, enterpriseData)
-            +changePassword(enterpriseId, oldPassword, newPassword)
         }
         
         class JobPostingService {
