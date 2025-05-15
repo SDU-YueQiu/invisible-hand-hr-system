@@ -247,7 +247,7 @@ namespace Router
         }
     }
 
-    void ResumeController::deleteResume(const crow::request &request, crow::response &response)
+    void ResumeController::deleteResume(const crow::request &request, crow::response &response, int rid)
     {
         try
         {
@@ -263,7 +263,7 @@ namespace Router
             }
 
             // 获取路径参数中的简历ID
-            std::string resumeId = request.url_params.get("resumeId");
+            std::string resumeId = std::to_string(rid);
             if (resumeId.empty())
             {
                 response.code = 400;

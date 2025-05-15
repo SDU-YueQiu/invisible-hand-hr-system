@@ -12,10 +12,10 @@
 
 namespace Service
 {
-    bool FeedbackService::submitFeedback(const Model::Feedback& feedbackData)
+    bool FeedbackService::submitFeedback(const Model::Feedback &feedbackData)
     {
         CROW_LOG_INFO << "Submitting feedback from user ID: " << feedbackData.UserID;
-        
+
         // 验证必要字段
         if (feedbackData.FeedbackType.empty() || feedbackData.Content.empty())
         {
@@ -29,7 +29,7 @@ namespace Service
         {
             feedbackToSave.Status = "Pending";
         }
-        
+
         std::time_t now = std::time(nullptr);
         feedbackToSave.CreateTime = std::to_string(now);
         feedbackToSave.UpdateTime = std::to_string(now);
@@ -37,16 +37,16 @@ namespace Service
         return feedbackDAO.create(feedbackToSave);
     }
 
-    std::vector<Model::Feedback> FeedbackService::getFeedbacks(const std::string& filter)
+    std::vector<Model::Feedback> FeedbackService::getFeedbacks(const std::string &filter)
     {
         CROW_LOG_INFO << "Getting feedbacks with filter: " << (filter.empty() ? "none" : filter);
         return feedbackDAO.findAll(filter);
     }
 
-    bool FeedbackService::processFeedback(int64_t feedbackId, const std::string& reply)
+    bool FeedbackService::processFeedback(int64_t feedbackId, const std::string &reply)
     {
         CROW_LOG_INFO << "Processing feedback ID: " << feedbackId;
-        
+
         // 获取现有反馈记录
         auto feedback = feedbackDAO.findById(feedbackId);
         if (feedback.FeedbackID == -1)
@@ -62,4 +62,4 @@ namespace Service
 
         return feedbackDAO.update(feedbackId, feedback);
     }
-} // namespace Service
+}// namespace Service

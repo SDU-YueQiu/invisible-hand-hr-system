@@ -83,7 +83,7 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void updateApplicationStatus(const crow::request &request, crow::response &response);
+        static void updateApplicationStatus(const crow::request &request, crow::response &response, int eid);
 
         /**
          * @brief 获取职位详细信息

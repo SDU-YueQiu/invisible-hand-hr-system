@@ -9,6 +9,7 @@
 #include "adminController.h"
 #include "../Utils/securityUtils.h"
 #include <crow/json.h>
+#include <string>
 
 namespace Router
 {
@@ -140,7 +141,7 @@ namespace Router
         }
     }
 
-    void AdminController::approveEnterprise(const crow::request &request, crow::response &response)
+    void AdminController::approveEnterprise(const crow::request &request, crow::response &response, int eid)
     {
         try
         {
@@ -155,7 +156,7 @@ namespace Router
 
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("enterpriseId"))
+            if (!body)
             {
                 response.code = 400;
                 response.write("无效的请求格式");
@@ -166,7 +167,7 @@ namespace Router
 
             // 调用服务层批准企业
             bool success = Service::AdminService::getInstance().approveEnterprise(
-                    body["enterpriseId"].i(),
+                    eid,
                     opinion);
 
             if (!success)
@@ -186,7 +187,7 @@ namespace Router
         }
     }
 
-    void AdminController::rejectEnterprise(const crow::request &request, crow::response &response)
+    void AdminController::rejectEnterprise(const crow::request &request, crow::response &response, int eid)
     {
         try
         {
@@ -201,7 +202,7 @@ namespace Router
 
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("enterpriseId"))
+            if (!body)
             {
                 response.code = 400;
                 response.write("无效的请求格式");
@@ -212,7 +213,7 @@ namespace Router
 
             // 调用服务层拒绝企业
             bool success = Service::AdminService::getInstance().rejectEnterprise(
-                    body["enterpriseId"].i(),
+                    eid,
                     opinion);
 
             if (!success)
@@ -361,7 +362,7 @@ namespace Router
         }
     }
 
-    void AdminController::getAnnouncementDetail(const crow::request &request, crow::response &response)
+    void AdminController::getAnnouncementDetail(const crow::request &request, crow::response &response, int aid)
     {
         try
         {
@@ -375,7 +376,7 @@ namespace Router
             }
 
             // 获取公告ID
-            std::string announcementId = request.url_params.get("announcementId");
+            std::string announcementId = std::to_string(aid);
             if (announcementId.empty())
             {
                 response.code = 400;
@@ -469,7 +470,7 @@ namespace Router
         }
     }
 
-    void AdminController::updateAnnouncement(const crow::request &request, crow::response &response)
+    void AdminController::updateAnnouncement(const crow::request &request, crow::response &response, int aid)
     {
         try
         {
@@ -484,7 +485,7 @@ namespace Router
 
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("announcementId"))
+            if (!body)
             {
                 response.code = 400;
                 response.write("无效的请求格式");
@@ -493,7 +494,7 @@ namespace Router
 
             // 构建公告更新对象
             Model::Announcement announcementData;
-            announcementData.AnnouncementID = body["announcementId"].i();
+            announcementData.AnnouncementID = aid;
             if (body.has("title")) announcementData.Title = body["title"].s();
             if (body.has("content")) announcementData.Content = body["content"].s();
             if (body.has("effectiveTime")) announcementData.EffectiveTime = body["effectiveTime"].i();
@@ -521,7 +522,7 @@ namespace Router
         }
     }
 
-    void AdminController::deleteAnnouncement(const crow::request &request, crow::response &response)
+    void AdminController::deleteAnnouncement(const crow::request &request, crow::response &response, int aid)
     {
         try
         {
@@ -535,7 +536,7 @@ namespace Router
             }
 
             // 获取公告ID
-            std::string announcementId = request.url_params.get("announcementId");
+            std::string announcementId = std::to_string(aid);
             if (announcementId.empty())
             {
                 response.code = 400;
@@ -562,4 +563,99 @@ namespace Router
             response.write("服务器内部错误");
         }
     }
+
+    void AdminController::getFeedbacks(const crow::request &request, crow::response &response)
+    {
+        try
+        {
+            // 验证管理员权限
+            std::string token = request.get_header_value("Authorization");
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            {
+                response.code = 403;
+                response.write("无权访问此资源");
+                return;
+            }
+
+            // 获取筛选条件
+            std::string filter = request.url_params.get("filter") ? request.url_params.get("filter") : "";
+
+            // 调用服务层获取反馈列表
+            auto feedbacks = Service::FeedbackService::getInstance().getFeedbacks(filter);
+
+            // 构建响应JSON数组
+            crow::json::wvalue::list feedbackList;
+            for (const auto &feedback: feedbacks)
+            {
+                crow::json::wvalue item;
+                item["feedbackId"] = feedback.FeedbackID;
+                item["userId"] = feedback.UserID;
+                item["userType"] = feedback.UserType;
+                item["feedbackType"] = feedback.FeedbackType;
+                item["content"] = feedback.Content;
+                item["contactInfo"] = feedback.ContactInfo;
+                item["status"] = feedback.Status;
+                item["adminReply"] = feedback.AdminReply;
+                item["createTime"] = feedback.CreateTime;
+                item["updateTime"] = feedback.UpdateTime;
+                feedbackList.push_back(item);
+            }
+
+            response.code = 200;
+            response.write(crow::json::wvalue(feedbackList).dump());
+        } catch (const std::exception &e)
+        {
+            CROW_LOG_ERROR << "获取反馈列表失败: " << e.what();
+            response.code = 500;
+            response.write("服务器内部错误");
+        }
+    }
+
+    void AdminController::processFeedback(const crow::request &request, crow::response &response, int fid)
+    {
+        try
+        {
+            // 验证管理员权限
+            std::string token = request.get_header_value("Authorization");
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            {
+                response.code = 403;
+                response.write("无权访问此资源");
+                return;
+            }
+
+            // 解析请求体
+            auto body = crow::json::load(request.body);
+            if (!body || !body.has("status"))
+            {
+                response.code = 400;
+                response.write("无效的请求格式");
+                return;
+            }
+
+            // 获取管理员回复
+            std::string adminReply = body.has("adminReply") ? body["adminReply"].s() : std::string("");
+
+            // 调用服务层处理反馈
+            bool success = Service::FeedbackService::getInstance().processFeedback(
+                    fid,
+                    adminReply);
+
+            if (!success)
+            {
+                response.code = 400;
+                response.write("处理反馈失败");
+                return;
+            }
+
+            response.code = 200;
+            response.write("反馈处理成功");
+        } catch (const std::exception &e)
+        {
+            CROW_LOG_ERROR << "处理反馈失败: " << e.what();
+            response.code = 500;
+            response.write("服务器内部错误");
+        }
+    }
+
 }// namespace Router

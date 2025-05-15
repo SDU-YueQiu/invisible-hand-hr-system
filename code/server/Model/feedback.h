@@ -9,8 +9,9 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 #include <ctime>
+#include <string>
+
 
 namespace Model
 {
@@ -25,9 +26,9 @@ namespace Model
         std::string FeedbackType;      ///< 反馈类型（"Suggestion"/"BugReport"/"Complaint"等）
         std::string Content;           ///< 反馈内容
         std::string ContactInfo;       ///< 联系方式（可选）
-        std::string Status = "Pending";///< 处理状态（"Pending"/"Processing"/"Resolved"）
+        std::string Status = "Pending";///< 处理状态（"Pending"/"Resolved"）
         std::string AdminReply;        ///< 管理员回复（可选）
         std::string CreateTime;        ///< 创建时间（默认当前时间）
         std::string UpdateTime;        ///< 最后更新时间
     };
-} // namespace Model
+}// namespace Model

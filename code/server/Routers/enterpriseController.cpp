@@ -443,13 +443,13 @@ namespace Router
         }
     }
 
-    void EnterpriseController::updateApplicationStatus(const crow::request &request, crow::response &response)
+    void EnterpriseController::updateApplicationStatus(const crow::request &request, crow::response &response, int eid)
     {
         try
         {
             // 验证请求并获取企业ID
             std::string token = request.get_header_value("Authorization");
-            std::string enterpriseId = Utils::SecurityUtils::getUserIdFromToken(token);
+            std::string enterpriseId = std::to_string(eid);
 
             if (enterpriseId.empty())
             {

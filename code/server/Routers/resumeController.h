@@ -46,13 +46,13 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void updateResume(const crow::request &request, crow::response &response,int id);
+        static void updateResume(const crow::request &request, crow::response &response, int id);
 
         /**
          * @brief 删除指定ID的简历
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void deleteResume(const crow::request &request, crow::response &response);
+        static void deleteResume(const crow::request &request, crow::response &response, int id);
     };
 }// namespace Router

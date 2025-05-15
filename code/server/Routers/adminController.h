@@ -48,14 +48,14 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void approveEnterprise(const crow::request &request, crow::response &response);
+        static void approveEnterprise(const crow::request &request, crow::response &response, int eid);
 
         /**
          * @brief 拒绝企业注册申请
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void rejectEnterprise(const crow::request &request, crow::response &response);
+        static void rejectEnterprise(const crow::request &request, crow::response &response, int eid);
 
         /**
          * @brief 获取职位列表(管理员视图)
@@ -83,7 +83,7 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void processFeedback(const crow::request &request, crow::response &response);
+        static void processFeedback(const crow::request &request, crow::response &response, int fid);
 
         /**
          * @brief 获取系统公告列表
@@ -104,20 +104,20 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void updateAnnouncement(const crow::request &request, crow::response &response);
+        static void updateAnnouncement(const crow::request &request, crow::response &response, int aid);
 
         /**
          * @brief 删除系统公告
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void deleteAnnouncement(const crow::request &request, crow::response &response);
+        static void deleteAnnouncement(const crow::request &request, crow::response &response, int aid);
 
         /**
          * @brief 获取公告详情
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void getAnnouncementDetail(const crow::request &request, crow::response &response);
+        static void getAnnouncementDetail(const crow::request &request, crow::response &response, int aid);
     };
 }// namespace Router
