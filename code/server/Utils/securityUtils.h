@@ -69,17 +69,14 @@ namespace Utils
         static std::string getRoleFromToken(const std::string &token);
 
         /**
-        * @brief 获取SecurityUtils类的单例实例
-        * @return SecurityUtils& 单例实例的引用
+        * @brief 初始化安全工具，从配置文件中读取JWT密钥
         */
-        static SecurityUtils &getInstance()
+        static void init()
         {
             if (JWT_SECRET.empty())
             {
                 JWT_SECRET = Config::globalConfig["JWT_SECRET"].s();
             }
-            thread_local static SecurityUtils instance;
-            return instance;
         }
 
     private:
