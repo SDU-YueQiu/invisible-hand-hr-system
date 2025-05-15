@@ -63,12 +63,12 @@ namespace DAL
         bool create(const Model::JobApplication &applicationData);
 
         /**
-         * @brief 更新申请状态
+         * @brief 更新职位申请记录
          * @param applicationId 申请记录ID
-         * @param status 新状态
-         * @return bool 更新成功返回true
+         * @param applicationData 更新后的申请数据
+         * @return bool 更新成功返回true，否则返回false
          */
-        bool updateStatus(int64_t applicationId, const std::string &status);
+        bool update(int64_t applicationId, const Model::JobApplication &applicationData);
 
     private:
         DatabaseManager &dbManager = DatabaseManager::getInstance();
