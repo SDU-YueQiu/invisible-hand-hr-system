@@ -90,6 +90,8 @@ namespace Service
             return false;
         }
 
-        return jobPostingDAO.updateStatus(jobId, status);
+        job.JobStatus = status;
+
+        return jobPostingDAO.update(jobId, job);
     }
 }// namespace Service

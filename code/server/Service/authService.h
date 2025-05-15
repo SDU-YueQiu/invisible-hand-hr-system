@@ -104,7 +104,6 @@ namespace Service
         Model::AuthResult loginAdmin(const std::string &username, const std::string &password);
 
     private:
-        Utils::SecurityUtils &securityUtils = Utils::SecurityUtils::getInstance();
         Utils::ValidationUtils &validationUtils = Utils::ValidationUtils::getInstance();
     };
 }// namespace Service
