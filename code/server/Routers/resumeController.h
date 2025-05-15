@@ -32,7 +32,7 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void getResume(const crow::request &request, crow::response &response);
+        static void getResume(const crow::request &request, crow::response &response, int id);
 
         /**
          * @brief 获取当前用户的所有简历列表
@@ -46,7 +46,7 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void updateResume(const crow::request &request, crow::response &response);
+        static void updateResume(const crow::request &request, crow::response &response,int id);
 
         /**
          * @brief 删除指定ID的简历

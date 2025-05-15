@@ -34,7 +34,7 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void updateUserStatus(const crow::request &request, crow::response &response);
+        static void updateUserStatus(const crow::request &request, crow::response &response, int id);
 
         /**
          * @brief 获取企业列表(支持分页和筛选)

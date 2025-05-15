@@ -54,7 +54,7 @@ namespace Router
         }
     }
 
-    void AdminController::updateUserStatus(const crow::request &request, crow::response &response)
+    void AdminController::updateUserStatus(const crow::request &request, crow::response &response, int id)
     {
         try
         {
@@ -69,7 +69,7 @@ namespace Router
 
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("userId") || !body.has("status"))
+            if (!body || !body.has("status"))
             {
                 response.code = 400;
                 response.write("无效的请求格式");
@@ -78,7 +78,7 @@ namespace Router
 
             // 调用服务层更新用户状态
             bool success = Service::AdminService::getInstance().updateUserStatus(
-                    body["userId"].i(),
+                    id,
                     body["status"].s());
 
             if (!success)

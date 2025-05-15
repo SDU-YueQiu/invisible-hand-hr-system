@@ -1,6 +1,6 @@
 /**
  * @file validationMiddleware.cpp
- * @brief 验证中间件ValidationMiddleware的实现，用于请求数据的JSON Schema验证，目前没用
+ * @brief 验证中间件ValidationMiddleware的实现，用于请求数据的JSON Schema验证
  * @author SDU-YueQiu
  * @date 2025/5/16
  * @version 1.1

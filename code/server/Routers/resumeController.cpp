@@ -9,6 +9,7 @@
 #include "resumeController.h"
 #include "../Utils/securityUtils.h"
 #include <crow/json.h>
+#include <string>
 
 namespace Router
 {
@@ -19,7 +20,7 @@ namespace Router
             // 验证请求并获取用户ID
             std::string token = request.get_header_value("Authorization");
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (userId.empty())
             {
                 response.code = 401;
@@ -52,7 +53,7 @@ namespace Router
 
             // 调用服务层创建简历
             bool success = Service::ResumeService::getInstance().createResume(
-                std::stoi(userId), resumeData);
+                    std::stoi(userId), resumeData);
 
             if (!success)
             {
@@ -63,8 +64,7 @@ namespace Router
 
             response.code = 200;
             response.write("简历创建成功");
-        }
-        catch (const std::exception &e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "创建简历失败: " << e.what();
             response.code = 500;
@@ -72,14 +72,14 @@ namespace Router
         }
     }
 
-    void ResumeController::getResume(const crow::request &request, crow::response &response)
+    void ResumeController::getResume(const crow::request &request, crow::response &response, int id)
     {
         try
         {
             // 验证请求并获取用户ID
             std::string token = request.get_header_value("Authorization");
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (userId.empty())
             {
                 response.code = 401;
@@ -88,7 +88,7 @@ namespace Router
             }
 
             // 获取路径参数中的简历ID
-            std::string resumeId = request.url_params.get("resumeId");
+            std::string resumeId = std::to_string(id);
             if (resumeId.empty())
             {
                 response.code = 400;
@@ -131,8 +131,7 @@ namespace Router
 
             response.code = 200;
             response.write(result.dump());
-        }
-        catch (const std::exception &e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取简历失败: " << e.what();
             response.code = 500;
@@ -147,7 +146,7 @@ namespace Router
             // 验证请求并获取用户ID
             std::string token = request.get_header_value("Authorization");
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (userId.empty())
             {
                 response.code = 401;
@@ -160,7 +159,7 @@ namespace Router
 
             // 构建响应JSON数组
             crow::json::wvalue::list resumeList;
-            for (const auto &resume : resumes)
+            for (const auto &resume: resumes)
             {
                 crow::json::wvalue item;
                 item["resumeId"] = resume.ResumeID;
@@ -172,8 +171,7 @@ namespace Router
 
             response.code = 200;
             response.write(crow::json::wvalue(resumeList).dump());
-        }
-        catch (const std::exception &e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取简历列表失败: " << e.what();
             response.code = 500;
@@ -181,14 +179,14 @@ namespace Router
         }
     }
 
-    void ResumeController::updateResume(const crow::request &request, crow::response &response)
+    void ResumeController::updateResume(const crow::request &request, crow::response &response, int id)
     {
         try
         {
             // 验证请求并获取用户ID
             std::string token = request.get_header_value("Authorization");
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (userId.empty())
             {
                 response.code = 401;
@@ -197,7 +195,7 @@ namespace Router
             }
 
             // 获取路径参数中的简历ID
-            std::string resumeId = request.url_params.get("resumeId");
+            std::string resumeId = std::to_string(id);
             if (resumeId.empty())
             {
                 response.code = 400;
@@ -230,7 +228,7 @@ namespace Router
 
             // 调用服务层更新简历
             bool success = Service::ResumeService::getInstance().updateResume(
-                std::stoi(resumeId), resumeData);
+                    std::stoi(resumeId), resumeData);
 
             if (!success)
             {
@@ -241,8 +239,7 @@ namespace Router
 
             response.code = 200;
             response.write("简历更新成功");
-        }
-        catch (const std::exception &e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "更新简历失败: " << e.what();
             response.code = 500;
@@ -257,7 +254,7 @@ namespace Router
             // 验证请求并获取用户ID
             std::string token = request.get_header_value("Authorization");
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
-            
+
             if (userId.empty())
             {
                 response.code = 401;
@@ -286,12 +283,11 @@ namespace Router
 
             response.code = 200;
             response.write("简历删除成功");
-        }
-        catch (const std::exception &e)
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "删除简历失败: " << e.what();
             response.code = 500;
             response.write("服务器内部错误");
         }
     }
-} // namespace Router
+}// namespace Router

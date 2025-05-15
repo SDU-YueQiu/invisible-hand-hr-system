@@ -33,15 +33,21 @@ int main()
             .methods("GET"_method, "POST"_method, "PUT"_method, "DELETE"_method);
 
     // 设置API路由
-    Routers::ApiRouter::setupRoutes(app);
+    Router::ApiRouter::setupRoutes(app);
 
     // 配置日志级别
     crow::logger::setLogLevel(crow::LogLevel::Info);
 
     // 启动服务器
-    app.port(Config::globalConfig["PORT"].i())
-            .multithreaded()
-            .run();
+    try
+    {
+        app.port(Config::globalConfig["PORT"].i())
+                .multithreaded()
+                .run();
+    } catch (std::exception &e)
+    {
+        CROW_LOG_ERROR << "Failed to start server: " << e.what();
+    }
 
     return 0;
 }

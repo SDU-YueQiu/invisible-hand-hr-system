@@ -20,9 +20,10 @@ namespace Config
     void loadDefaultConfig()
     {
         CROW_LOG_INFO << "Start to load default config file";
-        
+
         crow::json::wvalue defaultConfig;
         defaultConfig["DB_PATH"] = "./db/hr_system.db";
+        defaultConfig["DB_INIT_PATH"] = "./db/databaseInit.sql";
         defaultConfig["IS_DB_INIT"] = false;
         defaultConfig["PORT"] = 8080;
         defaultConfig["JWT_SECRET"] = "165732496815674651651";

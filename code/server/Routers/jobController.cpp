@@ -11,6 +11,7 @@
 #include "../Service/jobSearchService.h"
 #include "../Utils/securityUtils.h"
 #include <crow/json.h>
+#include <string>
 
 
 namespace Router
@@ -75,12 +76,12 @@ namespace Router
         }
     }
 
-    void JobController::getJobDetails(const crow::request &request, crow::response &response)
+    void JobController::getJobDetails(const crow::request &request, crow::response &response, int id)
     {
         try
         {
             // 获取路径参数中的职位ID
-            std::string jobId = request.url_params.get("jobId");
+            std::string jobId = std::to_string(id);
             if (jobId.empty())
             {
                 response.code = 400;
@@ -143,7 +144,7 @@ namespace Router
         }
     }
 
-    void JobController::applyForJob(const crow::request &request, crow::response &response)
+    void JobController::applyForJob(const crow::request &request, crow::response &response,int jobID)
     {
         try
         {
@@ -159,7 +160,7 @@ namespace Router
             }
 
             // 获取路径参数中的职位ID
-            std::string jobId = request.url_params.get("jobId");
+            std::string jobId = std::to_string(jobID);
             if (jobId.empty())
             {
                 response.code = 400;

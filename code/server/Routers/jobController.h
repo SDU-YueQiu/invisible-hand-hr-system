@@ -33,14 +33,14 @@ namespace Router
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void getJobDetails(const crow::request &request, crow::response &response);
+        static void getJobDetails(const crow::request &request, crow::response &response, int id);
 
         /**
          * @brief 申请职位
          * @param request Crow请求对象
          * @param response Crow响应对象
          */
-        static void applyForJob(const crow::request &request, crow::response &response);
+        static void applyForJob(const crow::request &request, crow::response &response, int jobID);
 
         /**
          * @brief 获取当前用户的职位申请记录
