@@ -26,8 +26,7 @@ namespace DAL
             thread_local static AnnouncementDAO instance;
             return instance;
         }
-
-    private:
+        
         // 私有构造函数，防止外部实例化
         AnnouncementDAO() = default;
         // 禁止拷贝构造函数
