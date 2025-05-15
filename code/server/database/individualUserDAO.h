@@ -51,6 +51,13 @@ namespace DAL
         Model::IndividualUser findByEmail(const std::string &email);
 
         /**
+         * @brief 根据手机号查询个人用户信息
+         * @param phoneNumber 手机号码
+         * @return IndividualUser 存在则返回用户对象，否则返回空对象
+         */
+        Model::IndividualUser findByPhoneNumber(const std::string &phoneNumber);
+
+        /**
          * @brief 插入新的个人用户记录
          * @param userData 待插入的用户对象
          * @return 插入成功返回true，否则返回false

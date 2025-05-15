@@ -179,17 +179,119 @@ namespace Service
         return result;
     }
 
-    bool AuthService::requestPasswordReset(const std::string &email)
+    Model::AuthResult AuthService::loginIndividualByPhoneNumber(const std::string &phoneNumber, const std::string &password)
     {
-        CROW_LOG_INFO << "Password reset requested for email: " << email;
-        // 实现密码重置逻辑
-        return false;
+        CROW_LOG_INFO << "Individual user login attempt by phone: " << phoneNumber;
+        Model::AuthResult result;
+    
+        // 查找用户
+        auto user = DAL::IndividualUserDAO::getInstance().findByPhoneNumber(phoneNumber);
+        if (user.UserID == -1)
+        {
+            result.message = "User not found";
+            return result;
+        }
+    
+        // 验证密码
+        if (!securityUtils.verifyPassword(password, user.PasswordHash))
+        {
+            result.message = "Invalid password";
+            return result;
+        }
+    
+        // 生成JWT
+        result.success = true;
+        result.userId = user.UserID;
+        result.token = securityUtils.generateJWT(std::to_string(user.UserID), "individual", 3600 * 24);
+        result.message = "Login successful";
+    
+        return result;
     }
 
-    bool AuthService::resetPassword(const std::string &token, const std::string &newPassword)
+    Model::AuthResult AuthService::loginIndividualByEmail(const std::string &email, const std::string &password)
     {
-        CROW_LOG_INFO << "Password reset attempt with token";
-        // 实现密码重置逻辑
-        return false;
+        CROW_LOG_INFO << "Individual user login attempt by email: " << email;
+        Model::AuthResult result;
+    
+        // 查找用户
+        auto user = DAL::IndividualUserDAO::getInstance().findByEmail(email);
+        if (user.UserID == -1)
+        {
+            result.message = "User not found";
+            return result;
+        }
+    
+        // 验证密码
+        if (!securityUtils.verifyPassword(password, user.PasswordHash))
+        {
+            result.message = "Invalid password";
+            return result;
+        }
+    
+        // 生成JWT
+        result.success = true;
+        result.userId = user.UserID;
+        result.token = securityUtils.generateJWT(std::to_string(user.UserID), "individual", 3600 * 24);
+        result.message = "Login successful";
+    
+        return result;
+    }
+
+    Model::AuthResult AuthService::loginEnterpriseByPhoneNumber(const std::string &phoneNumber, const std::string &password)
+    {
+        CROW_LOG_INFO << "Enterprise user login attempt by phone: " << phoneNumber;
+        Model::AuthResult result;
+    
+        // 查找企业用户
+        auto enterprise = DAL::EnterpriseUserDAO::getInstance().findByContactPhone(phoneNumber);
+        if (enterprise.EnterpriseID == -1)
+        {
+            result.message = "Enterprise not found";
+            return result;
+        }
+    
+        // 验证密码
+        if (!securityUtils.verifyPassword(password, enterprise.PasswordHash))
+        {
+            result.message = "Invalid password";
+            return result;
+        }
+    
+        // 生成JWT
+        result.success = true;
+        result.userId = enterprise.EnterpriseID;
+        result.token = securityUtils.generateJWT(std::to_string(enterprise.EnterpriseID), "enterprise", 3600 * 24);
+        result.message = "Enterprise login successful";
+    
+        return result;
+    }
+
+    Model::AuthResult AuthService::loginEnterpriseByEmail(const std::string &email, const std::string &password)
+    {
+        CROW_LOG_INFO << "Enterprise user login attempt by email: " << email;
+        Model::AuthResult result;
+    
+        // 查找企业用户
+        auto enterprise = DAL::EnterpriseUserDAO::getInstance().findByContactEmail(email);
+        if (enterprise.EnterpriseID == -1)
+        {
+            result.message = "Enterprise not found";
+            return result;
+        }
+    
+        // 验证密码
+        if (!securityUtils.verifyPassword(password, enterprise.PasswordHash))
+        {
+            result.message = "Invalid password";
+            return result;
+        }
+    
+        // 生成JWT
+        result.success = true;
+        result.userId = enterprise.EnterpriseID;
+        result.token = securityUtils.generateJWT(std::to_string(enterprise.EnterpriseID), "enterprise", 3600 * 24);
+        result.message = "Enterprise login successful";
+    
+        return result;
     }
 }// namespace Service

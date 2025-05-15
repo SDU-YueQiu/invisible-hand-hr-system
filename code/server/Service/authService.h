@@ -41,12 +41,28 @@ namespace Service
         Model::AuthResult registerIndividual(const Model::IndividualUser &userData);
 
         /**
-         * @brief 个人用户登录
-         * @param username 用户名/手机/邮箱
+         * @brief 个人用户登录(用户名)
+         * @param username 用户名
          * @param password 密码
          * @return Model::AuthResult 认证结果
          */
         Model::AuthResult loginIndividual(const std::string &username, const std::string &password);
+
+        /**
+         * @brief 个人用户登录(手机号)
+         * @param phoneNumber 手机号
+         * @param password 密码
+         * @return Model::AuthResult 认证结果
+         */
+        Model::AuthResult loginIndividualByPhoneNumber(const std::string &phoneNumber, const std::string &password);
+
+        /**
+         * @brief 个人用户登录(邮箱)
+         * @param email 邮箱
+         * @param password 密码
+         * @return Model::AuthResult 认证结果
+         */
+        Model::AuthResult loginIndividualByEmail(const std::string &email, const std::string &password);
 
         /**
          * @brief 企业用户注册
@@ -56,12 +72,28 @@ namespace Service
         Model::AuthResult registerEnterprise(const Model::EnterpriseUser &enterpriseData);
 
         /**
-         * @brief 企业用户登录
+         * @brief 企业用户登录(用户名)
          * @param username 企业用户名
          * @param password 密码
          * @return Model::AuthResult 认证结果
          */
         Model::AuthResult loginEnterprise(const std::string &username, const std::string &password);
+
+        /**
+         * @brief 企业用户登录(手机号)
+         * @param phoneNumber 联系电话
+         * @param password 密码
+         * @return Model::AuthResult 认证结果
+         */
+        Model::AuthResult loginEnterpriseByPhoneNumber(const std::string &phoneNumber, const std::string &password);
+
+        /**
+         * @brief 企业用户登录(邮箱)
+         * @param email 联系邮箱
+         * @param password 密码
+         * @return Model::AuthResult 认证结果
+         */
+        Model::AuthResult loginEnterpriseByEmail(const std::string &email, const std::string &password);
 
         /**
          * @brief 管理员登录
@@ -70,21 +102,6 @@ namespace Service
          * @return Model::AuthResult 认证结果
          */
         Model::AuthResult loginAdmin(const std::string &username, const std::string &password);
-
-        /**
-         * @brief 请求密码重置
-         * @param email 用户注册邮箱
-         * @return bool 请求成功返回true，否则返回false
-         */
-        bool requestPasswordReset(const std::string &email);
-
-        /**
-         * @brief 重置密码
-         * @param token 重置令牌
-         * @param newPassword 新密码
-         * @return bool 重置成功返回true，否则返回false
-         */
-        bool resetPassword(const std::string &token, const std::string &newPassword);
 
     private:
         Utils::SecurityUtils &securityUtils = Utils::SecurityUtils::getInstance();

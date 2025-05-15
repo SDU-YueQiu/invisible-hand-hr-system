@@ -183,4 +183,33 @@ namespace DAL
         return result != nullptr;
     }
 
+
+    Model::EnterpriseUser EnterpriseUserDAO::findByContactEmail(const std::string &email)
+    {
+        CROW_LOG_INFO << "查询企业用户，联系邮箱: " << email;
+        const std::string sql = "SELECT * FROM EnterpriseUsers WHERE ContactEmail = ?";
+        auto result = dbManager.executeQuery(sql, {email});
+
+        if (!result || result->empty())
+        {
+            CROW_LOG_WARNING << "未找到企业用户，联系邮箱: " << email;
+            return Model::EnterpriseUser{};
+        }
+        return createEnterpriseUserFromRow(result->front());
+    }
+
+    Model::EnterpriseUser EnterpriseUserDAO::findByContactPhone(const std::string &phone)
+    {
+        CROW_LOG_INFO << "查询企业用户，联系电话: " << phone;
+        const std::string sql = "SELECT * FROM EnterpriseUsers WHERE ContactPhone = ?";
+        auto result = dbManager.executeQuery(sql, {phone});
+
+        if (!result || result->empty())
+        {
+            CROW_LOG_WARNING << "未找到企业用户，联系电话: " << phone;
+            return Model::EnterpriseUser{};
+        }
+        return createEnterpriseUserFromRow(result->front());
+    }
+
 }// namespace DAL

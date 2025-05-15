@@ -3,7 +3,7 @@
  * @brief 数据库初始化脚本
  * @author SDU-YueQiu
  * @date 2025/5/12
- * @version 1.0
+ * @version 1.1
 */
 
 -- 创建个人用户表
@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS EnterpriseUsers (
     Scale TEXT,
     Address TEXT,
     ContactPerson TEXT,
-    ContactPhone TEXT,
-    ContactEmail TEXT,
+    ContactPhone TEXT UNIQUE,
+    ContactEmail TEXT UNIQUE,
     LogoURL TEXT,
     LicenseImageURL TEXT NOT NULL,
     RegistrationDate TEXT DEFAULT CURRENT_TIMESTAMP,

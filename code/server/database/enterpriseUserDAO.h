@@ -50,6 +50,20 @@ namespace DAL
         Model::EnterpriseUser findByLoginUsername(const std::string &loginUsername);
 
         /**
+     * @brief 根据联系邮箱查询企业用户信息
+     * @param email 企业联系邮箱
+     * @return Model::EnterpriseUser 企业用户对象（若不存在则返回空对象）
+     */
+        Model::EnterpriseUser findByContactEmail(const std::string &email);
+
+        /**
+     * @brief 根据联系电话查询企业用户信息
+     * @param phone 企业联系电话
+     * @return Model::EnterpriseUser 企业用户对象（若不存在则返回空对象）
+     */
+        Model::EnterpriseUser findByContactPhone(const std::string &phone);
+
+        /**
      * @brief 向数据库中插入一条新的企业用户记录
      * @param enterpriseData 待插入的企业用户数据
      * @return 插入成功返回true，否则返回false

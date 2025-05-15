@@ -40,7 +40,8 @@ namespace DAL
                     getTimeFromRow("LastLoginDate"),   // 使用稳健转换函数
                     std::get<std::string>(row.at("AccountStatus")),
                     std::get<std::string>(row.at("AvatarURL"))};
-        } catch (const std::exception& e) {
+        } catch (const std::exception &e)
+        {
             CROW_LOG_ERROR << "创建用户对象失败: " << e.what();
             return IndividualUser{};
         }
@@ -97,6 +98,26 @@ namespace DAL
 
         if (!result || result->empty())
         {
+            return IndividualUser{};
+        }
+        return createUserFromRow(result->front());
+    }
+
+    /**
+     * @brief 根据手机号查询个人用户信息
+     * @param phoneNumber 手机号码
+     * @return IndividualUser 存在则返回用户对象，否则返回空对象
+     */
+    IndividualUser IndividualUserDAO::findByPhoneNumber(const std::string &phoneNumber)
+    {
+        CROW_LOG_INFO << "Attempting to find user by phone number: " << phoneNumber;
+
+        const std::string sql = "SELECT * FROM IndividualUsers WHERE PhoneNumber = ?";
+        auto result = dbManager.executeQuery(sql, {phoneNumber});
+
+        if (!result || result->empty())
+        {
+            CROW_LOG_WARNING << "未找到用户，手机号: " << phoneNumber;
             return IndividualUser{};
         }
         return createUserFromRow(result->front());

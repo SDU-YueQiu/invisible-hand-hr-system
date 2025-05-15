@@ -187,6 +187,7 @@ classDiagram
             +findById(id)
             +findByUsername(username)
             +findByEmail(email)
+            +findByPhoneNumber(phoneNumber)
             +create(userData)
             +update(id, userData)
             +updatePassword(id, passwordHash)
@@ -204,6 +205,8 @@ classDiagram
         class EnterpriseUserDAO {
             +findById(id)
             +findByUsername(username)
+            +findByEmail(email)
+            +findByPhoneNumber(phoneNumber)
             +findByCreditCode(creditCode)
             +create(enterpriseData)
             +update(id, enterpriseData)
