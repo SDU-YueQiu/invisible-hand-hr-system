@@ -415,9 +415,25 @@ namespace Router
                 return;
             }
 
-            // TODO: 实现获取职位申请者列表的逻辑
-            response.code = 501;
-            response.write("功能暂未实现");
+            // 调用服务层获取申请者简历列表
+            auto resumes = Service::TalentSearchService::getInstance().getApplicantsByJobId(std::stoll(jobId));
+
+            // 构建响应JSON数组
+            crow::json::wvalue::list resumeList;
+            for (const auto &resume: resumes)
+            {
+                crow::json::wvalue item;
+                item["resumeId"] = resume.ResumeID;
+                item["userId"] = resume.UserID;
+                item["resumeTitle"] = resume.ResumeTitle;
+                item["lastUpdateTime"] = resume.LastUpdateTime;
+                item["visibilityStatus"] = resume.VisibilityStatus;
+                item["attachmentPath"] = resume.AttachmentPath;
+                resumeList.push_back(item);
+            }
+
+            response.code = 200;
+            response.write(crow::json::wvalue(resumeList).dump());
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取申请者列表失败: " << e.what();
