@@ -4,18 +4,18 @@
 #include "../server/Model/announcement.h"
 #include "../server/Main/main.h"
 
-// ³õÊ¼»¯²âÊÔ
+// åˆå§‹åŒ–æµ‹è¯•
 class SystemIntegrationTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        // ³õÊ¼»¯ÅäÖÃ»òÄ£ÄâÊı¾İ
+        // åˆå§‹åŒ–é…ç½®æˆ–æ¨¡æ‹Ÿæ•°æ®
         config = Config();
         adminUser = AdminUser("admin", "password");
         announcement = Announcement();
     }
 
     void TearDown() override {
-        // ÇåÀí×ÊÔ´
+        // æ¸…ç†èµ„æº
     }
 
     Config config;
@@ -23,12 +23,12 @@ protected:
     Announcement announcement;
 };
 
-// ²âÊÔÅäÖÃ¼ÓÔØ
+// æµ‹è¯•é…ç½®åŠ è½½
 TEST_F(SystemIntegrationTest, ConfigLoadTest) {
     ASSERT_TRUE(config.loadConfig("../config/config.json"));
 }
 
-// ²âÊÔ¹ÜÀíÔ±ÓÃ»§´´½¨ºÍÈ¨ÏŞ
+// æµ‹è¯•ç®¡ç†å‘˜ç”¨æˆ·åˆ›å»ºå’Œæƒé™
 TEST_F(SystemIntegrationTest, AdminUserTest) {
     EXPECT_EQ(adminUser.getUsername(), "admin");
     EXPECT_TRUE(adminUser.verifyPassword("password"));
@@ -37,7 +37,7 @@ TEST_F(SystemIntegrationTest, AdminUserTest) {
     EXPECT_TRUE(adminUser.hasPermission("read"));
 }
 
-// ²âÊÔ¹«¸æÄ£¿é
+// æµ‹è¯•å…¬å‘Šæ¨¡å—
 TEST_F(SystemIntegrationTest, AnnouncementTest) {
     announcement.setTitle("Test Announcement");
     announcement.setContent("This is a test announcement.");
@@ -49,9 +49,9 @@ TEST_F(SystemIntegrationTest, AnnouncementTest) {
     EXPECT_TRUE(announcement.isPublished());
 }
 
-// ²âÊÔÏµÍ³Ö÷Ä£¿é
+// æµ‹è¯•ç³»ç»Ÿä¸»æ¨¡å—
 TEST_F(SystemIntegrationTest, MainModuleTest) {
-    // Ä£ÄâÏµÍ³³õÊ¼»¯
+    // æ¨¡æ‹Ÿç³»ç»Ÿåˆå§‹åŒ–
     ASSERT_NO_THROW(main::initializeSystem());
 }
 
