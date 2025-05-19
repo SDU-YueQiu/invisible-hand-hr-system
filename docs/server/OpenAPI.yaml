@@ -1,0 +1,2761 @@
+openapi: 3.0.0
+info:
+  title: 无形大手 人才招聘系统 API
+  version: v1.0
+  description: 本文档详细描述了“无形大手 人才招聘系统”前后端之间交互的RESTful API接口。
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Development server
+
+components:
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT for user authentication. Usage: Authorization: Bearer <your_jwt_token>"
+
+  schemas:
+    # 1.5 Generic Responses (adapted for specific data types later)
+    GenericSuccessResponseBase:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 操作成功
+    GenericErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        data:
+          type: 'null'
+          nullable: true
+        message:
+          type: string
+          example: 错误描述信息
+        errorCode:
+          type: string
+          nullable: true
+          example: ERROR_CODE_STRING
+
+    # --- Schemas for Auth Module (Section 2) ---
+    IndividualRegisterRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: Unique, 4-20 chars, letters, numbers, underscore
+          example: testuser123
+        password:
+          type: string
+          description: Min length 6, letters and numbers
+          format: password
+          example: Pa_swoRd123
+        phoneNumber:
+          type: string
+          description: Unique, optional, valid phone format
+          example: "13800138000"
+          nullable: true
+        email:
+          type: string
+          description: Unique, optional, valid email format
+          format: email
+          example: user@example.com
+          nullable: true
+    UserLoginResponseData:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: testuser123
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    IndividualLoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: Can be username, phone number, or email
+          example: testuser123
+        password:
+          type: string
+          format: password
+          example: Pa_swoRd123
+    EnterpriseRegisterRequest:
+      type: object
+      required:
+        - loginUsername
+        - password
+        - enterpriseName
+        - creditCode
+        - contactPerson
+        - contactPhone
+        - contactEmail
+        - licenseImageURL
+      properties:
+        loginUsername:
+          type: string
+          description: Unique
+          example: company_admin
+        password:
+          type: string
+          minLength: 6
+          format: password
+          example: StrongPass!23
+        enterpriseName:
+          type: string
+          example: "Acme Corp"
+        creditCode:
+          type: string
+          description: Unique
+          example: "91310000MA1FL00000"
+        description:
+          type: string
+          nullable: true
+          example: "Leading innovator in tech solutions."
+        industry:
+          type: string
+          nullable: true
+          example: "Technology"
+        scale:
+          type: string
+          nullable: true
+          example: "100-500 employees"
+        address:
+          type: string
+          nullable: true
+          example: "123 Tech Park, Silicon Valley"
+        contactPerson:
+          type: string
+          example: "Jane Doe"
+        contactPhone:
+          type: string
+          example: "010-12345678"
+        contactEmail:
+          type: string
+          format: email
+          example: hr@acmecorp.com
+        licenseImageURL:
+          type: string
+          format: url
+          example: "http://example.com/license.jpg"
+    EnterpriseRegisterResponseData:
+      type: object
+      properties:
+        enterpriseId:
+          type: integer
+          example: 101
+        loginUsername:
+          type: string
+          example: company_admin
+        accountStatus:
+          type: string
+          example: "PendingReview"
+          enum: ["PendingReview", "Approved", "Rejected", "Disabled"]
+    EnterpriseLoginRequest:
+      type: object
+      required:
+        - loginUsername
+        - password
+      properties:
+        loginUsername:
+          type: string
+          example: company_admin
+        password:
+          type: string
+          format: password
+          example: StrongPass!23
+    EnterpriseLoginResponseData:
+      type: object
+      properties:
+        enterpriseId:
+          type: integer
+          example: 101
+        loginUsername:
+          type: string
+          example: company_admin
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        accountStatus:
+          type: string
+          example: "Approved"
+          enum: ["PendingReview", "Approved", "Rejected", "Disabled"]
+    AdminLoginRequest:
+      type: object
+      required:
+        - adminUsername
+        - password
+      properties:
+        adminUsername:
+          type: string
+          example: root_admin
+        password:
+          type: string
+          format: password
+          example: AdminPassword123
+    AdminLoginResponseData:
+      type: object
+      properties:
+        adminId:
+          type: integer
+          example: 1
+        adminUsername:
+          type: string
+          example: root_admin
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    # --- Schemas for User Module (Section 3) ---
+    UserProfileData:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: testuser123
+        phoneNumber:
+          type: string
+          nullable: true
+          example: "13800138000"
+        email:
+          type: string
+          format: email
+          nullable: true
+          example: user@example.com
+        registrationDate:
+          type: string
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+        lastLoginDate:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2023-10-20T14:30:00Z"
+        accountStatus:
+          type: string
+          enum: ["Active", "Disabled"]
+          example: "Active"
+        avatarURL:
+          type: string
+          format: url
+          nullable: true
+          example: "http://example.com/avatar.jpg"
+    UpdateUserProfileRequest:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          nullable: true
+          example: "13900139000"
+        email:
+          type: string
+          format: email
+          nullable: true
+          example: new_user@example.com
+        avatarURL:
+          type: string
+          format: url
+          nullable: true
+          example: "http://example.com/new_avatar.jpg"
+    ChangePasswordRequest:
+      type: object
+      required:
+        - oldPassword
+        - newPassword
+      properties:
+        oldPassword:
+          type: string
+          format: password
+          example: Pa_swoRd123
+        newPassword:
+          type: string
+          minLength: 6
+          format: password
+          example: NewStrongPass456
+
+    # --- Schemas for Resume Module (Section 4) ---
+    ResumeListItem:
+      type: object
+      properties:
+        resumeId:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        resumeTitle:
+          type: string
+          example: "My Professional Resume"
+        lastUpdateTime:
+          type: string
+          format: date-time
+          example: "2023-10-20T15:00:00Z"
+        visibilityStatus:
+          type: string
+          enum: ["PublicToAll", "PublicToApplied", "Private"]
+          example: "Private"
+    ResumeBasicInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "John Doe"
+        gender:
+          type: string
+          example: "Male"
+        birthDate:
+          type: string
+          format: date
+          example: "1990-05-15"
+        # ... other basic info fields
+    ResumeJobIntent:
+      type: object
+      properties:
+        industry:
+          type: string
+          example: "Software Development"
+        position:
+          type: string
+          example: "Senior Backend Engineer"
+        salary:
+          type: string
+          example: "20k-30k CNY"
+        # ... other job intent fields
+    ResumeEducationExperience:
+      type: object
+      properties:
+        school:
+          type: string
+          example: "University of Technology"
+        degree:
+          type: string
+          example: "Master's in Computer Science"
+        # ... other education fields
+    ResumeWorkExperience:
+      type: object
+      properties:
+        company:
+          type: string
+          example: "Tech Solutions Inc."
+        role:
+          type: string
+          example: "Software Engineer"
+        # ... other work experience fields
+    ResumeProjectExperience:
+      type: object
+      properties:
+        projectName:
+          type: string
+          example: "E-commerce Platform Revamp"
+        description:
+          type: string
+          example: "Led the backend development team..."
+        # ... other project fields
+    ResumeSkillCertificate:
+      type: object
+      properties:
+        skillName:
+          type: string
+          example: "Java"
+        level:
+          type: string
+          example: "Proficient"
+        # ... other skill fields
+    CreateResumeRequest:
+      type: object
+      required:
+        - resumeTitle
+      properties:
+        resumeTitle:
+          type: string
+          example: "Application for Backend Developer"
+        basicInfo:
+          $ref: '#/components/schemas/ResumeBasicInfo'
+        jobIntent:
+          $ref: '#/components/schemas/ResumeJobIntent'
+        educationExperience:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResumeEducationExperience'
+        workExperience:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResumeWorkExperience'
+        projectExperience:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResumeProjectExperience'
+        skillsCertificates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResumeSkillCertificate'
+        selfDescription:
+          type: string
+          nullable: true
+          example: "A highly motivated and experienced software engineer..."
+        visibilityStatus:
+          type: string
+          enum: ["PublicToAll", "PublicToApplied", "Private"]
+          default: "Private"
+          example: "Private"
+        attachmentPath:
+          type: string
+          format: url
+          nullable: true
+          example: "http://example.com/resume.pdf"
+    ResumeDetail: # Used for Get, Create Response, Update Response
+      allOf:
+        - $ref: '#/components/schemas/CreateResumeRequest' # Includes all fields from create
+        - type: object
+          properties:
+            resumeId:
+              type: integer
+              example: 1
+            userId:
+              type: integer
+              example: 1
+            lastUpdateTime:
+              type: string
+              format: date-time
+              example: "2023-10-20T15:00:00Z"
+
+    # --- Schemas for Job Module (Section 5) ---
+    PaginationInfo:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          example: 1
+        totalPages:
+          type: integer
+          example: 10
+        totalItems:
+          type: integer
+          example: 98
+        itemsPerPage:
+          type: integer
+          example: 10
+    JobListItem:
+      type: object
+      properties:
+        jobId:
+          type: integer
+          example: 1001
+        enterpriseId:
+          type: integer
+          example: 101
+        enterpriseName:
+          type: string
+          example: "Acme Corp"
+        logoURL:
+          type: string
+          format: url
+          nullable: true
+          example: "http://example.com/acme_logo.png"
+        jobTitle:
+          type: string
+          example: "Senior Backend Engineer"
+        workLocation:
+          type: string
+          example: "Beijing"
+        salaryMin:
+          type: string # Changed to string to accommodate ranges like "15k" or "面议"
+          example: "15k"
+        salaryMax:
+          type: string # Changed to string
+          example: "25k"
+        experienceRequired:
+          type: string
+          example: "3-5 years"
+        educationRequired:
+          type: string
+          example: "Bachelor's"
+        publishDate:
+          type: string
+          format: date-time
+          example: "2023-10-01T09:00:00Z"
+    JobListResponseData:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobListItem'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+    EnterpriseBriefInfo:
+      type: object
+      properties:
+        enterpriseName:
+          type: string
+          example: "Acme Corp"
+        logoURL:
+          type: string
+          format: url
+          nullable: true
+          example: "http://example.com/acme_logo.png"
+        industry:
+          type: string
+          example: "Technology"
+        scale:
+          type: string
+          example: "100-500 employees"
+    JobDetail:
+      type: object
+      properties:
+        jobId:
+          type: integer
+          example: 1001
+        enterpriseId:
+          type: integer
+          example: 101
+        enterpriseInfo:
+          $ref: '#/components/schemas/EnterpriseBriefInfo'
+        jobTitle:
+          type: string
+          example: "Senior Backend Engineer"
+        jobCategory:
+          type: string
+          example: "Backend Development"
+        recruitmentCount:
+          type: integer
+          example: 3
+        workLocation:
+          type: string
+          example: "Beijing"
+        minSalary: # Consistent naming
+          type: string
+          example: "15000"
+        maxSalary: # Consistent naming
+          type: string
+          example: "25000"
+        responsibilities:
+          type: string
+          format: text # No standard format, just implies longer text
+          example: "Design and develop backend services..."
+        requirements:
+          type: string
+          format: text
+          example: "Proficient in Java/Spring..."
+        experienceRequired:
+          type: string
+          example: "3-5 years"
+        educationRequired:
+          type: string
+          example: "Bachelor's"
+        benefits:
+          type: string
+          format: text
+          nullable: true
+          example: "Stock options, Health insurance, Annual leave"
+        publishDate:
+          type: string
+          format: date-time
+          example: "2023-10-01T09:00:00Z"
+        updateDate:
+          type: string
+          format: date-time
+          example: "2023-10-05T11:00:00Z"
+        deadlineDate:
+          type: string
+          format: date-time # Document says date string (ISO 8601, nullable)
+          nullable: true
+          example: "2023-11-01T00:00:00Z"
+        jobStatus:
+          type: string
+          enum: ["Recruiting", "PendingReview", "Offline"]
+          example: "Recruiting"
+
+    # --- Schemas for Application Module (Section 6) ---
+    ApplyJobRequest:
+      type: object
+      required:
+        - resumeId
+      properties:
+        resumeId:
+          type: integer
+          description: ID of the resume to be used
+          example: 12
+    ApplicationResultData:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+          example: 501
+        jobId:
+          type: integer
+          example: 1001
+        resumeId:
+          type: integer
+          example: 12
+        applicationTime:
+          type: string
+          format: date-time
+          example: "2023-10-21T10:30:00Z"
+        currentStatus:
+          type: string
+          example: "Submitted"
+          enum: ["Submitted", "ViewedByHR", "InterviewInvited", "Rejected", "Hired"]
+    UserApplicationJobInfo:
+      type: object
+      properties:
+        jobId:
+          type: integer
+          example: 1001
+        jobTitle:
+          type: string
+          example: "Senior Backend Engineer"
+        enterpriseName:
+          type: string
+          example: "Acme Corp"
+    UserApplicationResumeInfo:
+      type: object
+      properties:
+        resumeId:
+          type: integer
+          example: 12
+        resumeTitle:
+          type: string
+          example: "My Professional Resume for Backend Role"
+    UserApplicationItem:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+          example: 501
+        jobInfo:
+          $ref: '#/components/schemas/UserApplicationJobInfo'
+        resumeInfo:
+          $ref: '#/components/schemas/UserApplicationResumeInfo'
+        applicationTime:
+          type: string
+          format: date-time
+          example: "2023-10-21T10:30:00Z"
+        currentStatus:
+          type: string
+          example: "Submitted"
+          enum: ["Submitted", "ViewedByHR", "InterviewInvited", "Rejected", "Hired"]
+    UserApplicationListResponseData:
+      type: object
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserApplicationItem'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    # --- Schemas for Enterprise Module (Section 7) ---
+    EnterpriseProfileData:
+      type: object
+      properties:
+        enterpriseId:
+          type: integer
+          example: 101
+        loginUsername:
+          type: string
+          example: "company_admin"
+        enterpriseName:
+          type: string
+          example: "Acme Corp"
+        creditCode:
+          type: string
+          example: "91310000MA1FL00000"
+        description:
+          type: string
+          nullable: true
+          example: "Leading innovator in tech solutions."
+        industry:
+          type: string
+          nullable: true
+          example: "Technology"
+        scale:
+          type: string
+          nullable: true
+          example: "100-500 employees"
+        address:
+          type: string
+          nullable: true
+          example: "123 Tech Park, Silicon Valley"
+        contactPerson:
+          type: string
+          example: "Jane Doe"
+        contactPhone:
+          type: string
+          example: "010-12345678"
+        contactEmail:
+          type: string
+          format: email
+          example: hr@acmecorp.com
+        logoURL:
+          type: string
+          format: url
+          nullable: true
+          example: "http://example.com/acme_logo.png"
+        licenseImageURL:
+          type: string
+          format: url
+          example: "http://example.com/license.jpg"
+        registrationDate:
+          type: string
+          format: date-time
+          example: "2023-01-10T09:00:00Z"
+        accountStatus:
+          type: string
+          enum: ["Approved", "PendingReview", "Rejected", "Disabled"]
+          example: "Approved"
+        auditOpinion:
+          type: string
+          nullable: true
+          example: "All documents verified."
+    UpdateEnterpriseProfileRequest:
+      type: object
+      properties:
+        enterpriseName:
+          type: string
+          nullable: true
+          description: May trigger re-audit
+          example: "Acme Innovations Corp"
+        description:
+          type: string
+          nullable: true
+          example: "Global leader in innovative technology solutions."
+        industry:
+          type: string
+          nullable: true
+          example: "AI & Robotics"
+        logoURL:
+          type: string
+          format: url
+          nullable: true
+          example: "http://example.com/new_acme_logo.png"
+        # ... other modifiable fields
+    EnterpriseJobListItem: # For enterprise's own job list
+      type: object
+      properties:
+        jobId:
+          type: integer
+          example: 1001
+        jobTitle:
+          type: string
+          example: "Senior Backend Engineer"
+        publishDate:
+          type: string
+          format: date-time
+          example: "2023-10-01T09:00:00Z"
+        jobStatus:
+          type: string
+          enum: ["Recruiting", "PendingReview", "Offline"]
+          example: "Recruiting"
+        applicantCount:
+          type: integer
+          example: 25
+    EnterpriseJobListResponseData:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnterpriseJobListItem'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+    CreateJobRequestEnterprise: # Most fields same as JobDetail, but without IDs and enterpriseInfo
+      type: object
+      required:
+        - jobTitle
+        - workLocation
+        - responsibilities
+        - requirements
+      properties:
+        jobTitle:
+          type: string
+          example: "Frontend Developer"
+        jobCategory:
+          type: string
+          nullable: true
+          example: "Frontend Development"
+        recruitmentCount:
+          type: integer
+          nullable: true
+          example: 2
+        workLocation:
+          type: string
+          example: "Shanghai"
+        maxSalary:
+          type: integer # doc says integer
+          nullable: true
+          example: 20000
+        minSalary:
+          type: integer # doc says integer
+          nullable: true
+          example: 12000
+        responsibilities:
+          type: string
+          format: text
+          example: "Develop user-facing features..."
+        requirements:
+          type: string
+          format: text
+          example: "Proficient in React, Vue..."
+        experienceRequired:
+          type: string
+          nullable: true
+          example: "1-3 years"
+        educationRequired:
+          type: string
+          nullable: true
+          example: "Bachelor's"
+        benefits:
+          type: string
+          format: text
+          nullable: true
+          example: "Flexible working hours, Team building activities"
+        deadlineDate:
+          type: string
+          format: date # doc says date string (ISO 8601)
+          nullable: true
+          example: "2023-12-01"
+        jobStatus:
+          type: string
+          enum: ["Recruiting", "PendingReview", "Offline"]
+          nullable: true
+          description: "Default 'Recruiting' or 'PendingReview' based on system config"
+          example: "Recruiting"
+    JobApplicantUserInfo:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 15
+        username:
+          type: string
+          example: "applicant_john"
+        avatarURL:
+          type: string
+          format: url
+          nullable: true
+          example: "http://example.com/applicant_avatar.png"
+    JobApplicantResumeInfo:
+      type: object
+      properties:
+        resumeId:
+          type: integer
+          example: 22
+        resumeTitle:
+          type: string
+          example: "John's Application for Frontend Role"
+    JobApplicantItem:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+          example: 505
+        userInfo:
+          $ref: '#/components/schemas/JobApplicantUserInfo'
+        resumeInfo:
+          $ref: '#/components/schemas/JobApplicantResumeInfo'
+        applicationTime:
+          type: string
+          format: date-time
+          example: "2023-10-22T11:00:00Z"
+        currentStatus:
+          type: string
+          enum: ["Submitted", "ViewedByHR", "InterviewInvited", "Rejected", "Hired"]
+          example: "Submitted"
+    JobApplicantListResponseData:
+      type: object
+      properties:
+        applicants:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobApplicantItem'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+    UpdateApplicationStatusRequest:
+      type: object
+      required:
+        - newStatus
+      properties:
+        newStatus:
+          type: string
+          enum: ["ViewedByHR", "InterviewInvited", "Rejected", "Hired"]
+          example: "InterviewInvited"
+        enterpriseNotes:
+          type: string
+          nullable: true
+          example: "Candidate looks promising, schedule interview."
+    ApplicationStatusUpdateResultData:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+          example: 505
+        currentStatus:
+          type: string
+          example: "InterviewInvited"
+    ResumeSearchItem: # A simplified resume for search results by enterprise
+      type: object
+      properties:
+        resumeId:
+          type: integer
+        userId:
+          type: integer
+        resumeTitle:
+          type: string
+        basicInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            gender:
+              type: string
+        jobIntent:
+          type: object
+          properties:
+            position:
+              type: string
+            salary:
+              type: string
+        educationExperience: # Show highest degree or summary
+          type: array
+          items:
+            type: object
+            properties:
+              school:
+                type: string
+              degree:
+                type: string
+        workExperience: # Show latest or summary
+          type: array
+          items:
+            type: object
+            properties:
+              company:
+                type: string
+              role:
+                type: string
+        skillsCertificates:
+          type: array
+          items:
+            type: string # e.g., list of skill names
+        lastUpdateTime:
+          type: string
+          format: date-time
+    ResumeSearchListResponseData:
+      type: object
+      properties:
+        resumes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResumeSearchItem' # Or ResumeDetail if full detail is needed
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+
+
+    # --- Schemas for Admin Module (Section 8) ---
+    # Most list items can reuse UserProfileData, EnterpriseProfileData, JobListItem with pagination
+    AdminUserListResponseData:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProfileData'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+    UpdateUserStatusRequest:
+      type: object
+      required:
+        - newStatus
+      properties:
+        newStatus:
+          type: string
+          enum: ["Active", "Disabled"]
+          example: "Disabled"
+    AdminEnterpriseListResponseData:
+      type: object
+      properties:
+        enterprises:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnterpriseProfileData'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+    AdminAuditRequest:
+      type: object
+      properties:
+        auditOpinion:
+          type: string
+          example: "Documents are not clear."
+    AdminJobListResponseData:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobListItem' # Assuming admin sees public job list item structure
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+    AdminUpdateJobStatusRequest:
+      type: object
+      required:
+        - newStatus
+      properties:
+        newStatus:
+          type: string
+          enum: ["Recruiting", "Offline", "PendingReview"]
+          example: "Offline"
+        auditOpinion:
+          type: string
+          nullable: true
+          example: "Job description violates policy."
+
+    # --- Schemas for Feedback Module (Section 9) ---
+    CreateFeedbackRequest:
+      type: object
+      required:
+        - feedbackType
+        - content
+      properties:
+        feedbackType:
+          type: string
+          enum: ["Suggestion", "BugReport", "Complaint"]
+          example: "BugReport"
+        content:
+          type: string
+          format: text
+          example: "The login button is not working on Safari."
+        contactInfo:
+          type: string
+          nullable: true
+          example: "user@example.com or 13812345678"
+    FeedbackCreateResultData:
+      type: object
+      properties:
+        feedbackId:
+          type: integer
+          example: 1
+    FeedbackItem: # For admin list
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateFeedbackRequest'
+        - type: object
+          properties:
+            feedbackId:
+              type: integer
+            userId: # Added, assuming backend fills this
+              type: integer
+              nullable: true
+            userType: # Added, assuming backend fills this
+              type: string
+              enum: ["Individual", "Enterprise", "Anonymous"]
+              nullable: true
+            submissionTime: # Added, assuming backend timestamps
+              type: string
+              format: date-time
+            processStatus:
+              type: string
+              enum: ["Pending", "Processing", "Resolved"]
+            adminReply:
+              type: string
+              format: text
+              nullable: true
+    AdminFeedbackListResponseData:
+      type: object
+      properties:
+        feedbacks:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeedbackItem'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+    AdminUpdateFeedbackRequest:
+      type: object
+      required:
+        - processStatus
+      properties:
+        processStatus:
+          type: string
+          enum: ["Processing", "Resolved"]
+          example: "Resolved"
+        adminReply:
+          type: string
+          format: text
+          nullable: true
+          example: "Thank you for your feedback. The issue has been fixed."
+
+    # --- Schemas for Announcement Module (Section 10) ---
+    AnnouncementListItem:
+      type: object
+      properties:
+        announcementId:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "System Maintenance Notice"
+        contentSummary:
+          type: string
+          example: "The system will undergo maintenance on..."
+        publishTime:
+          type: string
+          format: date-time
+          example: "2023-10-20T08:00:00Z"
+        isTop:
+          type: boolean
+          example: true
+    AnnouncementListResponseData:
+      type: object
+      properties:
+        announcements:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnnouncementListItem'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+    AnnouncementDetail:
+      type: object
+      properties:
+        announcementId:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "System Maintenance Notice"
+        content:
+          type: string
+          format: text # Could be markdown or HTML
+          example: "The system will undergo scheduled maintenance on October 25th from 2 AM to 4 AM. During this time, services may be temporarily unavailable."
+        publishTime:
+          type: string
+          format: date-time
+          example: "2023-10-20T08:00:00Z"
+        effectiveTime:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2023-10-25T02:00:00Z"
+        expireTime:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2023-10-25T04:00:00Z"
+        isTop:
+          type: boolean
+          example: true
+    CreateAnnouncementRequest:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+          example: "New Feature Launch!"
+        content:
+          type: string
+          format: text
+          example: "We are excited to announce the launch of our new resume builder tool..."
+        effectiveTime:
+          type: string
+          format: date-time
+          nullable: true
+        expireTime:
+          type: string
+          format: date-time
+          nullable: true
+        isTop:
+          type: boolean
+          default: false
+          example: false
+    # UpdateAnnouncementRequest is same as Create, but all fields optional. Can reuse or make specific.
+
+  responses: # Common responses
+    UnauthorizedError:
+      description: Unauthorized - Invalid or missing JWT token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorResponse'
+          example:
+            success: false
+            data: null
+            message: "未提供有效的认证凭证"
+            errorCode: "UNAUTHORIZED"
+    ForbiddenError:
+      description: Forbidden - Authenticated user lacks permission.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorResponse'
+          example:
+            success: false
+            data: null
+            message: "无权限访问该资源"
+            errorCode: "FORBIDDEN"
+    NotFoundError:
+      description: Not Found - The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorResponse'
+          example:
+            success: false
+            data: null
+            message: "请求的资源不存在"
+            errorCode: "NOT_FOUND"
+    BadRequestError:
+      description: Bad Request - Invalid input parameters or request format.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorResponse'
+          example:
+            success: false
+            data: null
+            message: "请求参数无效"
+            errorCode: "BAD_REQUEST"
+    ConflictError:
+      description: Conflict - Request conflicts with the current state of the target resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorResponse'
+          example:
+            success: false
+            data: null
+            message: "请求冲突，例如尝试创建一个已存在的唯一资源"
+            errorCode: "CONFLICT"
+    InternalServerError:
+      description: Internal Server Error - An unexpected error occurred on the server.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorResponse'
+          example:
+            success: false
+            data: null
+            message: "服务器内部错误"
+            errorCode: "INTERNAL_SERVER_ERROR"
+    SuccessWithMessageOnly: # For simple success messages like logout, password change
+      description: Operation successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              data:
+                type: 'null'
+                nullable: true
+              message:
+                type: string
+
+# Global security, can be overridden at operation level
+# security:
+#   - jwtAuth: [] # Most endpoints require JWT, those that don't will specify security: []
+
+tags:
+  - name: Auth
+    description: Authentication and Authorization
+  - name: Users
+    description: Personal User Management
+  - name: Resumes
+    description: User Resume Management
+  - name: Jobs
+    description: Public Job Listings and Details
+  - name: Applications
+    description: Job Application Management
+  - name: Enterprises
+    description: Enterprise User and Job Management
+  - name: Admin
+    description: Administrator Operations
+  - name: Feedback
+    description: User Feedback System
+  - name: Announcements
+    description: System Announcements
+
+paths:
+  # --- 2. Auth Module ---
+  /auth/individual/register:
+    post:
+      tags: [Auth]
+      summary: 2.1 个人用户注册
+      description: Personal user registration.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndividualRegisterRequest'
+      responses:
+        '201':
+          description: 个人用户注册成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserLoginResponseData' # Reusing for consistency
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '409':
+          $ref: '#/components/responses/ConflictError' # Username/phone/email exists
+
+  /auth/individual/login:
+    post:
+      tags: [Auth]
+      summary: 2.2 个人用户登录
+      description: Personal user login.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndividualLoginRequest'
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserLoginResponseData'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError' # Credentials wrong
+
+  /auth/enterprise/register:
+    post:
+      tags: [Auth]
+      summary: 2.3 企业用户注册
+      description: Enterprise user submits registration application.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnterpriseRegisterRequest'
+      responses:
+        '201':
+          description: 企业注册申请已提交，请等待审核
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EnterpriseRegisterResponseData'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+
+  /auth/enterprise/login:
+    post:
+      tags: [Auth]
+      summary: 2.4 企业用户登录
+      description: Enterprise user login.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnterpriseLoginRequest'
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EnterpriseLoginResponseData'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError' # Credentials wrong or account not approved/disabled
+
+  /auth/admin/login:
+    post:
+      tags: [Auth]
+      summary: 2.5 管理员登录
+      description: Administrator login.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLoginRequest'
+      responses:
+        '200':
+          description: 管理员登录成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AdminLoginResponseData'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: 2.6 退出登录
+      description: User (individual/enterprise/admin) logout.
+      security:
+        - jwtAuth: []
+      responses:
+        '200':
+          description: 退出成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessWithMessageOnly/content/application/json/schema'
+              example:
+                success: true
+                data: null
+                message: "退出成功"
+
+  # --- 3. Personal User (Users) Module ---
+  /users/me:
+    get:
+      tags: [Users]
+      summary: 3.1 获取当前个人用户信息
+      description: Get current logged-in personal user's details.
+      security:
+        - jwtAuth: []
+      responses:
+        '200':
+          description: 获取用户信息成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    put:
+      tags: [Users]
+      summary: 3.2 修改当前个人用户信息
+      description: Update current logged-in personal user's basic info (excluding password).
+      security:
+        - jwtAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserProfileRequest'
+      responses:
+        '200':
+          description: 用户信息更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileData' # Updated user info
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /users/me/password:
+    put:
+      tags: [Users]
+      summary: 3.3 修改当前个人用户密码
+      description: Current logged-in personal user changes their password.
+      security:
+        - jwtAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: 密码修改成功，请重新登录。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessWithMessageOnly/content/application/json/schema'
+              example:
+                success: true
+                data: null
+                message: "密码修改成功，请重新登录。"
+        '400':
+          $ref: '#/components/responses/BadRequestError' # Old password wrong, new password policy
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  # --- 4. Resume (Resumes) Module ---
+  /users/me/resumes:
+    get:
+      tags: [Resumes]
+      summary: 4.1 获取当前用户的简历列表
+      description: Get all resumes for the current logged-in personal user.
+      security:
+        - jwtAuth: []
+      responses:
+        '200':
+          description: 获取简历列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ResumeListItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags: [Resumes]
+      summary: 4.2 创建新简历
+      description: Create a new resume for the current logged-in personal user.
+      security:
+        - jwtAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResumeRequest'
+      responses:
+        '201':
+          description: 简历创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ResumeDetail' # Full created resume object
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /users/me/resumes/{resumeId}:
+    get:
+      tags: [Resumes]
+      summary: 4.3 获取简历详情
+      description: Get details of a specific resume.
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: resumeId
+          in: path
+          required: true
+          description: Resume ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取简历详情成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ResumeDetail'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError' # If resume doesn't belong to user
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags: [Resumes]
+      summary: 4.4 修改简历
+      description: Update a specific resume.
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: resumeId
+          in: path
+          required: true
+          description: Resume ID
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResumeRequest' # Same structure, fields are optional effectively
+      responses:
+        '200':
+          description: 简历更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ResumeDetail' # Updated resume object
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    delete:
+      tags: [Resumes]
+      summary: 4.5 删除简历
+      description: Delete a specific resume.
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: resumeId
+          in: path
+          required: true
+          description: Resume ID
+          schema:
+            type: integer
+      responses:
+        '200': # Document states 204 or 200 with message. Using 200 for consistency with provided example.
+          description: 简历删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessWithMessageOnly/content/application/json/schema'
+              example:
+                success: true
+                data: null
+                message: "简历删除成功"
+        '204':
+          description: 简历删除成功 (No content variant)
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # --- 5. Job (Jobs) Module ---
+  /jobs:
+    get:
+      tags: [Jobs]
+      summary: 5.1 查询职位列表
+      description: Publicly query job listings with filtering and pagination. (Auth optional)
+      security: [] # Public, or [{ "jwtAuth": [] }] if personalized results
+      parameters:
+        - name: keyword
+          in: query
+          description: Keyword (job title, company, skills)
+          schema: { type: string }
+        - name: category
+          in: query
+          description: Job category
+          schema: { type: string }
+        - name: location
+          in: query
+          description: Work location
+          schema: { type: string }
+        - name: salaryMin
+          in: query
+          description: Minimum salary
+          schema: { type: integer }
+        - name: salaryMax
+          in: query
+          description: Maximum salary
+          schema: { type: integer }
+        - name: experience
+          in: query
+          description: Work experience requirement
+          schema: { type: string }
+        - name: education
+          in: query
+          description: Education requirement
+          schema: { type: string }
+        - name: page
+          in: query
+          description: Page number
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          description: Items per page
+          schema: { type: integer, default: 10 }
+        - name: sortBy
+          in: query
+          description: Sort field (e.g., 'publishDate')
+          schema: { type: string }
+        - name: sortOrder
+          in: query
+          description: Sort order ('asc' or 'desc')
+          schema: { type: string, enum: [asc, desc], default: desc }
+      responses:
+        '200':
+          description: 查询职位列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/JobListResponseData'
+
+  /jobs/{jobId}:
+    get:
+      tags: [Jobs]
+      summary: 5.2 获取职位详情
+      description: Publicly get details of a specific job. (Auth optional)
+      security: [] # Public, or [{ "jwtAuth": [] }]
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          description: Job ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取职位详情成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/JobDetail'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # --- 6. Job Application (Applications) Module ---
+  /jobs/{jobId}/apply:
+    post:
+      tags: [Applications]
+      summary: 6.1 个人用户申请职位
+      description: Logged-in personal user applies for a job using a selected resume.
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          description: ID of the job to apply for
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplyJobRequest'
+      responses:
+        '201':
+          description: 职位申请成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ApplicationResultData'
+        '400':
+          $ref: '#/components/responses/BadRequestError' # Resume invalid or not user's
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError' # Job not found
+        '409':
+          $ref: '#/components/responses/ConflictError' # Already applied
+
+  /users/me/applications:
+    get:
+      tags: [Applications]
+      summary: 6.2 获取个人用户的求职申请列表
+      description: Get all job application records for the current logged-in personal user.
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Filter by status (e.g., 'Submitted', 'ViewedByHR')
+          schema: { type: string }
+        - name: page
+          in: query
+          description: Page number
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          description: Items per page
+          schema: { type: integer, default: 10 }
+      responses:
+        '200':
+          description: 获取求职申请列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserApplicationListResponseData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  # --- 7. Enterprise User (Enterprises) Module ---
+  /enterprises/me:
+    get:
+      tags: [Enterprises]
+      summary: 7.1 获取当前企业信息
+      description: Get current logged-in enterprise user's details.
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      responses:
+        '200':
+          description: 获取企业信息成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EnterpriseProfileData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    put:
+      tags: [Enterprises]
+      summary: 7.2 修改当前企业信息
+      description: Update current logged-in enterprise user's basic info (excluding password).
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEnterpriseProfileRequest'
+      responses:
+        '200':
+          description: 企业信息更新成功 (or submitted for re-audit)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EnterpriseProfileData' # Updated enterprise info
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /enterprises/me/password:
+    put:
+      tags: [Enterprises]
+      summary: 7.3 修改当前企业用户密码
+      description: Current logged-in enterprise user changes their password.
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest' # Reusing
+      responses:
+        '200':
+          description: 密码修改成功，请重新登录。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessWithMessageOnly/content/application/json/schema'
+              example:
+                success: true
+                data: null
+                message: "密码修改成功，请重新登录。"
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /enterprises/me/jobs:
+    get:
+      tags: [Enterprises]
+      summary: 7.4 获取企业发布的职位列表
+      description: Get all jobs published by the current logged-in enterprise.
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      parameters:
+        - name: status
+          in: query
+          description: Filter by job status (e.g., 'Recruiting', 'PendingReview')
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        '200':
+          description: 获取企业职位列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EnterpriseJobListResponseData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags: [Enterprises]
+      summary: 7.5 企业发布新职位
+      description: Current logged-in enterprise user publishes a new job.
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobRequestEnterprise'
+      responses:
+        '201':
+          description: 职位发布成功 (or submitted for review)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/JobDetail' # Full created job object
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /enterprises/me/jobs/{jobId}:
+    get:
+      tags: [Enterprises]
+      summary: 7.6 获取企业发布的某个职位详情
+      description: Get details of a specific job published by the enterprise (for editing).
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: 获取职位详情成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/JobDetail'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError' # If job not by this enterprise
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags: [Enterprises]
+      summary: 7.7 修改企业发布的职位
+      description: Update a specific job published by the enterprise.
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobRequestEnterprise' # Same structure, fields effectively optional
+      responses:
+        '200':
+          description: 职位更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/JobDetail' # Updated job object
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    delete:
+      tags: [Enterprises]
+      summary: 7.8 删除企业发布的职位
+      description: Delete a specific job published by the enterprise.
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: 职位删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessWithMessageOnly/content/application/json/schema'
+              example:
+                success: true
+                data: null
+                message: "职位删除成功"
+        '204':
+          description: 职位删除成功 (No content variant)
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /enterprises/me/jobs/{jobId}/applicants:
+    get:
+      tags: [Enterprises]
+      summary: 7.9 获取某职位的申请者列表
+      description: Get list of applicants for a specific job published by the enterprise.
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: status
+          in: query
+          description: Filter by application status
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        '200':
+          description: 获取申请者列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/JobApplicantListResponseData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError' # Job not found
+
+  /enterprises/me/applications/{applicationId}/status:
+    put:
+      tags: [Enterprises]
+      summary: 7.10 更新职位申请状态 (企业操作)
+      description: Enterprise user updates the status of a job application.
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateApplicationStatusRequest'
+      responses:
+        '200':
+          description: 申请状态更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ApplicationStatusUpdateResultData'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError' # Application not for this enterprise's job
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /enterprises/me/resumes/search:
+    get:
+      tags: [Enterprises]
+      summary: 7.11 搜索符合条件的简历
+      description: Enterprise user searches public resume database.
+      security:
+        - jwtAuth: [] # Enterprise JWT
+      parameters:
+        - name: keyword
+          in: query
+          schema: { type: string }
+        - name: education
+          in: query
+          schema: { type: string }
+        - name: experience
+          in: query
+          schema: { type: string }
+        - name: location
+          in: query
+          schema: { type: string }
+        - name: minSalary
+          in: query
+          schema: { type: integer }
+        - name: maxSalary
+          in: query
+          schema: { type: integer }
+        - name: sortBy
+          in: query
+          schema: { type: string }
+        - name: sortOrder
+          in: query
+          schema: { type: string, enum: [asc, desc] }
+        - name: page # Added standard pagination
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit # Added standard pagination
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        '200':
+          description: 简历搜索成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ResumeSearchListResponseData'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError' # If enterprise has no search rights
+
+  # --- 8. Admin Module ---
+  # ALL ADMIN ENDPOINTS REQUIRE ADMIN JWT
+  /admin/users:
+    get:
+      tags: [Admin]
+      summary: 8.1 获取个人用户列表 (Admin)
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: filter
+          in: query
+          description: "Complete SQL query condition (NOTE: Potentially unsafe, define specific filters instead)"
+          schema: { type: string }
+        - name: page # Added standard pagination
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit # Added standard pagination
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        '200':
+          description: 获取个人用户列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AdminUserListResponseData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /admin/users/{userId}/status:
+    put:
+      tags: [Admin]
+      summary: 8.2 更新个人用户状态 (Admin)
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserStatusRequest'
+      responses:
+        '200':
+          description: 用户状态更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data: # Could return updated user or just status
+                        type: object
+                        properties:
+                          userId:
+                            type: integer
+                          newStatus:
+                            type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /admin/enterprises:
+    get:
+      tags: [Admin]
+      summary: 8.3 获取企业用户列表 (Admin)
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: filter
+          in: query
+          description: "Complete SQL query condition"
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        '200':
+          description: 获取企业用户列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AdminEnterpriseListResponseData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /admin/enterprises/{enterpriseId}/approve:
+    put:
+      tags: [Admin]
+      summary: 8.4 批准企业注册 (Admin)
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: enterpriseId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminAuditRequest' # Optional auditOpinion
+      responses:
+        '200':
+          description: 企业状态更新为 'Approved'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data: # Could return updated enterprise status
+                        type: object
+                        properties:
+                          enterpriseId:
+                            type: integer
+                          accountStatus:
+                            type: string
+                            example: "Approved"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /admin/enterprises/{enterpriseId}/reject:
+    put:
+      tags: [Admin]
+      summary: 8.5 拒绝企业注册 (Admin)
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: enterpriseId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [auditOpinion]
+              properties:
+                auditOpinion:
+                  type: string
+                  description: Rejection reason
+      responses:
+        '200':
+          description: 企业状态更新为 'Rejected'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          enterpriseId:
+                            type: integer
+                          accountStatus:
+                            type: string
+                            example: "Rejected"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /admin/jobs:
+    get:
+      tags: [Admin]
+      summary: 8.7 管理所有职位 (Admin)
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: filter
+          in: query
+          description: "Complete SQL query condition"
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        '200':
+          description: 获取职位列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AdminJobListResponseData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /admin/jobs/{jobId}/status:
+    put:
+      tags: [Admin]
+      summary: 8.8 更新职位状态 (Admin操作)
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUpdateJobStatusRequest'
+      responses:
+        '200':
+          description: 职位状态更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data: # Could return updated job status
+                        type: object
+                        properties:
+                          jobId:
+                            type: integer
+                          newStatus:
+                            type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # --- 9. Feedback Module ---
+  /feedback:
+    post:
+      tags: [Feedback]
+      summary: 9.1 用户提交反馈
+      description: Any user (logged-in or anonymous) submits feedback.
+      security: [{}] # Optional JWT - this means security is optional
+      # Alternative for optional JWT:
+      # security:
+      #   - jwtAuth: [] # If present, will be used
+      #   - {}        # Allows anonymous
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFeedbackRequest'
+      responses:
+        '201':
+          description: 反馈提交成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/FeedbackCreateResultData'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  /admin/feedbacks:
+    get:
+      tags: [Feedback, Admin]
+      summary: 9.2 管理员获取反馈列表
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: type
+          in: query
+          schema: { type: string, enum: [Suggestion, BugReport, Complaint] }
+        - name: status
+          in: query
+          schema: { type: string, enum: [Pending, Processing, Resolved] }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        '200':
+          description: 获取反馈列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AdminFeedbackListResponseData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /admin/feedbacks/{feedbackId}:
+    put:
+      tags: [Feedback, Admin]
+      summary: 9.3 管理员处理反馈
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: feedbackId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUpdateFeedbackRequest'
+      responses:
+        '200':
+          description: 反馈处理更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/FeedbackItem' # Updated feedback object
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # --- 10. Announcements Module ---
+  /announcements:
+    get:
+      tags: [Announcements]
+      summary: 10.1 获取公告列表 (公开)
+      description: Publicly get system announcements.
+      security: [] # Public
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 5 }
+      responses:
+        '200':
+          description: 获取公告列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AnnouncementListResponseData'
+
+  /announcements/{announcementId}:
+    get:
+      tags: [Announcements]
+      summary: 10.2 获取公告详情 (公开)
+      description: Publicly get details of a specific announcement.
+      security: [] # Public
+      parameters:
+        - name: announcementId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: 获取公告详情成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AnnouncementDetail'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /admin/announcements:
+    post:
+      tags: [Announcements, Admin]
+      summary: 10.3 管理员创建公告
+      security:
+        - jwtAuth: [] # Admin JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAnnouncementRequest'
+      responses:
+        '201':
+          description: 公告创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AnnouncementDetail' # Created announcement
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /admin/announcements/{announcementId}:
+    put:
+      tags: [Announcements, Admin]
+      summary: 10.4 管理员修改公告
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: announcementId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAnnouncementRequest' # Structure is same, fields effectively optional
+      responses:
+        '200':
+          description: 公告修改成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericSuccessResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AnnouncementDetail' # Updated announcement
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    delete:
+      tags: [Announcements, Admin]
+      summary: 10.5 管理员删除公告
+      security:
+        - jwtAuth: [] # Admin JWT
+      parameters:
+        - name: announcementId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: 公告删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessWithMessageOnly/content/application/json/schema'
+              example:
+                success: true
+                data: null
+                message: "公告删除成功"
+        '204':
+          description: 公告删除成功 (No content variant)
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'

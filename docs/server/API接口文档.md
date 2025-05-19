@@ -6,7 +6,7 @@
 
 ### 1.2 基础URL
 所有API请求的基础URL为：
-`http(s)://your-domain/api/v1`
+`http://localhost:8080/api/v1`
 
 ### 1.3 认证方式
 系统采用基于JWT (JSON Web Token) 的认证机制。
