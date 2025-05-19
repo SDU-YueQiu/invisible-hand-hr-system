@@ -42,6 +42,7 @@ int main()
     try
     {
         app.port(Config::globalConfig["PORT"].i())
+                .bindaddr("127.0.0.1")
                 .multithreaded()
                 .run();
     } catch (std::exception &e)
