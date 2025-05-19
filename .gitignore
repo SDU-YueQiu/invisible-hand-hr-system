@@ -16,3 +16,4 @@ build
 packges
 .trae
 vscTest.session.sql
+node_modules
