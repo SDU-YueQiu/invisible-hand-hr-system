@@ -51,6 +51,13 @@ namespace DAL
         Model::EnterpriseUser findByLoginUsername(const std::string &loginUsername);
 
         /**
+     * @brief 根据统一社会信用代码查询企业用户信息
+     * @param creditCode 企业统一社会信用代码
+     * @return Model::EnterpriseUser 企业用户对象（若不存在则返回空对象）
+     */
+        Model::EnterpriseUser findByCreditCode(const std::string &creditCode);
+
+        /**
      * @brief 根据联系邮箱查询企业用户信息
      * @param email 企业联系邮箱
      * @return Model::EnterpriseUser 企业用户对象（若不存在则返回空对象）

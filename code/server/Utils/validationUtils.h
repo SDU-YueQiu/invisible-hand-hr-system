@@ -50,6 +50,13 @@ namespace Utils {
         static bool validateSchema(const crow::json::rvalue& data, const crow::json::rvalue& schema);
 
         /**
+         * @brief 验证统一社会信用代码格式
+         * @param creditCode 待验证的统一社会信用代码字符串
+         * @return bool 验证结果
+         */
+        static bool validateCreditCode(const std::string& creditCode);
+
+        /**
          * @brief 获取ValidationUtils类的单例实例
          * @return ValidationUtils& 单例实例的引用
          */

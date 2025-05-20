@@ -237,4 +237,17 @@ namespace DAL
         return enterprises;
     }
 
+    Model::EnterpriseUser EnterpriseUserDAO::findByCreditCode(const std::string &creditCode)
+    {
+        CROW_LOG_INFO << "查询企业用户，统一社会信用代码: " << creditCode;
+        const std::string sql = "SELECT * FROM EnterpriseUsers WHERE CreditCode = ?";
+        auto result = dbManager.executeQuery(sql, {creditCode});
+
+        if (!result || result->empty())
+        {
+            CROW_LOG_WARNING << "未找到企业用户，统一社会信用代码: " << creditCode;
+            return Model::EnterpriseUser{};
+        }
+        return createEnterpriseUserFromRow(result->front());
+    }
 }// namespace DAL

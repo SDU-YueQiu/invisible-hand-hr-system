@@ -130,7 +130,7 @@ API将使用标准的HTTP状态码来指示请求的结果：
       "contactPerson": "string (required)",
       "contactPhone": "string (required, valid phone format)",
       "contactEmail": "string (required, valid email format)",
-      "licenseImageURL": "string (required, URL of uploaded license image)"
+      "licenseImageURL": "string (optional, URL of uploaded license image)"
       // logoURL is optional, can be updated later
     }
     ```

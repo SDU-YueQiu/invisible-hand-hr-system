@@ -95,14 +95,28 @@ namespace Service
         // 验证企业用户名唯一
         if (!validationUtils.validateUsername(enterpriseData.LoginUsername))
         {
-            result.message = "Invalid enterprise username format";
+            result.message = "用户名已存在";
             return result;
         }
 
         // 验证企业邮箱唯一
         if (!validationUtils.validateEmail(enterpriseData.ContactEmail))
         {
-            result.message = "Invalid enterprise email format";
+            result.message = "邮箱已存在";
+            return result;
+        }
+
+        // 验证CreditCode唯一
+        if (!validationUtils.validateCreditCode(enterpriseData.CreditCode))
+        {
+            result.message = "统一社会信用代码已存在";
+            return result;
+        }
+
+        // 验证手机号唯一
+        if (!validationUtils.validatePhone(enterpriseData.ContactPhone))
+        {
+            result.message = "手机号已存在";
             return result;
         }
 

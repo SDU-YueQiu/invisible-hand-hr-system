@@ -3,14 +3,14 @@
  * @brief 认证中间件AuthMiddleware的实现，用于JWT验证和角色检查
  * @author SDU-YueQiu
  * @date 2025/5/16
- * @version 1.0
+ * @version 1.1
  */
 
 #include "authMiddleware.h"
 #include "../Config/config.h"
 #include "../Utils/securityUtils.h"
+#include <crow/json.h>
 #include <crow/utility.h>
-
 
 namespace Middleware
 {
@@ -27,20 +27,37 @@ namespace Middleware
         if (authHeader.empty())
         {
             res.code = 401;
-            res.write("Missing Authorization header");
+            res.set_header("Content-Type", "application/json");
+            crow::json::wvalue error_json;
+            error_json["message"] = "Missing Authorization header";
+            res.write(error_json.dump());
             res.end();
             return;
         }
 
         // 提取Bearer Token
         std::string token;
-        if (authHeader.find("Bearer ") == 0)
+        if (authHeader.rfind("Bearer ", 0) == 0)
         {
             token = authHeader.substr(7);
         } else
         {
             res.code = 401;
-            res.write("Invalid Authorization header format");
+            res.set_header("Content-Type", "application/json");
+            crow::json::wvalue error_json;
+            error_json["message"] = "Invalid Authorization header format";
+            res.write(error_json.dump());
+            res.end();
+            return;
+        }
+
+        if (token.empty())// 确保token提取后不为空
+        {
+            res.code = 401;
+            res.set_header("Content-Type", "application/json");
+            crow::json::wvalue error_json;
+            error_json["message"] = "Token is empty after Bearer prefix";
+            res.write(error_json.dump());
             res.end();
             return;
         }
@@ -48,7 +65,10 @@ namespace Middleware
         if (!Utils::SecurityUtils::verifyJWT(token))
         {
             res.code = 401;
-            res.write("Invalid or expired token");
+            res.set_header("Content-Type", "application/json");
+            crow::json::wvalue error_json;
+            error_json["message"] = "Invalid or expired token";
+            res.write(error_json.dump());
             res.end();
             return;
         }
@@ -58,6 +78,7 @@ namespace Middleware
         ctx.userRole = Utils::SecurityUtils::getRoleFromToken(token);
     }
 
+    //本函数未经测试，请谨慎使用
     auto requireRole(const std::vector<std::string> &requiredRoles)
     {
         return [requiredRoles](const crow::request &req, crow::response &res,
@@ -81,5 +102,4 @@ namespace Middleware
             }
         };
     }
-
 }// namespace Middleware

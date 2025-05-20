@@ -15,15 +15,15 @@ using namespace Utils;
 
 bool ValidationUtils::validateEmail(const std::string &email)
 {
-    // 电子邮件正则表达式
-    const std::regex pattern(
-            R"(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$)");
+    // // 电子邮件正则表达式
+    // const std::regex pattern(
+    //         R"(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$)");
 
-    if (!std::regex_match(email, pattern))
-    {
-        CROW_LOG_WARNING << "邮箱格式验证失败: " << email;
-        return false;
-    }
+    // if (!std::regex_match(email, pattern))
+    // {
+    //     CROW_LOG_WARNING << "邮箱格式验证失败: " << email;
+    //     return false;
+    // }
 
     // 检查邮箱是否已被个人用户使用
     auto individualUser = DAL::IndividualUserDAO::getInstance().findByEmail(email);
@@ -46,15 +46,15 @@ bool ValidationUtils::validateEmail(const std::string &email)
 
 bool ValidationUtils::validatePhone(const std::string &phone)
 {
-    // 中国手机号正则表达式 (11位，1开头)
-    const std::regex pattern(
-            R"(^1[3-9]\d{9}$)");
+    // // 中国手机号正则表达式 (11位，1开头)
+    // const std::regex pattern(
+    //         R"(^1[3-9]\d{9}$)");
 
-    if (!std::regex_match(phone, pattern))
-    {
-        CROW_LOG_WARNING << "电话号码格式验证失败: " << phone;
-        return false;
-    }
+    // if (!std::regex_match(phone, pattern))
+    // {
+    //     CROW_LOG_WARNING << "电话号码格式验证失败: " << phone;
+    //     return false;
+    // }
 
     // 检查电话号码是否已被个人用户使用
     auto individualUser = DAL::IndividualUserDAO::getInstance().findByPhoneNumber(phone);
@@ -81,6 +81,29 @@ bool ValidationUtils::validateUsername(const std::string &username)
         CROW_LOG_WARNING << "用户名已存在: " << username;
         return false;
     }
+    return true;
+}
+
+bool ValidationUtils::validateCreditCode(const std::string &creditCode)
+{
+    // 统一社会信用代码正则表达式 (18位，包含数字和大写字母)
+    const std::regex pattern(
+            R"(^[0-9A-Z]{18}$)");
+
+    if (!std::regex_match(creditCode, pattern))
+    {
+        CROW_LOG_WARNING << "统一社会信用代码格式验证失败: " << creditCode;
+        return false;
+    }
+
+    // 检查信用代码是否已被企业用户使用
+    auto enterpriseUser = DAL::EnterpriseUserDAO::getInstance().findByCreditCode(creditCode);
+    if (enterpriseUser.EnterpriseID != -1)
+    {
+        CROW_LOG_WARNING << "统一社会信用代码已被企业用户使用: " << creditCode;
+        return false;
+    }
+
     return true;
 }
 

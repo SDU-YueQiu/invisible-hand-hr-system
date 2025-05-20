@@ -3,7 +3,7 @@
  * @brief 认证控制器实现，处理用户注册、登录等认证相关API请求
  * @author SDU-YueQiu
  * @date 2025/5/16
- * @version 1.0
+ * @version 1.3
  */
 
 #include "authController.h"
@@ -21,8 +21,11 @@ namespace Router
             if (!body)
             {
                 response.code = 400;
-                response.write("无效的请求格式");
-                response.end();// Added
+                crow::json::wvalue error_json;
+                error_json["success"] = false;
+                error_json["message"] = "无效的请求格式";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -37,17 +40,16 @@ namespace Router
             auto result = Service::AuthService::getInstance().registerIndividual(userData);
 
             crow::json::wvalue jsonResponse;
+            jsonResponse["success"] = result.success;
+            jsonResponse["message"] = result.message;
+
             if (!result.success)
             {
                 response.code = 409;
-                jsonResponse["success"] = result.success;
-                jsonResponse["message"] = result.message;
                 response.write(jsonResponse.dump());
                 response.end();
                 return;
             }
-            jsonResponse["success"] = result.success;
-            jsonResponse["message"] = result.message;
 
             response.code = 201;
             response.write(jsonResponse.dump());
@@ -56,8 +58,11 @@ namespace Router
         {
             CROW_LOG_ERROR << "用户注册失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
-            response.end();// Added
+            crow::json::wvalue error_json;
+            error_json["success"] = false;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -70,7 +75,10 @@ namespace Router
             if (!body || !body.has("username") || !body.has("password"))
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["success"] = false;
+                error_json["message"] = "无效的请求格式: 必须包含username和password";
+                response.write(error_json.dump());
                 response.end();
                 return;
             }
@@ -80,29 +88,33 @@ namespace Router
                     body["username"].s(),
                     body["password"].s());
 
+            crow::json::wvalue jsonResponse;
+            jsonResponse["success"] = result.success;
+            jsonResponse["message"] = result.message;
+
             if (!result.success)
             {
                 response.code = 401;
-                response.write(result.message);
+                response.write(jsonResponse.dump());
                 response.end();
                 return;
             }
 
-            // 构建响应JSON
-            crow::json::wvalue jsonResponse;
-            jsonResponse["success"] = result.success;
+            // 构建成功响应JSON
             jsonResponse["userId"] = result.userId;
             jsonResponse["token"] = result.token;
-            jsonResponse["message"] = result.message;
 
-            response.code = 201;
+            response.code = 200;
             response.write(jsonResponse.dump());
             response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "用户登录失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["success"] = false;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
             response.end();
         }
     }
@@ -116,7 +128,10 @@ namespace Router
             if (!body)
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["success"] = false;
+                error_json["message"] = "无效的请求格式";
+                response.write(error_json.dump());
                 response.end();
                 return;
             }
@@ -124,7 +139,7 @@ namespace Router
             // 构建企业注册对象
             Model::EnterpriseUser enterpriseData;
             if (body.has("loginUsername")) enterpriseData.LoginUsername = body["loginUsername"].s();
-            if (body.has("password")) enterpriseData.PasswordHash = body["password"].s();
+            if (body.has("password")) enterpriseData.PasswordHash = body["password"].s();// Hash in service
             if (body.has("contactPhone")) enterpriseData.ContactPhone = body["contactPhone"].s();
             if (body.has("contactEmail")) enterpriseData.ContactEmail = body["contactEmail"].s();
             if (body.has("enterpriseName")) enterpriseData.EnterpriseName = body["enterpriseName"].s();
@@ -132,20 +147,17 @@ namespace Router
             // 调用服务层注册企业
             auto result = Service::AuthService::getInstance().registerEnterprise(enterpriseData);
 
+            crow::json::wvalue jsonResponse;
+            jsonResponse["success"] = result.success;
+            jsonResponse["message"] = result.message;
+
             if (!result.success)
             {
-                response.code = 409;
-                response.write(result.message);
+                response.code = 409;// Conflict or Bad Request
+                response.write(jsonResponse.dump());
                 response.end();
                 return;
             }
-
-            // 构建响应JSON
-            crow::json::wvalue jsonResponse;
-            jsonResponse["success"] = result.success;
-            jsonResponse["enterpriseId"] = result.userId;
-            jsonResponse["token"] = result.token;
-            jsonResponse["message"] = result.message;
 
             response.code = 201;
             response.write(jsonResponse.dump());
@@ -154,7 +166,10 @@ namespace Router
         {
             CROW_LOG_ERROR << "企业注册失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["success"] = false;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
             response.end();
         }
     }
@@ -168,7 +183,10 @@ namespace Router
             if (!body || !body.has("username") || !body.has("password"))
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["success"] = false;
+                error_json["message"] = "无效的请求格式: 必须包含username和password";
+                response.write(error_json.dump());
                 response.end();
                 return;
             }
@@ -178,20 +196,21 @@ namespace Router
                     body["username"].s(),
                     body["password"].s());
 
+            crow::json::wvalue jsonResponse;
+            jsonResponse["success"] = result.success;
+            jsonResponse["message"] = result.message;
+
             if (!result.success)
             {
-                response.code = 401;
-                response.write(result.message);
+                response.code = 401;// Unauthorized
+                response.write(jsonResponse.dump());
                 response.end();
                 return;
             }
 
-            // 构建响应JSON
-            crow::json::wvalue jsonResponse;
-            jsonResponse["success"] = result.success;
+            // 构建成功响应JSON
             jsonResponse["enterpriseId"] = result.userId;
             jsonResponse["token"] = result.token;
-            jsonResponse["message"] = result.message;
 
             response.code = 200;
             response.write(jsonResponse.dump());
@@ -200,7 +219,10 @@ namespace Router
         {
             CROW_LOG_ERROR << "企业登录失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["success"] = false;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
             response.end();
         }
     }
@@ -214,7 +236,10 @@ namespace Router
             if (!body || !body.has("username") || !body.has("password"))
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["success"] = false;
+                error_json["message"] = "无效的请求格式: 必须包含username和password";
+                response.write(error_json.dump());
                 response.end();
                 return;
             }
@@ -224,20 +249,21 @@ namespace Router
                     body["username"].s(),
                     body["password"].s());
 
+            crow::json::wvalue jsonResponse;
+            jsonResponse["success"] = result.success;
+            jsonResponse["message"] = result.message;
+
             if (!result.success)
             {
-                response.code = 401;
-                response.write(result.message);
+                response.code = 401;// Unauthorized
+                response.write(jsonResponse.dump());
                 response.end();
                 return;
             }
 
-            // 构建响应JSON
-            crow::json::wvalue jsonResponse;
-            jsonResponse["success"] = result.success;
+            // 构建成功响应JSON
             jsonResponse["adminId"] = result.userId;
             jsonResponse["token"] = result.token;
-            jsonResponse["message"] = result.message;
 
             response.code = 200;
             response.write(jsonResponse.dump());
@@ -246,7 +272,10 @@ namespace Router
         {
             CROW_LOG_ERROR << "管理员登录失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["success"] = false;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
             response.end();
         }
     }
@@ -255,24 +284,33 @@ namespace Router
     {
         try
         {
-            // 从请求头获取token
-            std::string token = request.get_header_value("Authorization");
-            if (token.empty())
-            {
-                response.code = 401;
-                response.write("缺少授权令牌");
-                response.end();
-                return;
-            }
+            // // 从请求头获取token
+            // std::string token = request.get_header_value("Authorization");
+            // if (token.empty())
+            // {
+            //     response.code = 401;
+            //     crow::json::wvalue error_json;
+            //     error_json["success"] = false;
+            //     error_json["message"] = "缺少授权令牌";
+            //     response.write(error_json.dump());
+            //     response.end();
+            //     return;
+            // }
 
             response.code = 200;
-            response.write("退出登录成功");
+            crow::json::wvalue success_json;
+            success_json["success"] = true;
+            success_json["message"] = "退出登录成功";
+            response.write(success_json.dump());
             response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "退出登录失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["success"] = false;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
             response.end();
         }
     }
