@@ -81,9 +81,6 @@ API将使用标准的HTTP状态码来指示请求的结果：
     {
       "success": true,
       "data": {
-        "userId": "integer",
-        "username": "string",
-        "token": "string (JWT)"
       },
       "message": "个人用户注册成功"
     }

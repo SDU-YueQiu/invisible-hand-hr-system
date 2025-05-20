@@ -56,6 +56,13 @@ bool ValidationUtils::validatePhone(const std::string &phone)
         return false;
     }
 
+    // 检查电话号码是否已被个人用户使用
+    auto individualUser = DAL::IndividualUserDAO::getInstance().findByPhoneNumber(phone);
+    if (individualUser.UserID != -1)
+    {
+        CROW_LOG_WARNING << "手机号已被个人用户使用: " << phone;
+        return false;
+    }
 
     return true;
 }

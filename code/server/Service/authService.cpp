@@ -20,12 +20,24 @@ namespace Service
         CROW_LOG_INFO << "Registering individual user: " << userData.Username;
         Model::AuthResult result;
 
-        // 验证用户数据
-        if (!validationUtils.validateUsername(userData.Username) ||
-            !validationUtils.validateEmail(userData.Email) ||
-            !validationUtils.validatePhone(userData.PhoneNumber))
+        // 验证用户名格式
+        if (!validationUtils.validateUsername(userData.Username))
         {
-            result.message = "Invalid user data format";
+            result.message = "用户名已存在";
+            return result;
+        }
+
+        // 验证邮箱格式
+        if (!validationUtils.validateEmail(userData.Email))
+        {
+            result.message = "邮箱已存在";
+            return result;
+        }
+
+        // 验证手机号格式
+        if (!validationUtils.validatePhone(userData.PhoneNumber))
+        {
+            result.message = "手机号已存在";
             return result;
         }
 
@@ -37,7 +49,6 @@ namespace Service
         if (success)
         {
             result.success = true;
-            result.userId = newUser.UserID;
             result.message = "Registration successful";
         } else
         {
@@ -81,18 +92,17 @@ namespace Service
         CROW_LOG_INFO << "Registering enterprise user: " << enterpriseData.LoginUsername;
         Model::AuthResult result;
 
-        // 验证企业数据
-        if (!validationUtils.validateUsername(enterpriseData.LoginUsername) ||
-            !validationUtils.validateEmail(enterpriseData.ContactEmail))
+        // 验证企业用户名唯一
+        if (!validationUtils.validateUsername(enterpriseData.LoginUsername))
         {
-            result.message = "Invalid enterprise data format";
+            result.message = "Invalid enterprise username format";
             return result;
         }
 
-        // 检查用户名是否已存在
-        if (DAL::EnterpriseUserDAO::getInstance().findByLoginUsername(enterpriseData.LoginUsername).EnterpriseID != -1)
+        // 验证企业邮箱唯一
+        if (!validationUtils.validateEmail(enterpriseData.ContactEmail))
         {
-            result.message = "Username already exists";
+            result.message = "Invalid enterprise email format";
             return result;
         }
 

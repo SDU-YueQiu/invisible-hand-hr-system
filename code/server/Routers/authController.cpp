@@ -12,7 +12,7 @@
 
 namespace Router
 {
-    void AuthController::registerIndividual(const crow::request& request, crow::response& response)
+    void AuthController::registerIndividual(const crow::request &request, crow::response &response)
     {
         try
         {
@@ -22,6 +22,7 @@ namespace Router
             {
                 response.code = 400;
                 response.write("无效的请求格式");
+                response.end();// Added
                 return;
             }
 
@@ -35,32 +36,32 @@ namespace Router
             // 调用服务层注册用户
             auto result = Service::AuthService::getInstance().registerIndividual(userData);
 
+            crow::json::wvalue jsonResponse;
             if (!result.success)
             {
-                response.code = 400;
-                response.write(result.message);
+                response.code = 409;
+                jsonResponse["success"] = result.success;
+                jsonResponse["message"] = result.message;
+                response.write(jsonResponse.dump());
+                response.end();
                 return;
             }
-
-            // 构建响应JSON
-            crow::json::wvalue jsonResponse;
             jsonResponse["success"] = result.success;
-            jsonResponse["userId"] = result.userId;
-            jsonResponse["token"] = result.token;
             jsonResponse["message"] = result.message;
 
-            response.code = 200;
+            response.code = 201;
             response.write(jsonResponse.dump());
-        }
-        catch (const std::exception& e)
+            response.end();
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "用户注册失败: " << e.what();
             response.code = 500;
             response.write("服务器内部错误");
+            response.end();// Added
         }
     }
 
-    void AuthController::loginIndividual(const crow::request& request, crow::response& response)
+    void AuthController::loginIndividual(const crow::request &request, crow::response &response)
     {
         try
         {
@@ -70,18 +71,20 @@ namespace Router
             {
                 response.code = 400;
                 response.write("无效的请求格式");
+                response.end();
                 return;
             }
 
             // 调用服务层登录
             auto result = Service::AuthService::getInstance().loginIndividual(
-                body["username"].s(), 
-                body["password"].s());
+                    body["username"].s(),
+                    body["password"].s());
 
             if (!result.success)
             {
                 response.code = 401;
                 response.write(result.message);
+                response.end();
                 return;
             }
 
@@ -92,18 +95,19 @@ namespace Router
             jsonResponse["token"] = result.token;
             jsonResponse["message"] = result.message;
 
-            response.code = 200;
+            response.code = 201;
             response.write(jsonResponse.dump());
-        }
-        catch (const std::exception& e)
+            response.end();
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "用户登录失败: " << e.what();
             response.code = 500;
             response.write("服务器内部错误");
+            response.end();
         }
     }
 
-    void AuthController::registerEnterprise(const crow::request& request, crow::response& response)
+    void AuthController::registerEnterprise(const crow::request &request, crow::response &response)
     {
         try
         {
@@ -113,6 +117,7 @@ namespace Router
             {
                 response.code = 400;
                 response.write("无效的请求格式");
+                response.end();
                 return;
             }
 
@@ -129,8 +134,9 @@ namespace Router
 
             if (!result.success)
             {
-                response.code = 400;
+                response.code = 409;
                 response.write(result.message);
+                response.end();
                 return;
             }
 
@@ -141,18 +147,19 @@ namespace Router
             jsonResponse["token"] = result.token;
             jsonResponse["message"] = result.message;
 
-            response.code = 200;
+            response.code = 201;
             response.write(jsonResponse.dump());
-        }
-        catch (const std::exception& e)
+            response.end();
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "企业注册失败: " << e.what();
             response.code = 500;
             response.write("服务器内部错误");
+            response.end();
         }
     }
 
-    void AuthController::loginEnterprise(const crow::request& request, crow::response& response)
+    void AuthController::loginEnterprise(const crow::request &request, crow::response &response)
     {
         try
         {
@@ -162,18 +169,20 @@ namespace Router
             {
                 response.code = 400;
                 response.write("无效的请求格式");
+                response.end();
                 return;
             }
 
             // 调用服务层登录
             auto result = Service::AuthService::getInstance().loginEnterprise(
-                body["username"].s(), 
-                body["password"].s());
+                    body["username"].s(),
+                    body["password"].s());
 
             if (!result.success)
             {
                 response.code = 401;
                 response.write(result.message);
+                response.end();
                 return;
             }
 
@@ -186,16 +195,17 @@ namespace Router
 
             response.code = 200;
             response.write(jsonResponse.dump());
-        }
-        catch (const std::exception& e)
+            response.end();
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "企业登录失败: " << e.what();
             response.code = 500;
             response.write("服务器内部错误");
+            response.end();
         }
     }
 
-    void AuthController::loginAdmin(const crow::request& request, crow::response& response)
+    void AuthController::loginAdmin(const crow::request &request, crow::response &response)
     {
         try
         {
@@ -205,18 +215,20 @@ namespace Router
             {
                 response.code = 400;
                 response.write("无效的请求格式");
+                response.end();
                 return;
             }
 
             // 调用服务层登录
             auto result = Service::AuthService::getInstance().loginAdmin(
-                body["username"].s(), 
-                body["password"].s());
+                    body["username"].s(),
+                    body["password"].s());
 
             if (!result.success)
             {
                 response.code = 401;
                 response.write(result.message);
+                response.end();
                 return;
             }
 
@@ -229,16 +241,17 @@ namespace Router
 
             response.code = 200;
             response.write(jsonResponse.dump());
-        }
-        catch (const std::exception& e)
+            response.end();
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "管理员登录失败: " << e.what();
             response.code = 500;
             response.write("服务器内部错误");
+            response.end();
         }
     }
 
-    void AuthController::logout(const crow::request& request, crow::response& response)
+    void AuthController::logout(const crow::request &request, crow::response &response)
     {
         try
         {
@@ -248,20 +261,19 @@ namespace Router
             {
                 response.code = 401;
                 response.write("缺少授权令牌");
+                response.end();
                 return;
             }
 
-            // 这里可以添加token失效逻辑，如将token加入黑名单等
-            // 实际项目中可能需要维护一个token黑名单或使用其他机制
-
             response.code = 200;
             response.write("退出登录成功");
-        }
-        catch (const std::exception& e)
+            response.end();
+        } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "退出登录失败: " << e.what();
             response.code = 500;
             response.write("服务器内部错误");
+            response.end();
         }
     }
-} // namespace Router
+}// namespace Router
