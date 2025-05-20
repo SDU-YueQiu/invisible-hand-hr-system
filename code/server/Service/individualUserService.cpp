@@ -3,11 +3,12 @@
  * @brief 个人用户服务类实现，处理个人用户相关业务逻辑
  * @author SDU-YueQiu
  * @date 2025/5/15
- * @version 1.0
+ * @version 1.1
  */
 
 #include "individualUserService.h"
 #include <crow/logging.h>
+#include "../Utils/securityUtils.h"
 
 namespace Service
 {
@@ -45,13 +46,6 @@ namespace Service
             return false;
         }
 
-        // 确保用户名不能被修改
-        if (existingUser.Username != userData.Username)
-        {
-            CROW_LOG_WARNING << "Username cannot be modified";
-            return false;
-        }
-
         // 只更新非默认值的字段
         if (!userData.PhoneNumber.empty()) existingUser.PhoneNumber = userData.PhoneNumber;
         if (!userData.Email.empty()) existingUser.Email = userData.Email;
@@ -75,8 +69,10 @@ namespace Service
             return false;
         }
 
+        auto oldPasswordHash = Utils::SecurityUtils::hashPassword(oldPassword);
+
         // 验证旧密码是否正确
-        if (user.PasswordHash != oldPassword)
+        if (user.PasswordHash != oldPasswordHash)
         {
             CROW_LOG_WARNING << "Old password verification failed for user ID: " << userId;
             return false;
