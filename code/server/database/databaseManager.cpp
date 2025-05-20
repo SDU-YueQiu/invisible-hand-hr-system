@@ -67,50 +67,58 @@ namespace DAL
         auto resultSet = std::make_unique<ResultSet>();
         try
         {
-            while (query.executeStep())
-            {// 逐行遍历结果
-                DbRow currentRow;
-                for (int i = 0; i < query.getColumnCount(); ++i)
-                {// 处理当前行的所有列
-                    SQLite::Column col = query.getColumn(i);
-                    std::string colName = col.getName();
+            if (sql.find("SELECT") == 0 || sql.find("select") == 0)
+            {
+                while (query.executeStep())
+                {// 逐行遍历结果
+                    DbRow currentRow;
+                    for (int i = 0; i < query.getColumnCount(); ++i)
+                    {// 处理当前行的所有列
+                        SQLite::Column col = query.getColumn(i);
+                        std::string colName = col.getName();
 
-                    switch (col.getType())
-                    {
-                        case SQLITE_INTEGER:
-                            currentRow[colName] = col.getInt64();
-                            break;
-                        case SQLITE_FLOAT:
-                            currentRow[colName] = col.getDouble();
-                            break;
-                        case SQLITE_TEXT:
-                            currentRow[colName] = col.getString();
-                            break;
-                        case SQLITE_BLOB: {
-                            const void *blobData = col.getBlob();
-                            int blobSize = col.getBytes();
-                            std::vector<unsigned char> blob(
-                                    static_cast<const unsigned char *>(blobData),
-                                    static_cast<const unsigned char *>(blobData) + blobSize);
-                            currentRow[colName] = blob;
-                            break;
+                        switch (col.getType())
+                        {
+                            case SQLITE_INTEGER:
+                                currentRow[colName] = col.getInt64();
+                                break;
+                            case SQLITE_FLOAT:
+                                currentRow[colName] = col.getDouble();
+                                break;
+                            case SQLITE_TEXT:
+                                currentRow[colName] = col.getString();
+                                break;
+                            case SQLITE_BLOB: {
+                                const void *blobData = col.getBlob();
+                                int blobSize = col.getBytes();
+                                std::vector<unsigned char> blob(
+                                        static_cast<const unsigned char *>(blobData),
+                                        static_cast<const unsigned char *>(blobData) + blobSize);
+                                currentRow[colName] = blob;
+                                break;
+                            }
+                            case SQLITE_NULL:
+                                currentRow[colName] = nullptr;
+                                break;
+                            default:
+                                currentRow[colName] = col.getText();
+                                break;
                         }
-                        case SQLITE_NULL:
-                            currentRow[colName] = nullptr;
-                            break;
-                        default:
-                            currentRow[colName] = col.getText();
-                            break;
                     }
+                    resultSet->push_back(currentRow);// 添加当前行到结果集}
                 }
-                resultSet->push_back(currentRow);// 添加当前行到结果集
+                return resultSet;
+            } else
+            {
+                query.exec();
+                resultSet->push_back({});
+                return resultSet;
             }
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "Query execution failed: " << e.what();
             return nullptr;
         }
-        return resultSet;
     }
     bool DatabaseManager::beginTransaction()
     {

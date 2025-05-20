@@ -17,6 +17,9 @@ namespace Middleware
 
     void AuthMiddleware::before_handle(crow::request &req, crow::response &res, context &ctx)
     {
+        if (isLoginRoute(req))
+            return;
+
         // 从请求头获取Authorization字段
         auto authHeader = req.get_header_value("Authorization");
 

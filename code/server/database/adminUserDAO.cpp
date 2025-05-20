@@ -47,7 +47,7 @@ namespace DAL {
 
     AdminUser AdminUserDAO::findByUsername(const std::string& username) {
         CROW_LOG_INFO << "查询管理员信息，用户名: " << username;
-        const std::string sql = "SELECT * FROM AdminUsers WHERE Username = ?";
+        const std::string sql = "SELECT * FROM AdminUsers WHERE AdminUsername = ?";
         auto result = dbManager.executeQuery(sql, {username});
 
         if (!result || result->empty()) {

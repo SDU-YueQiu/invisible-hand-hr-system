@@ -39,6 +39,30 @@ namespace Middleware
         AuthMiddleware() = default;
 
         /**
+         * @brief 检查请求是否为登录或注册路由
+         * @param req Crow请求对象
+         * @return bool 是否为登录或注册路由
+         */
+        static bool isLoginRoute(const crow::request &req)
+        {
+            const std::string &url = req.url;
+            const crow::HTTPMethod &method = req.method;
+
+            // 检查是否为POST方法
+            if (method != crow::HTTPMethod::POST)
+            {
+                return false;
+            }
+
+            // 检查是否为登录/注册路由
+            return url == "/api/v1/auth/individual/register" ||
+                   url == "/api/v1/auth/individual/login" ||
+                   url == "/api/v1/auth/enterprise/register" ||
+                   url == "/api/v1/auth/enterprise/login" ||
+                   url == "/api/v1/auth/admin/login";
+        }
+
+        /**
          * @brief 请求处理前的钩子函数，执行JWT验证
          * @param req Crow请求对象
          * @param res Crow响应对象

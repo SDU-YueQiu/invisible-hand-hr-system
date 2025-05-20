@@ -29,13 +29,6 @@ namespace Service
             return result;
         }
 
-        // 检查用户名是否已存在
-        if (DAL::IndividualUserDAO::getInstance().findByUsername(userData.Username).UserID != -1)
-        {
-            result.message = "Username already exists";
-            return result;
-        }
-
         // 创建用户
         auto newUser = userData;
         newUser.PasswordHash = Utils::SecurityUtils::hashPassword(userData.PasswordHash);

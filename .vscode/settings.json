@@ -94,7 +94,11 @@
         "ranges": "cpp",
         "semaphore": "cpp",
         "span": "cpp",
-        "text_encoding": "cpp"
+        "text_encoding": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "cinttypes": "cpp",
+        "stack": "cpp"
     },
     "liveServer.settings.port": 5527,
     "sqltools.connections": [
@@ -105,5 +109,15 @@
             "database": "${workspaceFolder:invisible-hand-hr-system}/build/bin/db/hr_system.db"
         }
     ],
-    "sqltools.useNodeRuntime": true
+    "sqltools.useNodeRuntime": true,
+    "terminal.integrated.profiles.windows": {
+        "Command Prompt": {
+            "path": "cmd.exe",
+            "args": [
+                "/K",
+                "chcp 65001 > nul"
+            ]
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "Command Prompt" // 如果你想让它成为默认
 }
