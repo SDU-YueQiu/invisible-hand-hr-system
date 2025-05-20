@@ -86,15 +86,15 @@ bool ValidationUtils::validateUsername(const std::string &username)
 
 bool ValidationUtils::validateCreditCode(const std::string &creditCode)
 {
-    // 统一社会信用代码正则表达式 (18位，包含数字和大写字母)
-    const std::regex pattern(
-            R"(^[0-9A-Z]{18}$)");
+    // // 统一社会信用代码正则表达式 (18位，包含数字和大写字母)
+    // const std::regex pattern(
+    //         R"(^[0-9A-Z]{18}$)");
 
-    if (!std::regex_match(creditCode, pattern))
-    {
-        CROW_LOG_WARNING << "统一社会信用代码格式验证失败: " << creditCode;
-        return false;
-    }
+    // if (!std::regex_match(creditCode, pattern))
+    // {
+    //     CROW_LOG_WARNING << "统一社会信用代码格式验证失败: " << creditCode;
+    //     return false;
+    // }
 
     // 检查信用代码是否已被企业用户使用
     auto enterpriseUser = DAL::EnterpriseUserDAO::getInstance().findByCreditCode(creditCode);

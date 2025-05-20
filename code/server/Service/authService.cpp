@@ -181,7 +181,14 @@ namespace Service
         }
 
         // 验证密码
-        if (!Utils::SecurityUtils::verifyPassword(password, admin.PasswordHash))
+        // if (!Utils::SecurityUtils::verifyPassword(password, admin.PasswordHash))
+        // {
+        //     result.message = "Invalid password";
+        //     return result;
+        // }
+
+        // 因为压根没有注册api，管理员全手操sql，管理员使用明文密码登录
+        if (password != admin.PasswordHash)
         {
             result.message = "Invalid password";
             return result;
