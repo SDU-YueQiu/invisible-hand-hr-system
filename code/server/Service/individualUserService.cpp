@@ -79,6 +79,6 @@ namespace Service
         }
 
         // 通过DAO层更新密码
-        return userDAO.updatePassword(userId, newPassword);
+        return userDAO.updatePassword(userId, Utils::SecurityUtils::hashPassword(newPassword));
     }
 }// namespace Service
