@@ -163,7 +163,7 @@ namespace Router
         try
         {
             // 验证请求并获取用户ID
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
 
             if (userId.empty())
@@ -237,7 +237,7 @@ namespace Router
         try
         {
             // 验证请求并获取用户ID
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             std::string userId = Utils::SecurityUtils::getUserIdFromToken(token);
 
             if (userId.empty())

@@ -29,7 +29,7 @@ namespace Router
             Model::Feedback feedbackData;
 
             // 如果用户已登录，从JWT获取用户信息
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (!token.empty())
             {
                 feedbackData.UserID = std::stoi(Utils::SecurityUtils::getUserIdFromToken(token));
@@ -72,7 +72,7 @@ namespace Router
         try
         {
             // 验证用户权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (token.empty())
             {
                 response.code = 401;

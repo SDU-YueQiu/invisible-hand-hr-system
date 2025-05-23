@@ -125,12 +125,20 @@ namespace Router
         {
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("loginUsername") || !body.has("password"))
+            if (!body ||
+                !body.has("loginUsername") ||
+                !body.has("password") ||
+                !body.has("enterpriseName") ||
+                !body.has("creditCode") ||
+                !body.has("contactPerson") ||
+                !body.has("contactPhone") ||
+                !body.has("contactEmail"))
             {
                 response.code = 400;
                 crow::json::wvalue error_json;
                 error_json["success"] = false;
-                error_json["message"] = "无效的请求格式";
+                error_json["data"] = nullptr;
+                error_json["message"] = "无效的请求格式: 缺少一个或多个必要字段 (loginUsername, password, enterpriseName, creditCode, contactPerson, contactPhone, contactEmail)";
                 response.write(error_json.dump());
                 response.end();
                 return;
@@ -138,11 +146,19 @@ namespace Router
 
             // 构建企业注册对象
             Model::EnterpriseUser enterpriseData;
-            if (body.has("loginUsername")) enterpriseData.LoginUsername = body["loginUsername"].s();
-            if (body.has("password")) enterpriseData.PasswordHash = body["password"].s();// Hash in service
-            if (body.has("contactPhone")) enterpriseData.ContactPhone = body["contactPhone"].s();
-            if (body.has("contactEmail")) enterpriseData.ContactEmail = body["contactEmail"].s();
-            if (body.has("enterpriseName")) enterpriseData.EnterpriseName = body["enterpriseName"].s();
+            enterpriseData.LoginUsername = body["loginUsername"].s();
+            enterpriseData.PasswordHash = body["password"].s();
+            enterpriseData.EnterpriseName = body["enterpriseName"].s();
+            enterpriseData.CreditCode = body["creditCode"].s();
+            enterpriseData.ContactPerson = body["contactPerson"].s();
+            enterpriseData.ContactPhone = body["contactPhone"].s();
+            enterpriseData.ContactEmail = body["contactEmail"].s();
+
+            if (body.has("description")) enterpriseData.Description = body["description"].s();
+            if (body.has("industry")) enterpriseData.Industry = body["industry"].s();
+            if (body.has("scale")) enterpriseData.Scale = body["scale"].s();
+            if (body.has("address")) enterpriseData.Address = body["address"].s();
+            if (body.has("licenseImageURL")) enterpriseData.LicenseImageURL = body["licenseImageURL"].s();
 
             // 调用服务层注册企业
             auto result = Service::AuthService::getInstance().registerEnterprise(enterpriseData);
@@ -285,7 +301,7 @@ namespace Router
         try
         {
             // // 从请求头获取token
-            // std::string token = request.get_header_value("Authorization");
+            // std::string token = request.get_header_value("Authorization").substr(7);
             // if (token.empty())
             // {
             //     response.code = 401;

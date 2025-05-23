@@ -18,7 +18,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -60,7 +60,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -104,7 +104,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -146,7 +146,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -192,7 +192,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -238,7 +238,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -280,7 +280,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -324,7 +324,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -367,7 +367,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -419,7 +419,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -475,7 +475,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -527,7 +527,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -569,7 +569,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
@@ -616,7 +616,7 @@ namespace Router
         try
         {
             // 验证管理员权限
-            std::string token = request.get_header_value("Authorization");
+            std::string token = request.get_header_value("Authorization").substr(7);
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
