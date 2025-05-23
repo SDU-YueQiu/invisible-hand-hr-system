@@ -25,6 +25,9 @@ bool ValidationUtils::validateEmail(const std::string &email)
     //     return false;
     // }
 
+    if (email.empty())
+        return true;
+
     // 检查邮箱是否已被个人用户使用
     auto individualUser = DAL::IndividualUserDAO::getInstance().findByEmail(email);
     if (individualUser.UserID != -1)
@@ -56,6 +59,9 @@ bool ValidationUtils::validatePhone(const std::string &phone)
     //     return false;
     // }
 
+    if (phone.empty())
+        return true;
+
     // 检查电话号码是否已被个人用户使用
     auto individualUser = DAL::IndividualUserDAO::getInstance().findByPhoneNumber(phone);
     if (individualUser.UserID != -1)
@@ -69,6 +75,9 @@ bool ValidationUtils::validatePhone(const std::string &phone)
 
 bool ValidationUtils::validateUsername(const std::string &username)
 {
+    if (username.empty())
+        return false;
+
     // 检查用户名是否存在于三种用户表中
     auto adminUser = DAL::AdminUserDAO::getInstance().findByUsername(username);
     auto enterpriseUser = DAL::EnterpriseUserDAO::getInstance().findByLoginUsername(username);
@@ -95,6 +104,9 @@ bool ValidationUtils::validateCreditCode(const std::string &creditCode)
     //     CROW_LOG_WARNING << "统一社会信用代码格式验证失败: " << creditCode;
     //     return false;
     // }
+
+    if (creditCode.empty())
+        return true;
 
     // 检查信用代码是否已被企业用户使用
     auto enterpriseUser = DAL::EnterpriseUserDAO::getInstance().findByCreditCode(creditCode);

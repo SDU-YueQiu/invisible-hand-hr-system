@@ -3,7 +3,7 @@
  * @brief 认证控制器实现，处理用户注册、登录等认证相关API请求
  * @author SDU-YueQiu
  * @date 2025/5/16
- * @version 1.3
+ * @version 1.4
  */
 
 #include "authController.h"
@@ -18,7 +18,7 @@ namespace Router
         {
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body)
+            if (!body || !body.has("username") || !body.has("password"))
             {
                 response.code = 400;
                 crow::json::wvalue error_json;
@@ -125,7 +125,7 @@ namespace Router
         {
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body)
+            if (!body || !body.has("loginUsername") || !body.has("password"))
             {
                 response.code = 400;
                 crow::json::wvalue error_json;
