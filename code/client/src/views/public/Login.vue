@@ -106,6 +106,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '../../stores'
+import axios from 'axios'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -128,35 +129,38 @@ const adminForm = reactive({
   password: ''
 })
 
-// 模拟登录功能
-const handleIndividualLogin = () => {
+const handleIndividualLogin = async () => {
   if (!individualForm.username || !individualForm.password) {
     ElMessage.error('请输入用户名和密码')
     return
   }
-  
+
   loading.value = true
-  // 模拟API请求
-  setTimeout(() => {
-    loading.value = false
-    // 模拟成功登录
-    const userData = {
-      token: 'mock-token-123',
-      userType: 'individual',
-      userId: 1,
-      username: individualForm.username
+  const loginData = {
+      username: individualForm.username,
+      password: individualForm.password
+  };
+  console.log(loginData)
+  try {
+    const baseURL = 'http://localhost:8080/api/v1';
+    console.log(baseURL);
+    const response = await axios.post(`${baseURL}/auth/individual/login`,loginData);
+    console.log(response.status)
+    if (response.status==200) {
+      const userData = response.data.data
+      //localStorage.setItem('token', userData.token)
+      //localStorage.setItem('userType', 'individual')
+      //userStore.setUser(userData)
+      ElMessage.success('登录成功')
+      router.push('/user/dashboard')
+    } else {
+      ElMessage.error(response.data.message)
     }
-    
-    // 存储登录状态
-    localStorage.setItem('token', userData.token)
-    localStorage.setItem('userType', userData.userType)
-    
-    // 更新Pinia状态
-    userStore.setUser(userData)
-    
-    ElMessage.success('登录成功')
-    router.push('/user/dashboard')
-  }, 1000)
+  } catch (error) {
+    ElMessage.error('登录失败，请检查用户名和密码')
+  } finally {
+    loading.value = false
+  }
 }
 
 const handleEnterpriseLogin = () => {
