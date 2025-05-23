@@ -2,7 +2,7 @@
 import axios from 'axios'
 
 const request = axios.create({
-  baseURL: 'http://localhost:3000/api/v1', // 请根据实际后端地址修改
+  baseURL: 'http://localhost:8080/api/v1', 
   timeout: 5000
 })
 

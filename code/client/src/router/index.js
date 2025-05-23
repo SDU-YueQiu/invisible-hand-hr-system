@@ -12,7 +12,26 @@ const routes = [
     name: 'Login',
     component: () => import('../views/public/Login.vue'),
   },
-  // 定义更多路由...
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/public/Register.vue'),
+  },
+  {
+    path: '/register/enterprise',
+    name: 'EnterpriseRegister',
+    component: () => import('../views/public/EnterpriseRegister.vue'),
+  },
+//   {
+//     path: '/jobs',
+//     name: 'JobList',
+//     component: () => import('../views/jobs/JobList.vue'),
+//   },
+//   {
+//     path: '/jobs/:id',
+//     name: 'JobDetail',
+//     component: () => import('../views/jobs/JobDetail.vue'),
+//   }
 ]
 
 const router = createRouter({
