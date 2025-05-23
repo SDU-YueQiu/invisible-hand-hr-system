@@ -7,6 +7,7 @@
  */
 
 #include "enterpriseUserService.h"
+#include "../Utils/securityUtils.h"
 #include <crow/logging.h>
 
 namespace Service
@@ -74,7 +75,7 @@ namespace Service
         }
 
         // 验证旧密码是否正确
-        if (enterprise.PasswordHash != oldPassword)
+        if (enterprise.PasswordHash != Utils::SecurityUtils::hashPassword(oldPassword))
         {
             CROW_LOG_WARNING << "Old password verification failed for enterprise ID: " << enterpriseId;
             return false;
@@ -82,7 +83,7 @@ namespace Service
 
         // 创建更新后的企业对象
         Model::EnterpriseUser updatedEnterprise = enterprise;
-        updatedEnterprise.PasswordHash = newPassword;
+        updatedEnterprise.PasswordHash = Utils::SecurityUtils::hashPassword(newPassword);
 
         // 通过DAO层更新密码
         return enterpriseDAO.update(enterpriseId, updatedEnterprise);
