@@ -22,16 +22,16 @@ const routes = [
     name: 'EnterpriseRegister',
     component: () => import('../views/public/EnterpriseRegister.vue'),
   },
-//   {
-//     path: '/jobs',
-//     name: 'JobList',
-//     component: () => import('../views/jobs/JobList.vue'),
-//   },
-//   {
-//     path: '/jobs/:id',
-//     name: 'JobDetail',
-//     component: () => import('../views/jobs/JobDetail.vue'),
-//   }
+  {
+    path: '/jobs',
+    name: 'JobList',
+    component: () => import('../views/jobs/JobList.vue'),
+  },
+  {
+    path: '/jobs/:id',
+    name: 'JobDetail',
+    component: () => import('../views/jobs/JobDetail.vue'),
+  }
 ]
 
 const router = createRouter({
