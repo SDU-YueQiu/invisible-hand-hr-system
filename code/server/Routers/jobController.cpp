@@ -68,11 +68,15 @@ namespace Router
 
             response.code = 200;
             response.write(crow::json::wvalue(jobList).dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取职位列表失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -82,10 +86,13 @@ namespace Router
         {
             // 获取路径参数中的职位ID
             std::string jobId = std::to_string(id);
-            if (jobId.empty())
+            if (jobId.empty()) // Note: std::to_string(int) will not produce an empty string. This condition might always be false.
             {
                 response.code = 400;
-                response.write("缺少职位ID参数");
+                crow::json::wvalue error_json;
+                error_json["message"] = "缺少职位ID参数";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -94,7 +101,10 @@ namespace Router
             if (job.JobID == -1)
             {
                 response.code = 404;
-                response.write("职位不存在");
+                crow::json::wvalue error_json;
+                error_json["message"] = "职位不存在";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -136,11 +146,15 @@ namespace Router
 
             response.code = 200;
             response.write(result.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取职位详情失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -155,16 +169,22 @@ namespace Router
             if (userId.empty())
             {
                 response.code = 401;
-                response.write("无效的授权令牌");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无效的授权令牌";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             // 获取路径参数中的职位ID
             std::string jobId = std::to_string(jobID);
-            if (jobId.empty())
+            if (jobId.empty()) // Note: std::to_string(int) will not produce an empty string. This condition might always be false.
             {
                 response.code = 400;
-                response.write("缺少职位ID参数");
+                crow::json::wvalue error_json;
+                error_json["message"] = "缺少职位ID参数";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -173,30 +193,42 @@ namespace Router
             if (!body || !body.has("resumeId"))
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无效的请求格式";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             // 调用服务层申请职位
             bool success = Service::ApplicationService::getInstance().applyForJob(
                     std::stoll(userId),
-                    std::stoll(body["resumeId"].s()),
+                    std::stoll(body["resumeId"].s()), // Assuming resumeId is a string in JSON
                     std::stoll(jobId));
 
             if (!success)
             {
                 response.code = 400;
-                response.write("申请职位失败");
+                crow::json::wvalue error_json;
+                error_json["message"] = "申请职位失败";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             response.code = 200;
-            response.write("职位申请成功");
+            crow::json::wvalue success_json;
+            success_json["message"] = "职位申请成功";
+            response.write(success_json.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "申请职位失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -211,7 +243,10 @@ namespace Router
             if (userId.empty())
             {
                 response.code = 401;
-                response.write("无效的授权令牌");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无效的授权令牌";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -233,11 +268,15 @@ namespace Router
 
             response.code = 200;
             response.write(crow::json::wvalue(applicationList).dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取申请记录失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 }// namespace Router
