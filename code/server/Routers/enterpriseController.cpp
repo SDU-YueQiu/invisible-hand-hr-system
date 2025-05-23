@@ -395,7 +395,14 @@ namespace Router
                 return;
             }
 
-            // TODO:检查职位是否属于该企业
+            // 检查职位是否属于该企业
+            auto job = Service::JobPostingService::getInstance().getJobById(std::stoll(jobId));
+            if (job.EnterpriseID != std::stoll(enterpriseId))
+            {
+                response.code = 403;
+                response.write(crow::json::wvalue{{"message", "无权删除该职位"}}.dump());
+                response.end();
+            }
 
             // 调用服务层删除职位
             bool success = Service::JobPostingService::getInstance().deleteJob(std::stoll(jobId));

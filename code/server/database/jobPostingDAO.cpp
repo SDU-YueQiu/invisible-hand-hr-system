@@ -31,10 +31,10 @@ namespace DAL
                     std::get<int64_t>(row.at("EnterpriseID")),
                     std::get<std::string>(row.at("JobTitle")),
                     std::get<std::string>(row.at("JobCategory")),
-                    std::get<int32_t>(row.at("RecruitmentCount")),
+                    int(std::get<int64_t>(row.at("RecruitmentCount"))),
                     std::get<std::string>(row.at("WorkLocation")),
-                    std::get<int32_t>(row.at("MaxSalary")),
-                    std::get<int32_t>(row.at("MinSalary")),
+                    int(std::get<int64_t>(row.at("MaxSalary"))),
+                    int(std::get<int64_t>(row.at("MinSalary"))),
                     std::get<std::string>(row.at("Responsibilities")),
                     std::get<std::string>(row.at("Requirements")),
                     std::get<std::string>(row.at("ExperienceRequired")),
@@ -46,7 +46,13 @@ namespace DAL
                     std::get<std::string>(row.at("JobStatus"))};
         } catch (const std::exception &e)
         {
-            CROW_LOG_ERROR << "创建招聘岗位对象失败: " << e.what();
+            std::stringstream ss;
+            for (const auto &[key, val]: row)
+            {
+                ss << key << "=" << val.index() << "; ";// 输出字段类型索引
+            }
+            CROW_LOG_ERROR << "创建招聘岗位对象失败: " << e.what()
+                           << " 行数据: " << ss.str();
             return Model::JobPosting{};
         }
     }
@@ -105,7 +111,7 @@ namespace DAL
                 WorkLocation, MaxSalary, MinSalary, Responsibilities, Requirements,
                 ExperienceRequired, EducationRequired, Benefits,
                 PublishDate, UpdateDate, DeadlineDate, JobStatus
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         )";
 
         std::vector<std::string> params = {

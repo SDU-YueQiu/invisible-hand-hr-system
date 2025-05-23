@@ -1,3 +1,11 @@
+/**
+ * @file runtest.cpp
+ * @brief 原定使用gtest进行单元测试，但是由于时间问题，改用apifox直接测试
+ * @author yxz323
+ * @date 2025/5/18
+ * @version 1.0
+ */
+
 #include <gtest/gtest.h>
 #include "../server/Config/config.h"
 #include "../server/Model/adminUser.h"
