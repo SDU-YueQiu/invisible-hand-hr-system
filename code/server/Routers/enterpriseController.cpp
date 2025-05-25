@@ -456,22 +456,27 @@ namespace Router
             // 调用服务层获取申请者简历列表
             auto resumes = Service::TalentSearchService::getInstance().getApplicantsByJobId(std::stoll(jobId));
 
-            // 构建响应JSON数组
-            crow::json::wvalue::list resumeList;
+            // 构建响应JSON
+            crow::json::wvalue result;
+            result["success"] = true;
+            result["message"] = "操作成功";
+
+            crow::json::wvalue::list applicantsList;
             for (const auto &resume: resumes)
             {
                 crow::json::wvalue item;
-                item["resumeId"] = resume.ResumeID;
+                item["applicationId"] = resume.jobapplicationID;
                 item["userId"] = resume.UserID;
+                item["resumeId"] = resume.ResumeID;
                 item["resumeTitle"] = resume.ResumeTitle;
-                item["lastUpdateTime"] = resume.LastUpdateTime;
-                item["visibilityStatus"] = resume.VisibilityStatus;
                 item["attachmentPath"] = resume.AttachmentPath;
-                resumeList.push_back(item);
+                applicantsList.push_back(item);
             }
 
+            result["data"]["applicants"] = crow::json::wvalue(applicantsList);
+
             response.code = 200;
-            response.write(crow::json::wvalue(resumeList).dump());
+            response.write(result.dump());
             response.end();
         } catch (const std::exception &e)
         {

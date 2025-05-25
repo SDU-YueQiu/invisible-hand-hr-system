@@ -184,13 +184,15 @@ namespace Router
             if (userId.empty())
             {
                 response.code = 401;
-                response.write(crow::json::wvalue({{"message", "无效的授权令牌"}}).dump());
+                crow::json::wvalue error_json;
+                error_json["success"] = false;
+                error_json["message"] = "无效的授权令牌";
+                response.write(error_json.dump());
                 response.end();
                 return;
             }
 
             // 调用服务层获取申请记录
-            // 假设 ApplicationService::getUserApplications 和 Model::Application 定义如下
             auto applications = Service::ApplicationService::getInstance().getUserApplications(std::stoll(userId));
 
             // 构建响应JSON数组
@@ -200,23 +202,28 @@ namespace Router
                 crow::json::wvalue item;
                 item["applicationId"] = app.ApplicationID;
                 item["jobId"] = app.JobID;
-                item["enterpriseId"] = app.EnterpriseID;
                 item["resumeId"] = app.ResumeID;
-                item["applicationTime"] = app.ApplicationTime;
-                item["status"] = app.Status;
-                item["feedback"] = app.Feedback;
-                item["updateTime"] = app.UpdateTime;
+                //item["applicationTime"] = app.ApplicationTime;
+                item["currentStatus"] = app.Status;
+                item["enterpriseNotes"] = app.Feedback;
                 applicationList.push_back(item);
             }
 
+            crow::json::wvalue response_json;
+            response_json["success"] = true;
+            response_json["message"] = "操作成功";
+            response_json["data"]["applications"] = std::move(applicationList);
             response.code = 200;
-            response.write(crow::json::wvalue(applicationList).dump());
+            response.write(response_json.dump());
             response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取申请记录失败: " << e.what();
             response.code = 500;
-            response.write(crow::json::wvalue({{"message", "服务器内部错误"}}).dump());
+            crow::json::wvalue error_json;
+            error_json["success"] = false;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
             response.end();
         }
     }

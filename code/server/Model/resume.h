@@ -34,6 +34,7 @@ namespace Model
         std::string LastUpdateTime;              ///< 最后更新时间（默认当前时间）
         std::string VisibilityStatus = "Private";///< 公开状态（默认'Private'）
         std::string AttachmentPath;              ///< 附件简历路径（可选）
+        int64_t jobapplicationID = -1;           //TODO：关联的职位申请ID（仅在查询申请者列表时使用，技术债）
     };
 
 }// namespace Model
