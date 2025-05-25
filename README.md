@@ -71,3 +71,4 @@ New-Item -ItemType SymbolicLink -Path .\compile_commands.json -Value build\clang
 - 日志系统与Crow架构集成耦合，没有单独解耦出来的日志工具，不过这部分都是流式输出到宏中，如果你需要更换web架构，请重新定义日志输出宏或依次替换。
 - 仅保证api能工作，没有时间进行全面的覆盖测试。
 - 后端用户名邮箱等验证部分格式校验和唯一性校验混在一起。
+- 所有时间相关功能都是屎山

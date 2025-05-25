@@ -27,10 +27,9 @@ namespace DAL
                     std::get<std::string>(row.at("FeedbackType")),
                     std::get<std::string>(row.at("Content")),
                     std::get<std::string>(row.at("ContactInfo")),
-                    std::get<std::string>(row.at("Status")),
+                    std::get<std::string>(row.at("ProcessStatus")),
                     std::get<std::string>(row.at("AdminReply")),
-                    std::get<std::string>(row.at("CreateTime")),
-                    std::get<std::string>(row.at("UpdateTime"))};
+                    std::get<std::string>(row.at("SubmitTime"))};
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "创建反馈对象失败: " << e.what();
@@ -78,8 +77,8 @@ namespace DAL
         const std::string sql = R"(
             INSERT INTO Feedbacks (
                 UserID, UserType, FeedbackType, Content,
-                ContactInfo, Status, AdminReply, CreateTime, UpdateTime
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ContactInfo, ProcessStatus, AdminReply, SubmitTime
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         )";
 
         std::vector<std::string> params = {
@@ -90,8 +89,7 @@ namespace DAL
                 feedbackData.ContactInfo,
                 feedbackData.Status,
                 feedbackData.AdminReply,
-                feedbackData.CreateTime,
-                feedbackData.UpdateTime};
+                feedbackData.CreateTime};
 
         auto result = dbManager.executeQuery(sql, params);
         return !result->empty();
@@ -103,7 +101,7 @@ namespace DAL
         const std::string sql = R"(
             UPDATE Feedbacks SET
                 UserID = ?, UserType = ?, FeedbackType = ?, Content = ?,
-                ContactInfo = ?, Status = ?, AdminReply = ?, UpdateTime = ?
+                ContactInfo = ?, processStatus = ?, AdminReply = ?
             WHERE FeedbackID = ?
         )";
 
@@ -115,7 +113,6 @@ namespace DAL
                 feedbackData.ContactInfo,
                 feedbackData.Status,
                 feedbackData.AdminReply,
-                feedbackData.UpdateTime,
                 std::to_string(feedbackId)};
 
         auto result = dbManager.executeQuery(sql, params);

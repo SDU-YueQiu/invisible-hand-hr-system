@@ -14,7 +14,7 @@ namespace Service
     bool AnnouncementService::createAnnouncement(const Model::Announcement &announcementData)
     {
         CROW_LOG_INFO << "Creating new announcement, title: " << announcementData.Title;
-        
+
         // 验证管理员ID有效性
         if (announcementData.AdminID <= 0)
         {
@@ -23,11 +23,11 @@ namespace Service
         }
 
         // 验证时间有效性
-        if (announcementData.EffectiveTime >= announcementData.ExpireTime)
-        {
-            CROW_LOG_WARNING << "Invalid time range for announcement";
-            return false;
-        }
+        // if (announcementData.EffectiveTime >= announcementData.ExpireTime)
+        // {
+        //     CROW_LOG_WARNING << "Invalid time range for announcement";
+        //     return false;
+        // }
 
         return announcementDAO.create(announcementData);
     }
@@ -35,14 +35,14 @@ namespace Service
     std::vector<Model::Announcement> AnnouncementService::getAnnouncements(const std::string &filter)
     {
         CROW_LOG_INFO << "Getting announcements with filter: " << (filter.empty() ? "none" : filter);
-        
+
         // 获取当前时间，用于筛选有效公告
         auto now = std::time(nullptr);
-        std::string effectiveFilter = "EffectiveTime <= datetime('now') AND ExpireTime >= datetime('now')";
-        
+        std::string effectiveFilter;//= "EffectiveTime <= datetime('now') AND ExpireTime >= datetime('now')";
+
         if (!filter.empty())
         {
-            effectiveFilter += " AND " + filter;
+            effectiveFilter += filter;
         }
 
         return announcementDAO.findAll(effectiveFilter);
@@ -51,7 +51,7 @@ namespace Service
     bool AnnouncementService::updateAnnouncement(int64_t announcementId, const Model::Announcement &announcementData)
     {
         CROW_LOG_INFO << "Updating announcement, ID: " << announcementId;
-        
+
         // 获取现有公告信息
         auto existingAnnouncement = announcementDAO.findById(announcementId);
         if (existingAnnouncement.AnnouncementID == -1)
@@ -59,14 +59,6 @@ namespace Service
             CROW_LOG_WARNING << "Announcement not found for update, ID: " << announcementId;
             return false;
         }
-
-        // 确保管理员ID没有被修改
-        if (existingAnnouncement.AdminID != announcementData.AdminID)
-        {
-            CROW_LOG_WARNING << "Admin ID cannot be modified in announcement update";
-            return false;
-        }
-
         return announcementDAO.update(announcementId, announcementData);
     }
 
