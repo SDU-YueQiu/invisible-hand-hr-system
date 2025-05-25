@@ -2,7 +2,7 @@
 import axios from 'axios'
 
 const request = axios.create({
-  baseURL: 'http://localhost:8080', // json-server的基础URL
+  baseURL: 'http://localhost:8080/api/v1', // json-server的基础URL
   timeout: 5000
 })
 
