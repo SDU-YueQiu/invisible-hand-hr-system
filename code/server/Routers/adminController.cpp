@@ -19,7 +19,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -35,7 +35,12 @@ namespace Router
             // 调用服务层获取用户列表
             auto users = Service::AdminService::getInstance().getUsers(filter);
 
-            // 构建响应JSON数组
+            // 构建响应JSON对象
+            crow::json::wvalue result;
+            result["success"] = true;
+            result["message"] = "操作成功";
+
+            // 构建用户数据数组
             crow::json::wvalue::list userList;
             for (const auto &user: users)
             {
@@ -44,12 +49,18 @@ namespace Router
                 item["username"] = user.Username;
                 item["phoneNumber"] = user.PhoneNumber;
                 item["email"] = user.Email;
+                item["registrationDate"] = user.RegistrationDate;
+                item["lastLoginDate"] = user.LastLoginDate;
                 item["accountStatus"] = user.AccountStatus;
+                item["avatarURL"] = user.AvatarURL;
                 userList.push_back(item);
             }
 
+            // 组合最终响应
+            result["data"]["users"] = crow::json::wvalue(userList);
+
             response.code = 200;
-            response.write(crow::json::wvalue(userList).dump());
+            response.write(result.dump());
             response.end();
         } catch (const std::exception &e)
         {
@@ -68,7 +79,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -80,7 +91,7 @@ namespace Router
 
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("status"))
+            if (!body || !body.has("newStatus"))
             {
                 response.code = 400;
                 crow::json::wvalue error_json;
@@ -93,7 +104,7 @@ namespace Router
             // 调用服务层更新用户状态
             bool success = Service::AdminService::getInstance().updateUserStatus(
                     id,
-                    body["status"].s());
+                    body["newStatus"].s());
 
             if (!success)
             {
@@ -127,7 +138,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -143,21 +154,40 @@ namespace Router
             // 调用服务层获取企业列表
             auto enterprises = Service::AdminService::getInstance().getEnterprises(filter);
 
-            // 构建响应JSON数组
+            // 构建响应JSON对象
+            crow::json::wvalue result;
+            result["success"] = true;
+            result["message"] = "操作成功";
+
+            // 构建企业数据数组
             crow::json::wvalue::list enterpriseList;
             for (const auto &enterprise: enterprises)
             {
                 crow::json::wvalue item;
                 item["enterpriseId"] = enterprise.EnterpriseID;
+                item["loginUsername"] = enterprise.LoginUsername;
                 item["enterpriseName"] = enterprise.EnterpriseName;
+                item["creditCode"] = enterprise.CreditCode;
+                item["description"] = enterprise.Description;
+                item["industry"] = enterprise.Industry;
+                item["scale"] = enterprise.Scale;
+                item["address"] = enterprise.Address;
+                item["contactPerson"] = enterprise.ContactPerson;
                 item["contactPhone"] = enterprise.ContactPhone;
                 item["contactEmail"] = enterprise.ContactEmail;
+                item["logoURL"] = enterprise.LogoURL;
+                item["licenseImageURL"] = enterprise.LicenseImageURL;
+                item["registrationDate"] = enterprise.RegistrationDate;
                 item["accountStatus"] = enterprise.AccountStatus;
+                item["auditOpinion"] = enterprise.AuditOpinion;
                 enterpriseList.push_back(item);
             }
 
+            // 组合最终响应
+            result["data"]["enterprises"] = crow::json::wvalue(enterpriseList);
+
             response.code = 200;
-            response.write(crow::json::wvalue(enterpriseList).dump());
+            response.write(result.dump());
             response.end();
         } catch (const std::exception &e)
         {
@@ -176,7 +206,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -198,7 +228,7 @@ namespace Router
                 return;
             }
 
-            std::string opinion = body.has("opinion") ? body["opinion"].s() : std::string("");
+            std::string opinion = body.has("auditOpinion") ? body["auditOpinion"].s() : std::string("");
 
             // 调用服务层批准企业
             bool success = Service::AdminService::getInstance().approveEnterprise(
@@ -237,7 +267,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -298,7 +328,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -347,7 +377,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -359,7 +389,7 @@ namespace Router
 
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("jobId") || !body.has("status"))// Assuming jobId in body is for potential future use or validation against path param
+            if (!body || !body.has("newStatus"))// Assuming jobId in body is for potential future use or validation against path param
             {
                 response.code = 400;
                 crow::json::wvalue error_json;
@@ -372,7 +402,7 @@ namespace Router
             // 调用服务层更新职位状态
             bool success = Service::AdminService::getInstance().updateJobStatus(
                     jobID,// Use jobID from path parameter
-                    body["status"].s());
+                    body["newStatus"].s());
 
             if (!success)
             {
@@ -406,7 +436,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -456,7 +486,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -513,7 +543,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -584,7 +614,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -651,7 +681,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -701,7 +731,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;
@@ -755,7 +785,7 @@ namespace Router
         {
             // 验证管理员权限
             std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
+            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
             {
                 response.code = 403;
                 crow::json::wvalue error_json;

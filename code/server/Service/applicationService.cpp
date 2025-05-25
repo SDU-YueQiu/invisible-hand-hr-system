@@ -28,7 +28,7 @@ namespace Service
 
         // 验证职位是否存在且处于招聘状态
         auto job = JobPostingService::getInstance().getJobById(jobId);
-        if (job.JobID == -1 || job.JobStatus != "Open")
+        if (job.JobID == -1 || job.JobStatus != "Recruiting")
         {
             CROW_LOG_WARNING << "Invalid job ID or job is not open for application";
             return false;

@@ -52,6 +52,7 @@ namespace Service
 
         // 更新状态为"Approved"并记录审核意见
         enterprise.AccountStatus = "Approved";
+        enterprise.AuditOpinion = opinion;
         return enterpriseUserDAO.update(enterpriseId, enterprise);
     }
 

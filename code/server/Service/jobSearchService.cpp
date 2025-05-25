@@ -131,7 +131,7 @@ namespace Service
         std::string filter = "JobID != " + std::to_string(jobId) + 
                             " AND EnterpriseID = " + std::to_string(currentJob.EnterpriseID) + 
                             " AND JobCategory = '" + currentJob.JobCategory + "'" +
-                            " AND JobStatus = 'Open'";
+                            " AND JobStatus = 'Recruiting'";
         
         // 限制返回数量
         auto relatedJobs = jobPostingDAO.findByFilter(filter);

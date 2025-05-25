@@ -32,7 +32,7 @@ namespace Service
         std::string educationRequired; ///< 学历要求
         std::string sortBy;            ///< 排序字段
         std::string sortOrder;         ///< 排序顺序（默认为降序）
-        std::string jobStatus = "Open";///< 职位状态（默认为Open）
+        std::string jobStatus = "Recruiting";///< 职位状态（默认为Open）
         int32_t returnSize = 50;       ///< 每页显示数量
     };
 

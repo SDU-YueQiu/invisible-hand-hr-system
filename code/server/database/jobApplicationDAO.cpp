@@ -27,9 +27,8 @@ namespace DAL
                     std::get<int64_t>(row.at("JobID")),
                     std::get<int64_t>(row.at("EnterpriseID")),
                     std::get<std::string>(row.at("ApplicationTime")),
-                    std::get<std::string>(row.at("Status")),
-                    std::get<std::string>(row.at("Feedback")),
-                    std::get<std::string>(row.at("UpdateTime"))};
+                    std::get<std::string>(row.at("CurrentStatus")),
+                    std::get<std::string>(row.at("EnterpriseNotes")), ""};
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "创建职位申请对象失败: " << e.what();
@@ -103,8 +102,8 @@ namespace DAL
         const std::string sql = R"(
             INSERT INTO JobApplications (
                 UserID, ResumeID, JobID, EnterpriseID,
-                ApplicationTime, Status, Feedback, UpdateTime
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ApplicationTime, CurrentStatus, EnterpriseNotes
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
         )";
 
         std::vector<std::string> params = {
@@ -114,8 +113,7 @@ namespace DAL
                 std::to_string(applicationData.EnterpriseID),
                 applicationData.ApplicationTime,
                 applicationData.Status,
-                applicationData.Feedback,
-                applicationData.UpdateTime};
+                applicationData.Feedback};
 
         auto result = dbManager.executeQuery(sql, params);
         return !result->empty();
