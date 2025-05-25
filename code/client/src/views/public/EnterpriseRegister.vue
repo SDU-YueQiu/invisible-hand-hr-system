@@ -37,7 +37,7 @@
               type="password" 
               id="password" 
               v-model="form.password" 
-              placeholder="至少6个字符，包含字母和数字"
+              placeholder="至少6个字符,包含字母和数字"
               required
             >
           </div>
@@ -145,18 +145,19 @@
           </div>
           
           <div class="form-group">
-            <label for="licenseImage">营业执照</label>
+            <label for="licenseImage">营业执照 (选填)</label>
             <input 
               type="file" 
               id="licenseImage" 
               @change="handleFileUpload" 
               accept="image/*"
-              required
             >
-            <p class="upload-tip">请上传清晰的营业执照照片或扫描件</p>
+            <p class="upload-tip">请上传清晰的营业执照照片或扫描件（非必须）</p>
           </div>
           
-          <button type="submit" class="submit-btn">提交注册申请</button>
+          <button type="submit" class="submit-btn" :disabled="isSubmitting">
+            {{ isSubmitting ? '提交中...' : '提交注册申请' }}
+          </button>
         </form>
         
         <div class="login-link">
@@ -166,12 +167,14 @@
     </main>
     
     <footer class="footer">
-      <p>© 2023 无形大手人才招聘系统</p>
+      <p>© 2025 无形大手人才招聘系统</p>
     </footer>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'EnterpriseRegister',
   data() {
@@ -191,81 +194,131 @@ export default {
         contactEmail: '',
         licenseImageURL: ''
       },
-      licenseFile: null
+      licenseFile: null,
+      isSubmitting: false,
+      baseURL: 'http://localhost:8080/api/v1'
     };
   },
   methods: {
-    handleFileUpload(event) {
+    async handleFileUpload(event) {
       this.licenseFile = event.target.files[0];
-      // 实际项目中应该上传文件到服务器，获取URL
-      // 这里仅做模拟
       if (this.licenseFile) {
-        console.log('文件已选择:', this.licenseFile.name);
-        // 模拟上传成功后获取URL
-        this.form.licenseImageURL = 'temp-url-for-license-image';
+        try {
+          // 创建FormData对象上传文件
+          const formData = new FormData();
+          formData.append('file', this.licenseFile);
+          
+          // 假设有一个文件上传API
+          const response = await axios.post(`${this.baseURL}/upload`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          
+          if (response.data.success) {
+            this.form.licenseImageURL = response.data.data.fileUrl;
+            this.$message ? this.$message.success('文件上传成功') : alert('文件上传成功');
+          } else {
+            this.$message ? this.$message.error('文件上传失败') : alert('文件上传失败');
+          }
+        } catch (error) {
+          console.error('文件上传错误:', error);
+          this.$message ? this.$message.error('文件上传失败，请重试') : alert('文件上传失败，请重试');
+        }
       }
     },
-    handleRegister() {
+    async handleRegister() {
       // 验证表单
       if (this.form.password !== this.form.confirmPassword) {
-        alert('两次输入的密码不一致');
+        this.$message ? this.$message.error('两次输入的密码不一致') : alert('两次输入的密码不一致');
         return;
       }
       
       // 用户名验证
       const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
       if (!usernameRegex.test(this.form.loginUsername)) {
-        alert('用户名必须为4-20个字符，只能包含字母、数字和下划线');
+        this.$message ? this.$message.error('用户名必须为4-20个字符，只能包含字母、数字和下划线') : 
+          alert('用户名必须为4-20个字符,只能包含字母、数字和下划线');
         return;
       }
       
       // 密码验证
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
       if (!passwordRegex.test(this.form.password)) {
-        alert('密码至少6个字符，必须包含字母和数字');
+        this.$message ? this.$message.error('密码至少6个字符,必须包含字母和数字') : 
+          alert('密码至少6个字符,必须包含字母和数字');
         return;
       }
       
       // 手机号验证
       if (!/^1[3-9]\d{9}$/.test(this.form.contactPhone)) {
-        alert('请输入有效的手机号码');
+        this.$message ? this.$message.error('请输入有效的手机号码') : alert('请输入有效的手机号码');
         return;
       }
       
       // 邮箱验证
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.form.contactEmail)) {
-        alert('请输入有效的邮箱地址');
+        this.$message ? this.$message.error('请输入有效的邮箱地址') : alert('请输入有效的邮箱地址');
         return;
       }
       
-      // 检查执照是否上传
-      if (!this.form.licenseImageURL) {
-        alert('请上传营业执照');
-        return;
+      try {
+        this.isSubmitting = true;
+        
+        // 构建符合API要求的数据对象
+        const registerData = {
+          loginUsername: this.form.loginUsername,
+          password: this.form.password,
+          enterpriseName: this.form.enterpriseName,
+          creditCode: this.form.creditCode,
+          description: this.form.description || undefined,
+          industry: this.form.industry || undefined,
+          scale: this.form.scale || undefined,
+          address: this.form.address || undefined,
+          contactPerson: this.form.contactPerson,
+          contactPhone: this.form.contactPhone,
+          contactEmail: this.form.contactEmail
+        };
+        
+        // 如果有上传营业执照，添加到请求数据中
+        if (this.form.licenseImageURL) {
+          registerData.licenseImageURL = this.form.licenseImageURL;
+        }
+        
+        // 发送企业注册请求
+        const response = await axios.post(`${this.baseURL}/auth/enterprise/register`, registerData);
+        
+        if (response.data.success) {
+          this.$message ? this.$message.success('企业注册申请已提交，请等待审核') : 
+            alert('企业注册申请已提交，请等待审核');
+          this.$router.push('/login');
+        } else {
+          this.$message ? this.$message.error(response.data.message || '注册失败，请重试') : 
+            alert(response.data.message || '注册失败，请重试');
+        }
+      } catch (error) {
+        let errorMsg = '注册失败，请稍后重试';
+        
+        if (error.response) {
+          // 处理不同错误状态码
+          switch (error.response.status) {
+            case 400:
+              errorMsg = '请求参数有误，请检查输入';
+              break;
+            case 409:
+              errorMsg = '用户名或统一社会信用代码已存在';
+              break;
+            default:
+              errorMsg = error.response.data.message || errorMsg;
+          }
+        }
+        
+        this.$message ? this.$message.error(errorMsg) : alert(errorMsg);
+        console.error('注册错误:', error);
+      } finally {
+        this.isSubmitting = false;
       }
-      
-      // TODO: 发送注册请求到 API
-      console.log('企业注册表单提交', this.form);
-      
-      // 注册逻辑：
-      // const registerData = {
-      //   loginUsername: this.form.loginUsername,
-      //   password: this.form.password,
-      //   enterpriseName: this.form.enterpriseName,
-      //   creditCode: this.form.creditCode,
-      //   description: this.form.description,
-      //   industry: this.form.industry,
-      //   scale: this.form.scale,
-      //   address: this.form.address,
-      //   contactPerson: this.form.contactPerson,
-      //   contactPhone: this.form.contactPhone,
-      //   contactEmail: this.form.contactEmail,
-      //   licenseImageURL: this.form.licenseImageURL
-      // };
-      
-      // 调用 API: POST /auth/enterprise/register
-      // 成功后提示用户等待审核并跳转到登录页面
     }
   }
 }
