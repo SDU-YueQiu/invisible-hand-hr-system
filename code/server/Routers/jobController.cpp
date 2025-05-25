@@ -25,26 +25,24 @@ namespace Router
 
             if (request.url_params.get("keyword"))
                 criteria.keyword = request.url_params.get("keyword");
-            if (request.url_params.get("jobCategory"))
-                criteria.jobCategory = request.url_params.get("jobCategory");
-            if (request.url_params.get("workLocation"))
-                criteria.workLocation = request.url_params.get("workLocation");
-            if (request.url_params.get("minSalary"))
-                criteria.minSalary = std::stoi(request.url_params.get("minSalary"));
-            if (request.url_params.get("maxSalary"))
-                criteria.maxSalary = std::stoi(request.url_params.get("maxSalary"));
-            if (request.url_params.get("experienceRequired"))
-                criteria.experienceRequired = request.url_params.get("experienceRequired");
-            if (request.url_params.get("educationRequired"))
-                criteria.educationRequired = request.url_params.get("educationRequired");
+            if (request.url_params.get("category"))
+                criteria.jobCategory = request.url_params.get("category");
+            if (request.url_params.get("location"))
+                criteria.workLocation = request.url_params.get("location");
+            if (request.url_params.get("salaryMin") && !std::string_view(request.url_params.get("salaryMin")).empty())
+                criteria.minSalary = std::stoi(request.url_params.get("salaryMin"));
+            // if (request.url_params.get("experienceRequired"))
+            //     criteria.experienceRequired = request.url_params.get("experienceRequired");
+            if (request.url_params.get("education"))
+                criteria.educationRequired = request.url_params.get("education");
             if (request.url_params.get("sortBy"))
                 criteria.sortBy = request.url_params.get("sortBy");
             if (request.url_params.get("sortOrder"))
                 criteria.sortOrder = request.url_params.get("sortOrder");
-            if (request.url_params.get("jobStatus"))
-                criteria.jobStatus = request.url_params.get("jobStatus");
-            if (request.url_params.get("returnSize"))
-                criteria.returnSize = std::stoi(request.url_params.get("returnSize"));
+            // if (request.url_params.get("jobStatus"))
+            //     criteria.jobStatus = request.url_params.get("jobStatus");
+            // if (request.url_params.get("returnSize"))
+            // criteria.returnSize = std::stoi(request.url_params.get("returnSize"));
 
             // 调用服务层搜索职位
             auto jobs = Service::JobSearchService::getInstance().searchJobs(criteria);
