@@ -46,16 +46,13 @@ namespace Service
         //只搜索公开简历
         conditions.push_back("VisibilityStatus = 'Public'");
 
-        // 关键词搜索（技能、教育经历等）
+        // 关键词搜索（标题、技能、教育经历等）
         if (!criteria.keyword.empty())
         {
-            std::string keywordCondition = "(SkillsCertificates LIKE '%" + criteria.keyword + "%' OR "
-                                                                                              "EducationExperience LIKE '%" +
-                                           criteria.keyword + "%' OR "
-                                                              "WorkExperience LIKE '%" +
-                                           criteria.keyword + "%' OR "
-                                                              "JobIntent LIKE '%" +
-                                           criteria.keyword + "%')";
+            std::string keywordCondition = "(ResumeTitle LIKE '%" + criteria.keyword + "%' OR ""SkillsCertificates LIKE '%" + criteria.keyword + "%' OR "
+                "EducationExperience LIKE '%" + criteria.keyword + "%' OR "
+                "WorkExperience LIKE '%" + criteria.keyword + "%' OR "
+                "JobIntent LIKE '%" + criteria.keyword + "%')";
             conditions.push_back(keywordCondition);
         }
 
