@@ -619,14 +619,14 @@ namespace Router
                 criteria.education = request.url_params.get("education");
             if (request.url_params.get("experience"))
                 criteria.experience = request.url_params.get("experience");
-            if (request.url_params.get("location"))
-                criteria.location = request.url_params.get("location");
-            if (request.url_params.get("sortBy"))
-                criteria.sortBy = request.url_params.get("sortBy");
-            if (request.url_params.get("sortOrder"))
-                criteria.sortOrder = request.url_params.get("sortOrder");
-            if (request.url_params.get("returnSize"))
-                criteria.returnSize = std::stoi(request.url_params.get("returnSize"));
+            // if (request.url_params.get("location"))
+            //     criteria.location = request.url_params.get("location");
+            // if (request.url_params.get("sortBy"))
+            //     criteria.sortBy = request.url_params.get("sortBy");
+            // if (request.url_params.get("sortOrder"))
+            //     criteria.sortOrder = request.url_params.get("sortOrder");
+
+            //TODO：年龄关键词
 
             // 调用服务层搜索简历
             auto resumes = Service::TalentSearchService::getInstance().searchResumes(criteria);

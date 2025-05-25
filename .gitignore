@@ -18,3 +18,4 @@ packges
 vscTest.session.sql
 node_modules
 .DS_Store
+dist
