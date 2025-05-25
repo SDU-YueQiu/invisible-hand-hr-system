@@ -125,7 +125,7 @@ namespace DAL
         const std::string sql = R"(
             UPDATE JobApplications SET
                 UserID = ?, ResumeID = ?, JobID = ?, EnterpriseID = ?,
-                ApplicationTime = ?, Status = ?, Feedback = ?, UpdateTime = ?
+                ApplicationTime = ?, CurrentStatus = ?, EnterpriseNotes = ?
             WHERE ApplicationID = ?
         )";
 
@@ -137,7 +137,6 @@ namespace DAL
                 applicationData.ApplicationTime,
                 applicationData.Status,
                 applicationData.Feedback,
-                applicationData.UpdateTime,
                 std::to_string(applicationId)};
 
         auto result = dbManager.executeQuery(sql, params);

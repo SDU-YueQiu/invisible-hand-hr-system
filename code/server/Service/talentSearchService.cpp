@@ -44,7 +44,7 @@ namespace Service
         std::vector<std::string> conditions;
 
         //只搜索公开简历
-        conditions.push_back("VisibilityStatus = 'PUBLIC'");
+        conditions.push_back("VisibilityStatus = 'Public'");
 
         // 关键词搜索（技能、教育经历等）
         if (!criteria.keyword.empty())

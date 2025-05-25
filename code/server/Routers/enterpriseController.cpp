@@ -487,30 +487,13 @@ namespace Router
         }
     }
 
-    void EnterpriseController::updateApplicationStatus(const crow::request &request, crow::response &response, int eid)
+    void EnterpriseController::updateApplicationStatus(const crow::request &request, crow::response &response, int aid)
     {
         try
         {
-            // 验证请求并获取企业ID
-            std::string enterpriseId = std::to_string(eid);
-
-            // Security check: Ensure the enterpriseId (eid) from path matches the one from token, or that the enterprise actually owns the application being modified.
-            // The current code uses 'eid' from path directly. A token validation usually happens for authorization.
-            // Let's assume the route design ensures 'eid' is the authenticated enterprise.
-
-            // 获取路径参数中的申请ID
-            std::string applicationId = request.url_params.get("applicationId");
-            if (applicationId.empty())
-            {
-                response.code = 400;
-                response.write(crow::json::wvalue{{"message", "缺少申请ID参数"}}.dump());
-                response.end();
-                return;
-            }
-
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("status"))
+            if (!body || !body.has("newStatus"))
             {
                 response.code = 400;
                 response.write(crow::json::wvalue{{"message", "无效的请求格式"}}.dump());
@@ -519,15 +502,13 @@ namespace Router
             }
 
             // 调用服务层更新申请状态
-            // The service call updateApplicationStatus(applicationId, status) doesn't use enterpriseId.
-            // This implies the service layer might handle authorization or the applicationID is globally unique and its ownership is checked within.
             bool success = Service::ApplicationService::getInstance().updateApplicationStatus(
-                    std::stoll(applicationId),
-                    body["status"].s());
+                    aid,
+                    body["newStatus"].s());
 
             if (!success)
             {
-                response.code = 400;// Or 403 if not authorized, 404 if application not found
+                response.code = 400;
                 response.write(crow::json::wvalue{{"message", "更新申请状态失败"}}.dump());
                 response.end();
                 return;
