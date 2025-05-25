@@ -89,7 +89,7 @@ namespace Router
                 return;
             }
 
-            response.code = 200;
+            response.code = 201;
             response.write(crow::json::wvalue{{"message", "简历创建成功"}}.dump());
             response.end();
         } catch (const std::exception &e)
@@ -193,8 +193,11 @@ namespace Router
             // 调用服务层获取用户所有简历
             auto resumes = Service::ResumeService::getInstance().getResumesByUserId(std::stoi(userId));
 
-            // 构建响应JSON数组
-            crow::json::wvalue::list resumeList;
+            crow::json::wvalue result;
+            result["success"] = true;
+            result["message"] = "操作成功";
+
+            crow::json::wvalue::list dataList;
             for (const auto &resume: resumes)
             {
                 crow::json::wvalue item;
@@ -202,11 +205,12 @@ namespace Router
                 item["resumeTitle"] = resume.ResumeTitle;
                 item["lastUpdateTime"] = resume.LastUpdateTime;
                 item["visibilityStatus"] = resume.VisibilityStatus;
-                resumeList.push_back(item);
+                dataList.push_back(item);
             }
+            result["data"] = std::move(dataList);
 
             response.code = 200;
-            response.write(crow::json::wvalue(resumeList).dump());
+            response.write(result.dump());
             response.end();
         } catch (const std::exception &e)
         {
@@ -303,7 +307,7 @@ namespace Router
                 return;
             }
 
-            response.code = 200;
+            response.code = 201;
             response.write(crow::json::wvalue{{"message", "简历更新成功"}}.dump());
             response.end();
         } catch (const std::exception &e)

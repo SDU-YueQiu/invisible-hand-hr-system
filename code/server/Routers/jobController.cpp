@@ -3,7 +3,7 @@
  * @brief 职位信息控制器实现，处理职位查询和申请相关API请求
  * @author SDU-YueQiu
  * @date 2025/5/16
- * @version 1.0
+ * @version 1.1
  */
 
 #include "jobController.h"
@@ -66,8 +66,10 @@ namespace Router
                 jobList.push_back(item);
             }
 
+            crow::json::wvalue response_json;
+            response_json["message"] = std::move(jobList);
             response.code = 200;
-            response.write(crow::json::wvalue(jobList).dump());
+            response.write(response_json.dump());
             response.end();
         } catch (const std::exception &e)
         {
@@ -86,7 +88,7 @@ namespace Router
         {
             // 获取路径参数中的职位ID
             std::string jobId = std::to_string(id);
-            if (jobId.empty()) // Note: std::to_string(int) will not produce an empty string. This condition might always be false.
+            if (jobId.empty())// Note: std::to_string(int) will not produce an empty string. This condition might always be false.
             {
                 response.code = 400;
                 crow::json::wvalue error_json;
@@ -112,23 +114,23 @@ namespace Router
             auto relatedJobs = Service::JobSearchService::getInstance().getRelatedJobs(std::stoll(jobId));
 
             // 构建响应JSON
-            crow::json::wvalue result;
-            result["jobId"] = job.JobID;
-            result["jobTitle"] = job.JobTitle;
-            result["enterpriseId"] = job.EnterpriseID;
-            result["jobCategory"] = job.JobCategory;
-            result["recruitmentCount"] = job.RecruitmentCount;
-            result["workLocation"] = job.WorkLocation;
-            result["minSalary"] = job.MinSalary;
-            result["maxSalary"] = job.MaxSalary;
-            result["responsibilities"] = job.Responsibilities;
-            result["requirements"] = job.Requirements;
-            result["experienceRequired"] = job.ExperienceRequired;
-            result["educationRequired"] = job.EducationRequired;
-            result["benefits"] = job.Benefits;
-            result["publishDate"] = job.PublishDate;
-            result["deadlineDate"] = job.DeadlineDate;
-            result["jobStatus"] = job.JobStatus;
+            crow::json::wvalue result_data;// Renamed from 'result' to avoid confusion
+            result_data["jobId"] = job.JobID;
+            result_data["jobTitle"] = job.JobTitle;
+            result_data["enterpriseId"] = job.EnterpriseID;
+            result_data["jobCategory"] = job.JobCategory;
+            result_data["recruitmentCount"] = job.RecruitmentCount;
+            result_data["workLocation"] = job.WorkLocation;
+            result_data["minSalary"] = job.MinSalary;
+            result_data["maxSalary"] = job.MaxSalary;
+            result_data["responsibilities"] = job.Responsibilities;
+            result_data["requirements"] = job.Requirements;
+            result_data["experienceRequired"] = job.ExperienceRequired;
+            result_data["educationRequired"] = job.EducationRequired;
+            result_data["benefits"] = job.Benefits;
+            result_data["publishDate"] = job.PublishDate;
+            result_data["deadlineDate"] = job.DeadlineDate;
+            result_data["jobStatus"] = job.JobStatus;
 
             // 添加相关职位
             crow::json::wvalue::list relatedList;
@@ -142,10 +144,12 @@ namespace Router
                 item["maxSalary"] = related.MaxSalary;
                 relatedList.push_back(item);
             }
-            result["relatedJobs"] = std::move(relatedList);
+            result_data["relatedJobs"] = std::move(relatedList);
 
+            crow::json::wvalue response_json;
+            response_json["message"] = std::move(result_data);
             response.code = 200;
-            response.write(result.dump());
+            response.write(response_json.dump());
             response.end();
         } catch (const std::exception &e)
         {
@@ -158,7 +162,7 @@ namespace Router
         }
     }
 
-    void JobController::applyForJob(const crow::request &request, crow::response &response,int jobID)
+    void JobController::applyForJob(const crow::request &request, crow::response &response, int jobID)
     {
         try
         {
@@ -178,15 +182,6 @@ namespace Router
 
             // 获取路径参数中的职位ID
             std::string jobId = std::to_string(jobID);
-            if (jobId.empty()) // Note: std::to_string(int) will not produce an empty string. This condition might always be false.
-            {
-                response.code = 400;
-                crow::json::wvalue error_json;
-                error_json["message"] = "缺少职位ID参数";
-                response.write(error_json.dump());
-                response.end();
-                return;
-            }
 
             // 解析请求体
             auto body = crow::json::load(request.body);
@@ -203,7 +198,7 @@ namespace Router
             // 调用服务层申请职位
             bool success = Service::ApplicationService::getInstance().applyForJob(
                     std::stoll(userId),
-                    std::stoll(body["resumeId"].s()), // Assuming resumeId is a string in JSON
+                    body["resumeId"].i(),
                     std::stoll(jobId));
 
             if (!success)
@@ -266,8 +261,10 @@ namespace Router
                 applicationList.push_back(item);
             }
 
+            crow::json::wvalue response_json;
+            response_json["message"] = std::move(applicationList);
             response.code = 200;
-            response.write(crow::json::wvalue(applicationList).dump());
+            response.write(response_json.dump());
             response.end();
         } catch (const std::exception &e)
         {

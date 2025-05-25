@@ -3,7 +3,7 @@
  * @brief 管理员控制器实现，处理系统管理员相关API请求
  * @author SDU-YueQiu
  * @date 2025/5/16
- * @version 1.0
+ * @version 1.1
  */
 
 #include "adminController.h"
@@ -22,7 +22,10 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -47,11 +50,15 @@ namespace Router
 
             response.code = 200;
             response.write(crow::json::wvalue(userList).dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取用户列表失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -64,7 +71,10 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -73,7 +83,10 @@ namespace Router
             if (!body || !body.has("status"))
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无效的请求格式";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -85,17 +98,26 @@ namespace Router
             if (!success)
             {
                 response.code = 400;
-                response.write("更新用户状态失败");
+                crow::json::wvalue error_json;
+                error_json["message"] = "更新用户状态失败";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             response.code = 200;
-            response.write("用户状态更新成功");
+            crow::json::wvalue success_json;
+            success_json["message"] = "用户状态更新成功";
+            response.write(success_json.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "更新用户状态失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -108,7 +130,10 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -133,11 +158,15 @@ namespace Router
 
             response.code = 200;
             response.write(crow::json::wvalue(enterpriseList).dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取企业列表失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -150,7 +179,10 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -159,7 +191,10 @@ namespace Router
             if (!body)
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无效的请求格式";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -173,17 +208,26 @@ namespace Router
             if (!success)
             {
                 response.code = 400;
-                response.write("批准企业失败");
+                crow::json::wvalue error_json;
+                error_json["message"] = "批准企业失败";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             response.code = 200;
-            response.write("企业已批准");
+            crow::json::wvalue success_json;
+            success_json["message"] = "企业已批准";
+            response.write(success_json.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "批准企业失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -196,7 +240,10 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -205,7 +252,10 @@ namespace Router
             if (!body)
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无效的请求格式";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -219,17 +269,26 @@ namespace Router
             if (!success)
             {
                 response.code = 400;
-                response.write("拒绝企业失败");
+                crow::json::wvalue error_json;
+                error_json["message"] = "拒绝企业失败";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             response.code = 200;
-            response.write("企业已拒绝");
+            crow::json::wvalue success_json;
+            success_json["message"] = "企业已拒绝";
+            response.write(success_json.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "拒绝企业失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -242,7 +301,10 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -267,11 +329,15 @@ namespace Router
 
             response.code = 200;
             response.write(crow::json::wvalue(jobList).dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取职位列表失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -284,38 +350,53 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("jobId") || !body.has("status"))
+            if (!body || !body.has("jobId") || !body.has("status"))// Assuming jobId in body is for potential future use or validation against path param
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无效的请求格式";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             // 调用服务层更新职位状态
             bool success = Service::AdminService::getInstance().updateJobStatus(
-                    jobID,
+                    jobID,// Use jobID from path parameter
                     body["status"].s());
 
             if (!success)
             {
                 response.code = 400;
-                response.write("更新职位状态失败");
+                crow::json::wvalue error_json;
+                error_json["message"] = "更新职位状态失败";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             response.code = 200;
-            response.write("职位状态更新成功");
+            crow::json::wvalue success_json;
+            success_json["message"] = "职位状态更新成功";
+            response.write(success_json.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "更新职位状态失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -328,7 +409,10 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -354,11 +438,15 @@ namespace Router
 
             response.code = 200;
             response.write(crow::json::wvalue(announcementList).dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取公告列表失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -371,25 +459,26 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             // 获取公告ID
             std::string announcementId = std::to_string(aid);
-            if (announcementId.empty())
-            {
-                response.code = 400;
-                response.write("缺少公告ID参数");
-                return;
-            }
+            // No need to check if announcementId is empty as aid is int, std::to_string(int) is never empty.
 
             // 调用服务层获取公告详情
             auto announcements = Service::AnnouncementService::getInstance().getAnnouncements("AnnouncementID = " + announcementId);
             if (announcements.empty())
             {
                 response.code = 404;
-                response.write("公告不存在");
+                crow::json::wvalue error_json;
+                error_json["message"] = "公告不存在";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -406,11 +495,15 @@ namespace Router
 
             response.code = 200;
             response.write(result.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取公告详情失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -423,7 +516,10 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -432,7 +528,10 @@ namespace Router
             if (!body || !body.has("title") || !body.has("content"))
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无效的请求格式";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -456,17 +555,26 @@ namespace Router
             if (!success)
             {
                 response.code = 400;
-                response.write("创建公告失败");
+                crow::json::wvalue error_json;
+                error_json["message"] = "创建公告失败";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             response.code = 201;
-            response.write("公告创建成功");
+            crow::json::wvalue success_json;
+            success_json["message"] = "公告创建成功";
+            response.write(success_json.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "创建公告失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -479,7 +587,10 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -488,7 +599,10 @@ namespace Router
             if (!body)
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无效的请求格式";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -508,17 +622,26 @@ namespace Router
             if (!success)
             {
                 response.code = 400;
-                response.write("更新公告失败");
+                crow::json::wvalue error_json;
+                error_json["message"] = "更新公告失败";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             response.code = 200;
-            response.write("公告更新成功");
+            crow::json::wvalue success_json;
+            success_json["message"] = "公告更新成功";
+            response.write(success_json.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "更新公告失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -531,18 +654,17 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             // 获取公告ID
             std::string announcementId = std::to_string(aid);
-            if (announcementId.empty())
-            {
-                response.code = 400;
-                response.write("缺少公告ID参数");
-                return;
-            }
+            // No need to check if announcementId is empty as aid is int, std::to_string(int) is never empty.
+            // The original check `if (announcementId.empty())` was redundant here.
 
             // 调用服务层删除公告
             bool success = Service::AnnouncementService::getInstance().deleteAnnouncement(std::stoll(announcementId));
@@ -550,17 +672,26 @@ namespace Router
             if (!success)
             {
                 response.code = 400;
-                response.write("删除公告失败");
+                crow::json::wvalue error_json;
+                error_json["message"] = "删除公告失败";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             response.code = 200;
-            response.write("公告删除成功");
+            crow::json::wvalue success_json;
+            success_json["message"] = "公告删除成功";
+            response.write(success_json.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "删除公告失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -573,7 +704,10 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -603,11 +737,15 @@ namespace Router
 
             response.code = 200;
             response.write(crow::json::wvalue(feedbackList).dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "获取反馈列表失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
@@ -620,16 +758,22 @@ namespace Router
             if (Utils::SecurityUtils::getRoleFromToken(token) != "Admin")
             {
                 response.code = 403;
-                response.write("无权访问此资源");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无权访问此资源";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("status"))
+            if (!body || !body.has("status"))// Assuming 'status' field implies processing, adminReply is optional
             {
                 response.code = 400;
-                response.write("无效的请求格式");
+                crow::json::wvalue error_json;
+                error_json["message"] = "无效的请求格式";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
@@ -637,6 +781,11 @@ namespace Router
             std::string adminReply = body.has("adminReply") ? body["adminReply"].s() : std::string("");
 
             // 调用服务层处理反馈
+            // Assuming processFeedback updates the status and optionally the adminReply.
+            // The original Service::FeedbackService::getInstance().processFeedback only took fid and adminReply.
+            // If status update is also part of processing, the service method might need adjustment,
+            // or 'status' from body is used to determine the nature of processing.
+            // Sticking to the original service call signature for now.
             bool success = Service::FeedbackService::getInstance().processFeedback(
                     fid,
                     adminReply);
@@ -644,17 +793,26 @@ namespace Router
             if (!success)
             {
                 response.code = 400;
-                response.write("处理反馈失败");
+                crow::json::wvalue error_json;
+                error_json["message"] = "处理反馈失败";
+                response.write(error_json.dump());
+                response.end();
                 return;
             }
 
             response.code = 200;
-            response.write("反馈处理成功");
+            crow::json::wvalue success_json;
+            success_json["message"] = "反馈处理成功";
+            response.write(success_json.dump());
+            response.end();
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "处理反馈失败: " << e.what();
             response.code = 500;
-            response.write("服务器内部错误");
+            crow::json::wvalue error_json;
+            error_json["message"] = "服务器内部错误";
+            response.write(error_json.dump());
+            response.end();
         }
     }
 
