@@ -163,9 +163,35 @@ const handleIndividualLogin = async () => {
   }
 }
 
-const handleEnterpriseLogin = () => {
-  // 类似个人登录...
-  ElMessage.info('企业登录功能开发中')
+const handleEnterpriseLogin = async() => {
+  if (!enterpriseForm.loginUsername || !enterpriseForm.password) {
+    ElMessage.error('请输入用户名和密码')
+    return
+  }
+
+  loading.value = true
+  const loginData = {
+      username: enterpriseForm.loginUsername,
+      password: enterpriseForm.password
+  };
+  console.log(loginData)
+  try {
+    const baseURL = 'http://localhost:8080/api/v1';
+    console.log(baseURL);
+    const response = await axios.post(`${baseURL}/auth/enterprise/login`,loginData);
+    console.log(response.status)
+    if (response.status==200) {
+      const userData = response.data.data
+      ElMessage.success('登录成功')
+      router.push('/enterprise/dashboard')
+    } else {
+      ElMessage.error(response.data.message)
+    }
+  } catch (error) {
+    ElMessage.error('登录失败，请检查用户名和密码')
+  } finally {
+    loading.value = false
+  }
 }
 
 const handleAdminLogin = () => {
