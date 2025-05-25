@@ -484,18 +484,6 @@ namespace Router
     {
         try
         {
-            // 验证管理员权限
-            std::string token = request.get_header_value("Authorization").substr(7);
-            if (Utils::SecurityUtils::getRoleFromToken(token) != "admin")
-            {
-                response.code = 403;
-                crow::json::wvalue error_json;
-                error_json["message"] = "无权访问此资源";
-                response.write(error_json.dump());
-                response.end();
-                return;
-            }
-
             // 获取公告ID
             std::string announcementId = std::to_string(aid);
             // No need to check if announcementId is empty as aid is int, std::to_string(int) is never empty.
@@ -797,7 +785,7 @@ namespace Router
 
             // 解析请求体
             auto body = crow::json::load(request.body);
-            if (!body || !body.has("status"))// Assuming 'status' field implies processing, adminReply is optional
+            if (!body || !body.has("processStatus"))// Assuming 'status' field implies processing, adminReply is optional
             {
                 response.code = 400;
                 crow::json::wvalue error_json;

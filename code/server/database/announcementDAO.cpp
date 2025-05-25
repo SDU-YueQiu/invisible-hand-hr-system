@@ -26,17 +26,20 @@ namespace DAL
                     std::get<int64_t>(row.at("AdminID")),
                     std::get<std::string>(row.at("Title")),
                     std::get<std::string>(row.at("Content")),
-                    std::get<time_t>(row.at("PublishTime")),
-                    std::get<time_t>(row.at("EffectiveTime")),
-                    std::get<time_t>(row.at("ExpireTime")),
-                    static_cast<bool>(std::get<int>(row.at("IsTop")))};
+                    std::get<std::string>(row.at("PublishTime")),
+                    std::get<std::string>(row.at("EffectiveTime")),
+                    std::get<std::string>(row.at("ExpireTime")),
+                    static_cast<bool>(std::get<int64_t>(row.at("IsTop")))};
         } catch (const std::exception &e)
         {
             CROW_LOG_ERROR << "创建公告对象失败: " << e.what();
+            for (const auto &[key, value]: row)
+            {
+                CROW_LOG_ERROR << "列名: " << key << ", 类型: " << value.index();
+            }
             return Announcement{};
         }
     }
-
     Announcement AnnouncementDAO::findById(int64_t announcementId)
     {
         CROW_LOG_INFO << "查询公告信息，ID: " << announcementId;
@@ -85,9 +88,9 @@ namespace DAL
                 std::to_string(announcementData.AdminID),
                 announcementData.Title,
                 announcementData.Content,
-                std::to_string(announcementData.PublishTime),
-                std::to_string(announcementData.EffectiveTime),
-                std::to_string(announcementData.ExpireTime),
+                (announcementData.PublishTime),
+                (announcementData.EffectiveTime),
+                (announcementData.ExpireTime),
                 announcementData.IsTop ? "1" : "0"};
 
         auto result = dbManager.executeQuery(sql, params);
@@ -109,9 +112,9 @@ namespace DAL
                 std::to_string(announcementData.AdminID),
                 announcementData.Title,
                 announcementData.Content,
-                std::to_string(announcementData.PublishTime),
-                std::to_string(announcementData.EffectiveTime),
-                std::to_string(announcementData.ExpireTime),
+                (announcementData.PublishTime),
+                (announcementData.EffectiveTime),
+                (announcementData.ExpireTime),
                 announcementData.IsTop ? "1" : "0",
                 std::to_string(announcementId)};
 
