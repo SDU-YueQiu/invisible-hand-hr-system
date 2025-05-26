@@ -20,7 +20,7 @@
         <div class="resume-card-content">
           <div class="resume-card-title">{{ resume.resumeTitle }}</div>
           <div class="resume-card-meta">
-            <div>更新时间：{{ formatDate(resume.lastUpdateTime) }}</div>
+            <!-- <div>更新时间：{{ formatDate(resume.lastUpdateTime) }}</div> -->
             <div>可见性：{{ getVisibilityText(resume.visibilityStatus) }}</div>
           </div>
         </div>
@@ -63,12 +63,36 @@ onMounted(async () => {
   await fetchResumes()
 })
 
+const parseResumeData = (data) => {
+  const fieldsToParse = [
+    'basicInfo',
+    'jobIntent',
+    'educationExperience',
+    'workExperience',
+    'projectExperience',
+    'skillsCertificates',
+    'lastUpdateTime',
+    'resumeTitle',
+    'selfDescription'
+  ]
+  fieldsToParse.forEach(field => {
+    if (data[field] && typeof data[field] === 'string') {
+      try {
+        data[field] = JSON.parse(data[field])
+      } catch (e) {
+        console.error(`failed to parse ${field}:`, e)
+      }
+    }
+  })
+  return data
+}
+
 const fetchResumes = async () => {
   try {
     loading.value = true
     const res = await request.get('/users/me/resumes')
     if (res.success) {
-      resumes.value = res.data || []
+      resumes.value = parseResumeData(res.data) || []
     } else {
       ElMessage.error(res.message || '获取简历列表失败')
     }
@@ -138,7 +162,7 @@ const duplicateResume = async (resumeId) => {
     // 获取简历详情
     const getRes = await request.get(`/users/me/resumes/${resumeId}`)
     if (getRes.success) {
-      const resumeData = getRes.data
+      const resumeData = parseResumeData(getRes.data)
       // 创建新简历（复制）
       const postData = {
         ...resumeData,

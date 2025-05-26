@@ -304,17 +304,41 @@ onMounted(async () => {
   if (isEdit.value) {
     await fetchResumeDetails()
   } else {
-    // 初始化一个空的教育经历
     addEducation()
   }
 })
+
+const parseResumeData = (data) => {
+  const fieldsToParse = [
+    'basicInfo',
+    'jobIntent',
+    'educationExperience',
+    'workExperience',
+    'projectExperience',
+    'skillsCertificates',
+    'lastUpdateTime',
+    'resumeTitle',
+    'selfDescription'
+  ]
+  fieldsToParse.forEach(field => {
+    if (data[field] && typeof data[field] === 'string') {
+      try {
+        data[field] = JSON.parse(data[field])
+      } catch (e) {
+        console.error(`failed to parse ${field}:`, e)
+      }
+    }
+  })
+  return data
+}
 
 const fetchResumeDetails = async () => {
   try {
     loading.value = true
     const res = await request.get(`/users/me/resumes/${resumeId.value}`)
     if (res.success) {
-      Object.assign(resumeForm, res.data)
+      console.log('获取简历详情:', res.data)
+      Object.assign(resumeForm, parseResumeData(res.data))
     } else {
       ElMessage.error(res.message || '获取简历详情失败')
     }
@@ -434,7 +458,7 @@ const submitForm = async (formEl) => {
         } else {
           res = await request.post('/users/me/resumes', formattedData)
         }
-        
+        console.log('提交简历:', res)
         if (res.success) {
           ElMessage.success(isEdit.value ? '简历更新成功' : '简历创建成功')
           router.push('/user/resumes')

@@ -172,13 +172,37 @@ const resume = ref({})
 onMounted(async () => {
   await fetchResumeDetails()
 })
+const parseResumeData = (data) => {
+  const fieldsToParse = [
+    'basicInfo',
+    'jobIntent',
+    'educationExperience',
+    'workExperience',
+    'projectExperience',
+    'skillsCertificates',
+    'lastUpdateTime',
+    'resumeTitle',
+    'selfDescription'
+  ]
+  fieldsToParse.forEach(field => {
+    if (data[field] && typeof data[field] === 'string') {
+      try {
+        data[field] = JSON.parse(data[field])
+      } catch (e) {
+        console.error(`failed to parse ${field}:`, e)
+      }
+    }
+  })
+  return data
+}
 
 const fetchResumeDetails = async () => {
   try {
     loading.value = true
     const res = await request.get(`/users/me/resumes/${resumeId}`)
     if (res.success) {
-      resume.value = res.data
+      console.log('简历详情:', res.data)
+      resume.value = parseResumeData(res.data)
     }
   } catch (error) {
     ElMessage.error('获取简历详情失败')
