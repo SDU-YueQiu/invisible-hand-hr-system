@@ -49,30 +49,30 @@ const routes = [
         component: () => import('../views/user/Profile.vue'),
         meta: { requiresAuth: true, userType: 'individual' }
       },
-    //   {
-    //     path: 'resumes',
-    //     name: 'UserResumes',
-    //     component: () => import('../views/user/ResumeList.vue'),
-    //     meta: { requiresAuth: true, userType: 'individual' }
-    //   },
-    //   {
-    //     path: 'resume/create',
-    //     name: 'CreateResume',
-    //     component: () => import('../views/user/ResumeForm.vue'),
-    //     meta: { requiresAuth: true, userType: 'individual' }
-    //   },
-    //   {
-    //     path: 'resume/edit/:id',
-    //     name: 'EditResume',
-    //     component: () => import('../views/user/ResumeForm.vue'),
-    //     meta: { requiresAuth: true, userType: 'individual' }
-    //   },
-    //   {
-    //     path: 'resume/view/:id',
-    //     name: 'ViewResume',
-    //     component: () => import('../views/user/ResumeView.vue'),
-    //     meta: { requiresAuth: true, userType: 'individual' }
-    //   },
+      {
+        path: 'resumes',
+        name: 'UserResumes',
+        component: () => import('../views/user/ResumeList.vue'),
+        meta: { requiresAuth: true, userType: 'individual' }
+      },
+      {
+        path: 'resume/create',
+        name: 'CreateResume',
+        component: () => import('../views/user/ResumeForm.vue'),
+        meta: { requiresAuth: true, userType: 'individual' }
+      },
+      {
+        path: 'resume/edit/:id',
+        name: 'EditResume',
+        component: () => import('../views/user/ResumeForm.vue'),
+        meta: { requiresAuth: true, userType: 'individual' }
+      },
+      {
+        path: 'resume/view/:id',
+        name: 'ViewResume',
+        component: () => import('../views/user/ResumeView.vue'),
+        meta: { requiresAuth: true, userType: 'individual' }
+      },
     //   {
     //     path: 'applications',
     //     name: 'UserApplications',

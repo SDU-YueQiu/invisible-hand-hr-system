@@ -166,8 +166,8 @@ export default {
       try {
         this.loading = true;
         const jobId = this.$route.params.id;
-        const response = await axios.get(`/api/v1/jobs/${jobId}`);
-        
+        const baseURL = "http://localhost:8080/api/v1";
+        const response = await axios.get(`${baseURL}/jobs/${jobId}`);
         if (response.data.success) {
           this.job = response.data.data;
         } else {
@@ -194,7 +194,8 @@ export default {
     
     async loadUserResumes() {
       try {
-        const response = await axios.get('/api/v1/users/me/resumes');
+        const baseURL = "http://localhost:8080/api/v1";
+        const response = await axios.get(`${baseURL}/users/me/resumes`);
         if (response.data.success) {
           this.userResumes = response.data.data;
           if (this.userResumes.length > 0) {
@@ -215,7 +216,8 @@ export default {
       try {
         this.applyLoading = true;
         const jobId = this.$route.params.id;
-        const response = await axios.post(`/api/v1/jobs/${jobId}/apply`, {
+        baseURL = "http://localhost:8080/api/v1";
+        const response = await axios.post(`${baseURL}/jobs/${jobId}/apply`, {
           resumeId: this.selectedResumeId
         });
         
