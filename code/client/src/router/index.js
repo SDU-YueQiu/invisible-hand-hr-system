@@ -43,12 +43,12 @@ const routes = [
         component: () => import('../views/user/Dashboard.vue'),
         meta: { requiresAuth: true, userType: 'individual' }
       },
-    //   {
-    //     path: 'profile',
-    //     name: 'UserProfile',
-    //     component: () => import('../views/user/Profile.vue'),
-    //     meta: { requiresAuth: true, userType: 'individual' }
-    //   },
+      {
+        path: 'profile',
+        name: 'UserProfile',
+        component: () => import('../views/user/Profile.vue'),
+        meta: { requiresAuth: true, userType: 'individual' }
+      },
     //   {
     //     path: 'resumes',
     //     name: 'UserResumes',
