@@ -116,7 +116,7 @@ import {
   Setting, 
   ArrowDown 
 } from '@element-plus/icons-vue'
-import { useEnterpriseStore } from '../../stores/enterprise'
+import { useEnterpriseStore } from '../../stores'
 
 const router = useRouter()
 const enterpriseStore = useEnterpriseStore()
