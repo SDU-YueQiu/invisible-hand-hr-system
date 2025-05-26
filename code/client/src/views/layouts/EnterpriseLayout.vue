@@ -25,11 +25,11 @@
             <el-icon><document /></el-icon>
             <span>在招岗位</span>
           </el-menu-item>
-          <el-menu-item index="/enterprise/jobs/create">
+          <el-menu-item index="job/create">
             <el-icon><connection /></el-icon>
             <span>增加岗位</span>
           </el-menu-item>
-          <el-menu-item index="enterprise/jobs/edit/:id">
+          <el-menu-item index="job/edit/:id">
             <el-icon><search /></el-icon>
             <span>岗位变更</span>
           </el-menu-item>

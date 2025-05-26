@@ -107,11 +107,15 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '../../stores'
 import { useLocalStorage } from '@vueuse/core'
+import { useEnterpriseStore } from '../../stores'
+import { useAdminStore } from '../../stores'
 import axios from 'axios'
 import request from '../../utils/request'
 
 const router = useRouter()
 const userStore = useUserStore()
+const enterpriseStore = useEnterpriseStore()
+const adminStore = useAdminStore()
 
 const loading = ref(false)
 const activeTab = ref('individual')
@@ -187,34 +191,95 @@ const handleEnterpriseLogin = async() => {
   }
 
   loading.value = true
+  // 使用 useLocalStorage
+  const token = useLocalStorage('enterprise_token', '')
+  const userType = useLocalStorage('enterprise_userType', '')
+  
   const loginData = {
-      username: enterpriseForm.loginUsername,
-      password: enterpriseForm.password
+    username: enterpriseForm.loginUsername,
+    password: enterpriseForm.password
   };
-  console.log(loginData)
+  
   try {
-    const baseURL = 'http://localhost:8080/api/v1';
-    console.log(baseURL);
-    const response = await axios.post(`${baseURL}/auth/enterprise/login`,loginData);
-    console.log(response.status)
-    if (response.status==200) {
-      const userData = response.data.data
+    const response = await request.post('/auth/enterprise/login', loginData);
+    console.log('企业登录响应:', response)
+    if (response.success === true) {
+      // 从响应中获取数据
+      const { token: responseToken, userId } = response;
+      
+      // 保存到 localStorage (响应式)
+      token.value = responseToken
+      userType.value = 'enterprise'
+      
+      // 更新 store
+      enterpriseStore.setUser({
+        token: responseToken,
+        userType: 'enterprise',
+        userId,
+        username: enterpriseForm.loginUsername
+      })
+      
       ElMessage.success('登录成功')
       router.push('/enterprise/dashboard')
     } else {
-      ElMessage.error(response.data.message)
+      ElMessage.error(response.message)
     }
   } catch (error) {
+    console.error('企业登录错误:', error)
     ElMessage.error('登录失败，请检查用户名和密码')
   } finally {
     loading.value = false
   }
 }
 
-const handleAdminLogin = () => {
-  // 类似个人登录...
-  ElMessage.info('管理员登录功能开发中')
+const handleAdminLogin = async () => {
+  if (!adminForm.username || !adminForm.password) {
+    ElMessage.error('请输入用户名和密码')
+    return
+  }
+  
+  loading.value = true
+  // 使用 useLocalStorage
+  const token = useLocalStorage('admin_token', '')
+  const userType = useLocalStorage('admin_userType', '')
+  
+  const loginData = {
+    username: adminForm.username,
+    password: adminForm.password
+  };
+  
+  try {
+    const response = await request.post('/auth/admin/login', loginData);
+    console.log('管理员登录响应:', response)
+    if (response.success === true) {
+      // 从响应中获取数据
+      const { token: responseToken, userId } = response;
+      
+      // 保存到 localStorage (响应式)
+      token.value = responseToken
+      userType.value = 'admin'
+      
+      // 更新 store (假设有 adminStore)
+      adminStore.setUser({
+        token: responseToken,
+        userType: 'admin',
+        userId,
+        username: adminForm.username
+      })
+      
+      ElMessage.success('登录成功')
+      router.push('/admin/dashboard')
+    } else {
+      ElMessage.error(response.message)
+    }
+  } catch (error) {
+    console.error('管理员登录错误:', error)
+    ElMessage.error('登录失败，请检查用户名和密码')
+  } finally {
+    loading.value = false
+  }
 }
+
 </script>
 
 <style scoped>

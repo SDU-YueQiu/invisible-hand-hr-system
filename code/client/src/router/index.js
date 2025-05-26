@@ -110,18 +110,18 @@ const routes = [
 //         component: () => import('../views/enterprise/JobList.vue'),
 //         meta: { requiresAuth: true, userType: 'enterprise' }
 //       },
-//       {
-//         path: 'job/create',
-//         name: 'CreateJob',
-//         component: () => import('../views/enterprise/JobForm.vue'),
-//         meta: { requiresAuth: true, userType: 'enterprise' }
-//       },
-//       {
-//         path: 'job/edit/:id',
-//         name: 'EditJob',
-//         component: () => import('../views/enterprise/JobForm.vue'),
-//         meta: { requiresAuth: true, userType: 'enterprise' }
-//       },
+      {
+        path: 'job/create',
+        name: 'CreateJob',
+        component: () => import('../views/enterprise/JobForm.vue'),
+        meta: { requiresAuth: true, userType: 'enterprise' }
+      },
+      {
+        path: 'job/edit/:id',
+        name: 'EditJob',
+        component: () => import('../views/enterprise/JobForm.vue'),
+        meta: { requiresAuth: true, userType: 'enterprise' }
+      },
 //       {
 //         path: 'job/:id/applicants',
 //         name: 'JobApplicants',
