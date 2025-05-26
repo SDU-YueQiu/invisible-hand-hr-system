@@ -130,58 +130,12 @@ const adminForm = reactive({
   password: ''
 })
 
-// const handleIndividualLogin = async () => {
-//   if (!individualForm.username || !individualForm.password) {
-//     ElMessage.error('请输入用户名和密码')
-//     return
-//   }
-
-//   loading.value = true
-//   const loginData = {
-//       username: individualForm.username,
-//       password: individualForm.password
-//   };
-//   console.log(loginData)
-//   try {
-//     const baseURL = 'http://localhost:8080/api/v1';
-//     //console.log(baseURL);
-//     const response = await axios.post(`${baseURL}/auth/individual/login`,loginData);
-//     //console.log(response.status)
-//     //console.log('完整响应:', response)
-//     //console.log('响应数据:', response.data)
-//     if (response.status==200) {
-//       const userData = response.data
-//       //console.log(userData)
-//       token = userData.token
-//       if (typeof(Storage) !== "undefined") {
-//         localStorage.setItem('token', token)
-//       } else {
-//         console.log('localStorage不支持')
-//       }
-
-//       //localStorage.setItem('token', token)
-//       //localStorage.setItem('userType', 'individual')
-//       userStore.setUser(userData)
-      
-//       ElMessage.success('登录成功')
-//       router.push('/user/dashboard')
-//     } else {
-//       ElMessage.error(response.data.message)
-//     }
-//   } catch (error) {
-//     ElMessage.error('登录失败，请检查用户名和密码')
-//   } finally {
-//     loading.value = false
-//   }
-// }
 const handleIndividualLogin = async () => {
   if (!individualForm.username || !individualForm.password) {
     ElMessage.error('请输入用户名和密码')
     return
   }
-
   loading.value = true
-  
   // 使用 useLocalStorage
   const token = useLocalStorage('token', '')
   const userType = useLocalStorage('userType', '')
