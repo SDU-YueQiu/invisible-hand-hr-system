@@ -108,6 +108,7 @@ import { ElMessage } from 'element-plus'
 import { useUserStore } from '../../stores'
 import { useLocalStorage } from '@vueuse/core'
 import axios from 'axios'
+import request from '../../utils/request'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -146,12 +147,13 @@ const handleIndividualLogin = async () => {
   };
   
   try {
-    const baseURL = 'http://localhost:8080/api/v1';
-    const response = await axios.post(`${baseURL}/auth/individual/login`, loginData);
-    
-    if (response.status === 200) {
+    //const baseURL = 'http://localhost:8080/api/v1';
+    //const response = await axios.post(`${baseURL}/auth/individual/login`, loginData);
+    const response = await request.post('/auth/individual/login', loginData);
+    console.log('登录响应:', response)
+    if (response.success === true) {
       // 从响应中获取数据
-      const { token: responseToken, userId } = response.data;
+      const { token: responseToken, userId } = response;
       
       // 保存到 localStorage (响应式)
       token.value = responseToken
@@ -168,7 +170,7 @@ const handleIndividualLogin = async () => {
       ElMessage.success('登录成功')
       router.push('/user/dashboard')
     } else {
-      ElMessage.error(response.data.message)
+      ElMessage.error(response.message)
     }
   } catch (error) {
     console.error('登录错误:', error)
