@@ -79,12 +79,12 @@ const routes = [
     //     component: () => import('../views/user/ApplicationList.vue'),
     //     meta: { requiresAuth: true, userType: 'individual' }
     //   },
-    //   {
-    //     path: 'settings',
-    //     name: 'UserSettings',
-    //     component: () => import('../views/user/Settings.vue'),
-    //     meta: { requiresAuth: true, userType: 'individual' }
-    //   }
+      {
+        path: 'settings',
+        name: 'UserSettings',
+        component: () => import('../views/user/Settings.vue'),
+        meta: { requiresAuth: true, userType: 'individual' }
+      }
     ]
   },
     // 企业用户路由
