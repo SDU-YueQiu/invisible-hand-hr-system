@@ -169,7 +169,7 @@ export default {
         const baseURL = "http://localhost:8080/api/v1";
         const response = await axios.get(`${baseURL}/jobs/${jobId}`);
         if (response.data.success) {
-          this.job = response.data.data;
+          this.job = response.data;
         } else {
           this.$message.error(response.data.message || '获取职位详情失败');
         }
@@ -197,7 +197,7 @@ export default {
         const baseURL = "http://localhost:8080/api/v1";
         const response = await axios.get(`${baseURL}/users/me/resumes`);
         if (response.data.success) {
-          this.userResumes = response.data.data;
+          this.userResumes = response.data;
           if (this.userResumes.length > 0) {
             this.selectedResumeId = this.userResumes[0].resumeId;
           }
