@@ -87,17 +87,17 @@ const routes = [
     //   }
     ]
   },
-     // 企业用户路由
-//   {
-//     path: '/enterprise',
-//     component: () => import('../views/layouts/EnterpriseLayout.vue'),
-//     children: [
-//       {
-//         path: 'dashboard',
-//         name: 'EnterpriseDashboard',
-//         component: () => import('../views/enterprise/Dashboard.vue'),
-//         meta: { requiresAuth: true, userType: 'enterprise' }
-//       },
+    // 企业用户路由
+  {
+    path: '/enterprise',
+    component: () => import('../views/layouts/EnterpriseLayout.vue'),
+    children: [
+      {
+        path: 'dashboard',
+        name: 'EnterpriseDashboard',
+        component: () => import('../views/enterprise/Dashboard.vue'),
+        meta: { requiresAuth: true, userType: 'enterprise' }
+      },
 //       {
 //         path: 'profile',
 //         name: 'EnterpriseProfile',
@@ -140,8 +140,8 @@ const routes = [
 //         component: () => import('../views/enterprise/Settings.vue'),
 //         meta: { requiresAuth: true, userType: 'enterprise' }
 //       }
-//     ]
-//   },
+     ]
+  },
   // 管理员路由
 //   {
 //     path: '/admin',

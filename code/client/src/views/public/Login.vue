@@ -106,6 +106,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '../../stores'
+import { useLocalStorage } from '@vueuse/core'
 import axios from 'axios'
 
 const router = useRouter()
@@ -129,6 +130,50 @@ const adminForm = reactive({
   password: ''
 })
 
+// const handleIndividualLogin = async () => {
+//   if (!individualForm.username || !individualForm.password) {
+//     ElMessage.error('请输入用户名和密码')
+//     return
+//   }
+
+//   loading.value = true
+//   const loginData = {
+//       username: individualForm.username,
+//       password: individualForm.password
+//   };
+//   console.log(loginData)
+//   try {
+//     const baseURL = 'http://localhost:8080/api/v1';
+//     //console.log(baseURL);
+//     const response = await axios.post(`${baseURL}/auth/individual/login`,loginData);
+//     //console.log(response.status)
+//     //console.log('完整响应:', response)
+//     //console.log('响应数据:', response.data)
+//     if (response.status==200) {
+//       const userData = response.data
+//       //console.log(userData)
+//       token = userData.token
+//       if (typeof(Storage) !== "undefined") {
+//         localStorage.setItem('token', token)
+//       } else {
+//         console.log('localStorage不支持')
+//       }
+
+//       //localStorage.setItem('token', token)
+//       //localStorage.setItem('userType', 'individual')
+//       userStore.setUser(userData)
+      
+//       ElMessage.success('登录成功')
+//       router.push('/user/dashboard')
+//     } else {
+//       ElMessage.error(response.data.message)
+//     }
+//   } catch (error) {
+//     ElMessage.error('登录失败，请检查用户名和密码')
+//   } finally {
+//     loading.value = false
+//   }
+// }
 const handleIndividualLogin = async () => {
   if (!individualForm.username || !individualForm.password) {
     ElMessage.error('请输入用户名和密码')
@@ -136,27 +181,43 @@ const handleIndividualLogin = async () => {
   }
 
   loading.value = true
+  
+  // 使用 useLocalStorage
+  const token = useLocalStorage('token', '')
+  const userType = useLocalStorage('userType', '')
+  
   const loginData = {
-      username: individualForm.username,
-      password: individualForm.password
+    username: individualForm.username,
+    password: individualForm.password
   };
-  console.log(loginData)
+  
   try {
     const baseURL = 'http://localhost:8080/api/v1';
-    console.log(baseURL);
-    const response = await axios.post(`${baseURL}/auth/individual/login`,loginData);
-    console.log(response.status)
-    if (response.status==200) {
-      const userData = response.data.data
-      //localStorage.setItem('token', userData.token)
-      //localStorage.setItem('userType', 'individual')
-      //userStore.setUser(userData)
+    const response = await axios.post(`${baseURL}/auth/individual/login`, loginData);
+    
+    if (response.status === 200) {
+      // 从响应中获取数据
+      const { token: responseToken, userId } = response.data;
+      
+      // 保存到 localStorage (响应式)
+      token.value = responseToken
+      userType.value = 'individual'
+      
+      // 更新 store
+      userStore.setUser({
+        token: responseToken,
+        userType: 'individual',
+        userId,
+        username: individualForm.username
+      })
+      
       ElMessage.success('登录成功')
       router.push('/user/dashboard')
     } else {
       ElMessage.error(response.data.message)
     }
   } catch (error) {
+    console.error('登录错误:', error)
     ElMessage.error('登录失败，请检查用户名和密码')
   } finally {
     loading.value = false

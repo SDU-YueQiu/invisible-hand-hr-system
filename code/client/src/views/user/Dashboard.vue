@@ -132,7 +132,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted} from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
@@ -143,43 +143,99 @@ import {
   Setting, 
   ArrowDown 
 } from '@element-plus/icons-vue'
+import { useLocalStorage } from '@vueuse/core'
+import axios from 'axios'
 import { useUserStore } from '../../stores'
 
 const router = useRouter()
 const userStore = useUserStore()
 
-// 模拟数据
-const username = ref(userStore.username || '用户名')
-const recentApplications = ref([
-  {
-    id: 1,
-    jobTitle: '前端开发工程师',
-    companyName: '科技有限公司',
-    applyDate: '2023-05-15',
-    status: '已投递'
-  },
-  {
-    id: 2,
-    jobTitle: 'UI设计师',
-    companyName: '创意科技',
-    applyDate: '2023-05-10',
-    status: '面试邀请'
-  },
-  {
-    id: 3,
-    jobTitle: 'Web全栈开发',
-    companyName: '互联网科技',
-    applyDate: '2023-05-05',
-    status: '已查看'
-  },
-  {
-    id: 4,
-    jobTitle: '产品经理',
-    companyName: '软件科技',
-    applyDate: '2023-04-28',
-    status: '不合适'
-  },
-])
+const token = useLocalStorage('token', '')
+const userType = useLocalStorage('userType', '')
+
+const userInfo = ref({})
+const username = ref('')
+
+const fetchUserInfo = async () => {
+  try {
+    if (!token.value) {
+      ElMessage.warning('未登录')
+      router.push('/login')
+      return
+    }
+    
+    const baseURL = 'http://localhost:8080/api/v1'
+    const response = await axios.get(`${baseURL}/users/me`, {
+      headers: { 
+        'Authorization': `Bearer ${token.value}`
+      }
+    })
+    console.log('全部：',response)
+    console.log("data:",response.data);
+
+    if (response.status ===200) {
+      userInfo.value = response.data
+      username.value = userInfo.value.username
+      
+      // 更新 store
+      userStore.setUser({
+        token: token.value,
+        userType: userType.value,
+        userId: userInfo.value.userId,
+        username: userInfo.value.username
+      })
+    } else {
+      ElMessage.error(response.data.message || '获取用户信息失败')
+    }
+  } catch (error) {
+    console.error('获取用户信息失败:', error)
+    if (error.response?.status === 401) {
+      ElMessage.error('登录已过期，请重新登录')
+      // 清除token
+      token.value = ''
+      userType.value = ''
+      router.push('/login')
+    } else {
+      ElMessage.error('获取用户信息失败')
+    }
+  }
+}
+
+onMounted(() => {
+  fetchUserInfo()
+})
+// // 模拟数据
+// const username = ref(userStore.username || '用户名')
+// const recentApplications = ref([
+//   {
+//     id: 1,
+//     jobTitle: '前端开发工程师',
+//     companyName: '科技有限公司',
+//     applyDate: '2023-05-15',
+//     status: '已投递'
+//   },
+//   {
+//     id: 2,
+//     jobTitle: 'UI设计师',
+//     companyName: '创意科技',
+//     applyDate: '2023-05-10',
+//     status: '面试邀请'
+//   },
+//   {
+//     id: 3,
+//     jobTitle: 'Web全栈开发',
+//     companyName: '互联网科技',
+//     applyDate: '2023-05-05',
+//     status: '已查看'
+//   },
+//   {
+//     id: 4,
+//     jobTitle: '产品经理',
+//     companyName: '软件科技',
+//     applyDate: '2023-04-28',
+//     status: '不合适'
+//   },
+// ])
 
 const getStatusType = (status) => {
   const statusMap = {
@@ -201,9 +257,9 @@ const handleLogout = () => {
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    // 清除登录状态
-    localStorage.removeItem('token')
-    localStorage.removeItem('userType')
+    // 清除登录状态 (useLocalStorage 响应式清除)
+    token.value = ''
+    userType.value = ''
     userStore.clearUser()
     
     router.push('/login')
