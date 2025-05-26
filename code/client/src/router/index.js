@@ -73,12 +73,12 @@ const routes = [
         component: () => import('../views/user/ResumeView.vue'),
         meta: { requiresAuth: true, userType: 'individual' }
       },
-    //   {
-    //     path: 'applications',
-    //     name: 'UserApplications',
-    //     component: () => import('../views/user/ApplicationList.vue'),
-    //     meta: { requiresAuth: true, userType: 'individual' }
-    //   },
+      {
+        path: 'applications',
+        name: 'UserApplications',
+        component: () => import('../views/user/ApplicationList.vue'),
+        meta: { requiresAuth: true, userType: 'individual' }
+      },
       {
         path: 'settings',
         name: 'UserSettings',
