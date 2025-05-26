@@ -261,9 +261,14 @@ const handleLogout = () => {
     token.value = ''
     userType.value = ''
     userStore.clearUser()
-    
-    router.push('/login')
-    ElMessage.success('已成功退出登录')
+    const baseURL = 'http://localhost:8080/api/v1'
+    const response = axios.post(`${baseURL}/auth/logout`, {})
+    if(response.status === 200) {
+      router.push('/login')
+      ElMessage.success('已成功退出登录')
+    } else {
+      ElMessage.error('退出登录失败，请稍后再试')
+    }
   }).catch(() => {})
 }
 </script>

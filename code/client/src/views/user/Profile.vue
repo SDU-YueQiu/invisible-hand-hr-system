@@ -22,7 +22,7 @@
         <el-input v-model="userForm.email" placeholder="请输入电子邮箱" />
       </el-form-item>
       
-      <el-form-item label="头像">
+      <!-- <el-form-item label="头像">
         <el-upload
           class="avatar-uploader"
           action="/api/v1/upload"
@@ -33,7 +33,7 @@
           <img v-if="userForm.avatarURL" :src="userForm.avatarURL" class="avatar" />
           <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
         </el-upload>
-      </el-form-item>
+      </el-form-item> -->
       
       <el-form-item>
         <el-button type="primary" @click="submitForm(userFormRef)" :loading="submitting">保存修改</el-button>
@@ -92,26 +92,26 @@ const fetchUserProfile = async () => {
   }
 }
 
-const handleAvatarSuccess = (res) => {
-  if (res.success) {
-    userForm.avatarURL = res.data.url
-    ElMessage.success('头像上传成功')
-  }
-}
+// const handleAvatarSuccess = (res) => {
+//   if (res.success) {
+//     userForm.avatarURL = res.data.url
+//     ElMessage.success('头像上传成功')
+//   }
+// }
 
-const beforeAvatarUpload = (file) => {
-  const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
-  const isLt2M = file.size / 1024 / 1024 < 2
+// const beforeAvatarUpload = (file) => {
+//   const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+//   const isLt2M = file.size / 1024 / 1024 < 2
 
-  if (!isJPG) {
-    ElMessage.error('头像只能上传JPG或PNG格式图片!')
-  }
-  if (!isLt2M) {
-    ElMessage.error('头像图片大小不能超过2MB!')
-  }
+//   if (!isJPG) {
+//     ElMessage.error('头像只能上传JPG或PNG格式图片!')
+//   }
+//   if (!isLt2M) {
+//     ElMessage.error('头像图片大小不能超过2MB!')
+//   }
   
-  return isJPG && isLt2M
-}
+//   return isJPG && isLt2M
+// }
 
 const submitForm = async (formEl) => {
   if (!formEl) return
@@ -123,7 +123,7 @@ const submitForm = async (formEl) => {
         const updatedData = {
           phoneNumber: userForm.phoneNumber,
           email: userForm.email,
-          avatarURL: userForm.avatarURL
+          // avatarURL: userForm.avatarURL
         }
         
         const res = await request.put('/users/me', updatedData)
