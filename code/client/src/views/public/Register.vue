@@ -202,11 +202,6 @@ export default {
         const response = await axios.post(`${baseURL}/auth/individual/register`, registerData);
         console.log(response.status)
         if (response.status === 201) {
-          // 注册成功，存储token和用户信息
-          //localStorage.setItem('token', response.data.data.token);
-          //localStorage.setItem('userId', response.data.data.userId);
-          //localStorage.setItem('username', response.data.data.username);
-          
           // 显示成功消息
           this.$notify({
             title: '成功',
@@ -215,7 +210,7 @@ export default {
           });
           
           // 跳转到首页或个人中心
-          this.$router.push('/dashboard');
+          this.$router.push('/login');
         }
       } catch (error) {
         console.error('注册失败:', error);
