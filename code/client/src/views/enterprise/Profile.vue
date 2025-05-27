@@ -178,7 +178,7 @@ onMounted(async () => {
 const fetchEnterpriseProfile = async () => {
   try {
     loading.value = true
-    const res = await request.get(`/enterprises/${enterpriseStore.userId}`)
+    const res = await request.get(`http://localhost:8080/api/v1/enterprises/me/${enterpriseStore.userId}`)
     if (res.success) {
       Object.assign(enterpriseForm, res.data)
     } else {
@@ -252,7 +252,7 @@ const submitForm = async (formEl) => {
     if (valid) {
       try {
         submitting.value = true
-        const res = await request.put(`/enterprises/${enterpriseStore.userId}`, enterpriseForm)
+        const res = await request.put(`http://localhost:8080/api/v1/enterprises/me/${enterpriseStore.userId}`, enterpriseForm)
         if (res.success) {
           ElMessage.success('企业资料更新成功')
         } else {
