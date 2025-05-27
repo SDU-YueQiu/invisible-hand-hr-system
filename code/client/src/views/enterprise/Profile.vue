@@ -1,0 +1,328 @@
+<template>
+  <div class="enterprise-profile-container">
+    <h2>企业资料</h2>
+    
+    <el-form 
+      :model="enterpriseForm" 
+      :rules="rules" 
+      ref="enterpriseFormRef" 
+      label-width="120px" 
+      class="enterprise-form"
+      v-loading="loading"
+    >
+      <!-- 基本信息 -->
+      <h3>基本信息</h3>
+      <el-form-item label="企业名称" prop="EnterpriseName">
+        <el-input v-model="enterpriseForm.EnterpriseName" placeholder="请输入企业名称" />
+      </el-form-item>
+      
+      <el-form-item label="统一信用代码" prop="CreditCode">
+        <el-input v-model="enterpriseForm.CreditCode" placeholder="请输入统一信用代码" />
+      </el-form-item>
+      
+      <el-form-item label="所属行业">
+        <el-select v-model="enterpriseForm.Industry" placeholder="请选择所属行业">
+          <el-option label="互联网/IT" value="互联网/IT" />
+          <el-option label="金融" value="金融" />
+          <el-option label="制造业" value="制造业" />
+          <el-option label="教育" value="教育" />
+          <el-option label="医疗" value="医疗" />
+          <el-option label="其他" value="其他" />
+        </el-select>
+      </el-form-item>
+      
+      <el-form-item label="企业规模">
+        <el-select v-model="enterpriseForm.Scale" placeholder="请选择企业规模">
+          <el-option label="1-50人" value="1-50人" />
+          <el-option label="50-200人" value="50-200人" />
+          <el-option label="200-500人" value="200-500人" />
+          <el-option label="500-1000人" value="500-1000人" />
+          <el-option label="1000人以上" value="1000人以上" />
+        </el-select>
+      </el-form-item>
+      
+      <el-form-item label="企业地址">
+        <el-input v-model="enterpriseForm.Address" placeholder="请输入企业地址" />
+      </el-form-item>
+      
+      <el-form-item label="企业描述">
+        <el-input 
+          type="textarea" 
+          v-model="enterpriseForm.Description" 
+          rows="4" 
+          placeholder="请简要描述您的企业" 
+        />
+      </el-form-item>
+      
+      <!-- 联系信息 -->
+      <h3>联系信息</h3>
+      <el-form-item label="联系人" prop="ContactPerson">
+        <el-input v-model="enterpriseForm.ContactPerson" placeholder="请输入联系人姓名" />
+      </el-form-item>
+      
+      <el-form-item label="联系电话" prop="ContactPhone">
+        <el-input v-model="enterpriseForm.ContactPhone" placeholder="请输入联系电话" />
+      </el-form-item>
+      
+      <el-form-item label="联系邮箱" prop="ContactEmail">
+        <el-input v-model="enterpriseForm.ContactEmail" placeholder="请输入联系邮箱" />
+      </el-form-item>
+      
+      <!-- 企业资质 -->
+      <h3>企业资质</h3>
+      <el-form-item label="企业LOGO">
+        <el-upload
+          class="avatar-uploader"
+          action="/api/v1/upload"
+          :show-file-list="false"
+          :on-success="handleLogoSuccess"
+          :before-upload="beforeLogoUpload"
+        >
+          <img v-if="enterpriseForm.LogoURL" :src="enterpriseForm.LogoURL" class="avatar" />
+          <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+        </el-upload>
+      </el-form-item>
+      
+      <el-form-item label="营业执照">
+        <el-upload
+          class="license-uploader"
+          action="/api/v1/upload"
+          :show-file-list="false"
+          :on-success="handleLicenseSuccess"
+          :before-upload="beforeLicenseUpload"
+        >
+          <img v-if="enterpriseForm.LicenseImageURL" :src="enterpriseForm.LicenseImageURL" class="license" />
+          <el-icon v-else class="license-uploader-icon"><Plus /></el-icon>
+        </el-upload>
+      </el-form-item>
+      
+      <!-- 只读信息 -->
+      <h3>系统信息</h3>
+      <el-form-item label="注册日期">
+        <div>{{ enterpriseForm.RegistrationDate }}</div>
+      </el-form-item>
+      
+      <el-form-item label="账户状态">
+        <el-tag :type="getStatusTagType(enterpriseForm.AccountStatus)">
+          {{ enterpriseForm.AccountStatus }}
+        </el-tag>
+      </el-form-item>
+      
+      <el-form-item label="审核意见" v-if="enterpriseForm.AuditOpinion">
+        <div>{{ enterpriseForm.AuditOpinion }}</div>
+      </el-form-item>
+      
+      <!-- 操作按钮 -->
+      <el-form-item class="form-actions">
+        <el-button type="primary" @click="submitForm(enterpriseFormRef)" :loading="submitting">保存修改</el-button>
+        <el-button @click="resetForm">重置</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
+import { useEnterpriseStore } from '../../stores'
+import axios from 'axios'
+
+const enterpriseStore = useEnterpriseStore()
+const enterpriseFormRef = ref()
+const loading = ref(false)
+const submitting = ref(false)
+
+const enterpriseForm = reactive({
+  EnterpriseName: '',
+  CreditCode: '',
+  Description: '',
+  Industry: '',
+  Scale: '',
+  Address: '',
+  ContactPerson: '',
+  ContactPhone: '',
+  ContactEmail: '',
+  LogoURL: '',
+  LicenseImageURL: '',
+  RegistrationDate: '',
+  AccountStatus: '',
+  AuditOpinion: ''
+})
+
+const rules = reactive({
+  EnterpriseName: [
+    { required: true, message: '请输入企业名称', trigger: 'blur' }
+  ],
+  CreditCode: [
+    { required: true, message: '请输入统一信用代码', trigger: 'blur' },
+    { pattern: /^[0-9A-Z]{18}$/, message: '请输入正确的统一信用代码', trigger: 'blur' }
+  ],
+  ContactPerson: [
+    { required: true, message: '请输入联系人姓名', trigger: 'blur' }
+  ],
+  ContactPhone: [
+    { required: true, message: '请输入联系电话', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+  ],
+  ContactEmail: [
+    { required: true, message: '请输入联系邮箱', trigger: 'blur' },
+    { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+  ]
+})
+
+onMounted(async () => {
+  await fetchEnterpriseProfile()
+})
+
+const fetchEnterpriseProfile = async () => {
+  try {
+    loading.value = true
+    const res = await request.get(`/enterprises/${enterpriseStore.userId}`)
+    if (res.success) {
+      Object.assign(enterpriseForm, res.data)
+    } else {
+      ElMessage.error(res.message || '获取企业信息失败')
+    }
+  } catch (error) {
+    ElMessage.error('获取企业信息失败')
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 图片上传处理
+const handleLogoSuccess = (res) => {
+  if (res.success) {
+    enterpriseForm.LogoURL = res.data.url
+    ElMessage.success('LOGO上传成功')
+  }
+}
+
+const beforeLogoUpload = (file) => {
+  const isImage = file.type === 'image/jpeg' || file.type === 'image/png'
+  const isLt2M = file.size / 1024 / 1024 < 2
+
+  if (!isImage) {
+    ElMessage.error('LOGO只能上传JPG或PNG格式图片!')
+  }
+  if (!isLt2M) {
+    ElMessage.error('LOGO图片大小不能超过2MB!')
+  }
+  
+  return isImage && isLt2M
+}
+
+const handleLicenseSuccess = (res) => {
+  if (res.success) {
+    enterpriseForm.LicenseImageURL = res.data.url
+    ElMessage.success('营业执照上传成功')
+  }
+}
+
+const beforeLicenseUpload = (file) => {
+  const isImage = file.type === 'image/jpeg' || file.type === 'image/png'
+  const isLt5M = file.size / 1024 / 1024 < 5
+
+  if (!isImage) {
+    ElMessage.error('营业执照只能上传JPG或PNG格式图片!')
+  }
+  if (!isLt5M) {
+    ElMessage.error('营业执照图片大小不能超过5MB!')
+  }
+  
+  return isImage && isLt5M
+}
+
+// 账户状态标签样式
+const getStatusTagType = (status) => {
+  switch(status) {
+    case '已认证': return 'success'
+    case '待审核': return 'warning'
+    case '未通过': return 'danger'
+    default: return 'info'
+  }
+}
+
+const submitForm = async (formEl) => {
+  if (!formEl) return
+  
+  await formEl.validate(async (valid) => {
+    if (valid) {
+      try {
+        submitting.value = true
+        const res = await request.put(`/enterprises/${enterpriseStore.userId}`, enterpriseForm)
+        if (res.success) {
+          ElMessage.success('企业资料更新成功')
+        } else {
+          ElMessage.error(res.message || '更新企业资料失败')
+        }
+      } catch (error) {
+        ElMessage.error('更新企业资料失败')
+        console.error(error)
+      } finally {
+        submitting.value = false
+      }
+    }
+  })
+}
+
+const resetForm = () => {
+  fetchEnterpriseProfile()
+}
+</script>
+
+<style scoped>
+.enterprise-profile-container {
+  padding: 20px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.enterprise-form {
+  max-width: 800px;
+  margin-top: 20px;
+}
+
+h3 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #EBEEF5;
+  padding-bottom: 10px;
+}
+
+.avatar-uploader, .license-uploader {
+  width: 150px;
+  height: 150px;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.avatar-uploader:hover, .license-uploader:hover {
+  border-color: #409EFF;
+}
+
+.avatar-uploader-icon, .license-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 150px;
+  height: 150px;
+  line-height: 150px;
+  text-align: center;
+}
+
+.avatar, .license {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.form-actions {
+  margin-top: 40px;
+}
+</style>
