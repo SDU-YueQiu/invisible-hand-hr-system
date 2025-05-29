@@ -26,7 +26,7 @@
             <el-icon><document /></el-icon>
             <span>在招岗位</span>
           </el-menu-item>
-          <el-menu-item index="/enterprise/applications">
+          <el-menu-item index="/enterprise/job/:id/applicants">
             <el-icon><connection /></el-icon>
             <span>收到的申请</span>
           </el-menu-item>

@@ -17,7 +17,7 @@
             <el-icon><icon-menu /></el-icon>
             <span>企业中心</span>
           </el-menu-item>
-          <el-menu-item index="enterprise/profile">
+          <el-menu-item index="/enterprise/profile">
             <el-icon><user /></el-icon>
             <span>企业资料</span>
           </el-menu-item>
@@ -25,15 +25,15 @@
             <el-icon><document /></el-icon>
             <span>在招岗位</span>
           </el-menu-item>
-          <el-menu-item index="job/create">
+          <el-menu-item index="/enterprise/job/create">
             <el-icon><connection /></el-icon>
             <span>增加岗位</span>
           </el-menu-item>
-          <el-menu-item index="job/edit/:id">
+          <el-menu-item index="/enterprise/job/edit/:id">
             <el-icon><search /></el-icon>
             <span>岗位变更</span>
           </el-menu-item>
-          <el-menu-item index="/enterprise/jobs/:id/applicants">
+          <el-menu-item index="/enterprise/job/:id/applicants">
             <el-icon><search /></el-icon>
             <span>查看求职申请</span>
           </el-menu-item>

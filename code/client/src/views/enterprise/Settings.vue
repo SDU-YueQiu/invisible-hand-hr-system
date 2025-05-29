@@ -146,7 +146,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { useEnterpriseStore } from '../../stores'
 
 const router = useRouter()
-const userStore = useUserStore()
+const userStore = useEnterpriseStore()
 
 // 当前激活的标签页
 const activeTab = ref('password')
