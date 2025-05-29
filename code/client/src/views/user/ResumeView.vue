@@ -173,28 +173,38 @@ onMounted(async () => {
   await fetchResumeDetails()
 })
 const parseResumeData = (data) => {
-  const fieldsToParse = [
+  const jsonFields = [
     'basicInfo',
     'jobIntent',
     'educationExperience',
     'workExperience',
     'projectExperience',
-    'skillsCertificates',
-    'lastUpdateTime',
+    'skillsCertificates'
+  ];
+  
+  const plainFields = [
     'resumeTitle',
-    'selfDescription'
-  ]
-  fieldsToParse.forEach(field => {
-    if (data[field] && typeof data[field] === 'string') {
+    'selfDescription',
+    'lastUpdateTime'
+  ];
+  
+  Object.keys(data).forEach(field => {
+    if (!data[field]) return;
+    
+    if (jsonFields.includes(field) && typeof data[field] === 'string') {
       try {
-        data[field] = JSON.parse(data[field])
+        if (data[field].trim().startsWith('{') || data[field].trim().startsWith('[')) {
+          data[field] = JSON.parse(data[field]);
+        }
       } catch (e) {
-        console.error(`failed to parse ${field}:`, e)
+        console.error(`Failed to parse ${field}:`, e);
       }
     }
-  })
-  return data
+  });
+  
+  return data;
 }
+
 
 const fetchResumeDetails = async () => {
   try {
