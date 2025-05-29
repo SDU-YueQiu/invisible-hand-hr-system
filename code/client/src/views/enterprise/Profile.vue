@@ -12,16 +12,16 @@
     >
       <!-- 基本信息 -->
       <h3>基本信息</h3>
-      <el-form-item label="企业名称" prop="EnterpriseName">
-        <el-input v-model="enterpriseForm.EnterpriseName" placeholder="请输入企业名称" />
+      <el-form-item label="企业名称" prop="enterpriseName">
+        <el-input v-model="enterpriseForm.enterpriseName" placeholder="请输入企业名称" />
       </el-form-item>
       
-      <el-form-item label="统一信用代码" prop="CreditCode">
-        <el-input v-model="enterpriseForm.CreditCode" placeholder="请输入统一信用代码" />
+      <el-form-item label="统一信用代码" prop="creditCode">
+        <el-input v-model="enterpriseForm.creditCode" placeholder="请输入统一信用代码" />
       </el-form-item>
       
       <el-form-item label="所属行业">
-        <el-select v-model="enterpriseForm.Industry" placeholder="请选择所属行业">
+        <el-select v-model="enterpriseForm.industry" placeholder="请选择所属行业">
           <el-option label="互联网/IT" value="互联网/IT" />
           <el-option label="金融" value="金融" />
           <el-option label="制造业" value="制造业" />
@@ -32,7 +32,7 @@
       </el-form-item>
       
       <el-form-item label="企业规模">
-        <el-select v-model="enterpriseForm.Scale" placeholder="请选择企业规模">
+        <el-select v-model="enterpriseForm.scale" placeholder="请选择企业规模">
           <el-option label="1-50人" value="1-50人" />
           <el-option label="50-200人" value="50-200人" />
           <el-option label="200-500人" value="200-500人" />
@@ -42,13 +42,13 @@
       </el-form-item>
       
       <el-form-item label="企业地址">
-        <el-input v-model="enterpriseForm.Address" placeholder="请输入企业地址" />
+        <el-input v-model="enterpriseForm.address" placeholder="请输入企业地址" />
       </el-form-item>
       
       <el-form-item label="企业描述">
         <el-input 
           type="textarea" 
-          v-model="enterpriseForm.Description" 
+          v-model="enterpriseForm.description" 
           rows="4" 
           placeholder="请简要描述您的企业" 
         />
@@ -56,16 +56,16 @@
       
       <!-- 联系信息 -->
       <h3>联系信息</h3>
-      <el-form-item label="联系人" prop="ContactPerson">
-        <el-input v-model="enterpriseForm.ContactPerson" placeholder="请输入联系人姓名" />
+      <el-form-item label="联系人" prop="contactPerson">
+        <el-input v-model="enterpriseForm.contactPerson" placeholder="请输入联系人姓名" />
       </el-form-item>
       
-      <el-form-item label="联系电话" prop="ContactPhone">
-        <el-input v-model="enterpriseForm.ContactPhone" placeholder="请输入联系电话" />
+      <el-form-item label="联系电话" prop="contactPhone">
+        <el-input v-model="enterpriseForm.contactPhone" placeholder="请输入联系电话" />
       </el-form-item>
       
-      <el-form-item label="联系邮箱" prop="ContactEmail">
-        <el-input v-model="enterpriseForm.ContactEmail" placeholder="请输入联系邮箱" />
+      <el-form-item label="联系邮箱" prop="contactEmail">
+        <el-input v-model="enterpriseForm.contactEmail" placeholder="请输入联系邮箱" />
       </el-form-item>
       
       <!-- 企业资质 -->
@@ -77,8 +77,9 @@
           :show-file-list="false"
           :on-success="handleLogoSuccess"
           :before-upload="beforeLogoUpload"
+          :headers="uploadHeaders"
         >
-          <img v-if="enterpriseForm.LogoURL" :src="enterpriseForm.LogoURL" class="avatar" />
+          <img v-if="enterpriseForm.logoURL" :src="enterpriseForm.logoURL" class="avatar" />
           <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
         </el-upload>
       </el-form-item>
@@ -90,26 +91,27 @@
           :show-file-list="false"
           :on-success="handleLicenseSuccess"
           :before-upload="beforeLicenseUpload"
+          :headers="uploadHeaders"
         >
-          <img v-if="enterpriseForm.LicenseImageURL" :src="enterpriseForm.LicenseImageURL" class="license" />
+          <img v-if="enterpriseForm.licenseImageURL" :src="enterpriseForm.licenseImageURL" class="license" />
           <el-icon v-else class="license-uploader-icon"><Plus /></el-icon>
         </el-upload>
       </el-form-item>
       
       <!-- 只读信息 -->
       <h3>系统信息</h3>
-      <el-form-item label="注册日期">
-        <div>{{ enterpriseForm.RegistrationDate }}</div>
+      <el-form-item label="企业ID">
+        <div>{{ enterpriseForm.enterpriseId }}</div>
       </el-form-item>
       
       <el-form-item label="账户状态">
-        <el-tag :type="getStatusTagType(enterpriseForm.AccountStatus)">
-          {{ enterpriseForm.AccountStatus }}
+        <el-tag :type="getStatusTagType(enterpriseForm.accountStatus)">
+          {{ getStatusText(enterpriseForm.accountStatus) }}
         </el-tag>
       </el-form-item>
       
-      <el-form-item label="审核意见" v-if="enterpriseForm.AuditOpinion">
-        <div>{{ enterpriseForm.AuditOpinion }}</div>
+      <el-form-item label="审核意见" v-if="enterpriseForm.auditOpinion">
+        <div>{{ enterpriseForm.auditOpinion }}</div>
       </el-form-item>
       
       <!-- 操作按钮 -->
@@ -122,54 +124,94 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { useEnterpriseStore } from '../../stores'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
 const enterpriseStore = useEnterpriseStore()
+const router = useRouter()
 const enterpriseFormRef = ref()
 const loading = ref(false)
 const submitting = ref(false)
 
+// 上传组件的认证头
+const uploadHeaders = computed(() => {
+  return {
+    'Authorization': `Bearer ${enterpriseStore.token}`
+  }
+})
+
 const enterpriseForm = reactive({
-  EnterpriseName: '',
-  CreditCode: '',
-  Description: '',
-  Industry: '',
-  Scale: '',
-  Address: '',
-  ContactPerson: '',
-  ContactPhone: '',
-  ContactEmail: '',
-  LogoURL: '',
-  LicenseImageURL: '',
-  RegistrationDate: '',
-  AccountStatus: '',
-  AuditOpinion: ''
+  enterpriseId: '',
+  enterpriseName: '',
+  creditCode: '',
+  description: '',
+  industry: '',
+  scale: '',
+  address: '',
+  contactPerson: '',
+  contactPhone: '',
+  contactEmail: '',
+  logoURL: '',
+  licenseImageURL: '',
+  accountStatus: '',
+  auditOpinion: ''
 })
 
 const rules = reactive({
-  EnterpriseName: [
+  enterpriseName: [
     { required: true, message: '请输入企业名称', trigger: 'blur' }
   ],
-  CreditCode: [
+  creditCode: [
     { required: true, message: '请输入统一信用代码', trigger: 'blur' },
     { pattern: /^[0-9A-Z]{18}$/, message: '请输入正确的统一信用代码', trigger: 'blur' }
   ],
-  ContactPerson: [
+  contactPerson: [
     { required: true, message: '请输入联系人姓名', trigger: 'blur' }
   ],
-  ContactPhone: [
+  contactPhone: [
     { required: true, message: '请输入联系电话', trigger: 'blur' },
     { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
   ],
-  ContactEmail: [
+  contactEmail: [
     { required: true, message: '请输入联系邮箱', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
   ]
 })
+
+// 设置axios默认baseURL
+axios.defaults.baseURL = 'http://localhost:8080'
+
+// 添加请求拦截器
+axios.interceptors.request.use(
+  config => {
+    const token = enterpriseStore.token
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
+
+// 添加响应拦截器
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && error.response.status === 401) {
+      ElMessage.error('登录已过期，请重新登录')
+      enterpriseStore.logout()
+      router.push('/login')
+      return Promise.reject(error)
+    }
+    return Promise.reject(error)
+  }
+)
 
 onMounted(async () => {
   await fetchEnterpriseProfile()
@@ -178,25 +220,85 @@ onMounted(async () => {
 const fetchEnterpriseProfile = async () => {
   try {
     loading.value = true
-    const res = await request.get(`http://localhost:8080/api/v1/enterprises/me/${enterpriseStore.userId}`)
-    if (res.success) {
-      Object.assign(enterpriseForm, res.data)
+    const res = await axios.get('/api/v1/enterprises/me')
+    console.log('完整响应:', res)
+    console.log('数据内容:', res.data)
+    
+    if (res.status === 200 && res.data) {
+      // 清空表单，然后设置新值
+      Object.keys(enterpriseForm).forEach(key => {
+        enterpriseForm[key] = ''
+      })
+      
+      // 将后端数据复制到表单中
+      for (const key in res.data) {
+        if (key in enterpriseForm) {
+          enterpriseForm[key] = res.data[key]
+        }
+      }
+      
+      console.log('更新后的表单数据:', enterpriseForm)
     } else {
-      ElMessage.error(res.message || '获取企业信息失败')
+      ElMessage.error('获取企业信息失败: 返回数据格式错误')
     }
   } catch (error) {
-    ElMessage.error('获取企业信息失败')
-    console.error(error)
+    handleApiError(error, '获取企业信息失败')
   } finally {
     loading.value = false
+  }
+}
+
+
+// 通用错误处理函数
+const handleApiError = (error, defaultMessage) => {
+  if (error.response) {
+    // 请求已发出，服务器以状态码响应
+    if (error.response.status === 401) {
+      ElMessage.error('您的登录已过期，请重新登录')
+      enterpriseStore.logout()
+      router.push('/login')
+    } else if (error.response.status === 403) {
+      ElMessage.error('您没有权限执行此操作')
+    } else {
+      ElMessage.error(error.response.data?.message || defaultMessage)
+    }
+  } else if (error.request) {
+    // 请求已发出，但没有收到响应
+    ElMessage.error('服务器无响应，请稍后再试')
+  } else {
+    // 在设置请求时出错
+    ElMessage.error(defaultMessage)
+  }
+  console.error(error)
+}
+
+// 账户状态文本
+const getStatusText = (status) => {
+  switch(status) {
+    case 'Verified': return '已认证'
+    case 'PendingReview': return '待审核'
+    case 'Rejected': return '未通过'
+    default: return status
+  }
+}
+
+// 账户状态标签样式
+const getStatusTagType = (status) => {
+  switch(status) {
+    case 'Verified': return 'success'
+    case 'PendingReview': return 'warning'
+    case 'Rejected': return 'danger'
+    default: return 'info'
   }
 }
 
 // 图片上传处理
 const handleLogoSuccess = (res) => {
   if (res.success) {
-    enterpriseForm.LogoURL = res.data.url
+    enterpriseForm.logoURL = res.data.url
     ElMessage.success('LOGO上传成功')
+  } else {
+    ElMessage.error(res.message || 'LOGO上传失败')
   }
 }
 
@@ -216,8 +318,10 @@ const beforeLogoUpload = (file) => {
 
 const handleLicenseSuccess = (res) => {
   if (res.success) {
-    enterpriseForm.LicenseImageURL = res.data.url
+    enterpriseForm.licenseImageURL = res.data.url
     ElMessage.success('营业执照上传成功')
+  } else {
+    ElMessage.error(res.message || '营业执照上传失败')
   }
 }
 
@@ -235,16 +339,6 @@ const beforeLicenseUpload = (file) => {
   return isImage && isLt5M
 }
 
-// 账户状态标签样式
-const getStatusTagType = (status) => {
-  switch(status) {
-    case '已认证': return 'success'
-    case '待审核': return 'warning'
-    case '未通过': return 'danger'
-    default: return 'info'
-  }
-}
-
 const submitForm = async (formEl) => {
   if (!formEl) return
   
@@ -252,15 +346,17 @@ const submitForm = async (formEl) => {
     if (valid) {
       try {
         submitting.value = true
-        const res = await request.put(`http://localhost:8080/api/v1/enterprises/me/${enterpriseStore.userId}`, enterpriseForm)
-        if (res.success) {
+        const res = await axios.put(`/api/v1/enterprises/me`, enterpriseForm)
+        
+        if (res.status === 200) {
           ElMessage.success('企业资料更新成功')
+          // 重新获取最新数据
+          await fetchEnterpriseProfile()
         } else {
-          ElMessage.error(res.message || '更新企业资料失败')
+          ElMessage.error('更新企业资料失败')
         }
       } catch (error) {
-        ElMessage.error('更新企业资料失败')
-        console.error(error)
+        handleApiError(error, '更新企业资料失败')
       } finally {
         submitting.value = false
       }
@@ -326,3 +422,4 @@ h3 {
   margin-top: 40px;
 }
 </style>
+

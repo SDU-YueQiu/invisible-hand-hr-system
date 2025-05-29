@@ -91,11 +91,11 @@ import {
   Search,
   ArrowDown 
 } from '@element-plus/icons-vue'
-import { useUserStore } from '../../stores'
+import { useEnterpriseStore  } from '../../stores'
 
 const route = useRoute()
 const router = useRouter()
-const userStore = useUserStore()
+const userStore = useEnterpriseStore()
 
 const username = computed(() => userStore.username || '用户名')
 
