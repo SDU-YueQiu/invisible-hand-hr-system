@@ -233,7 +233,8 @@ const handleEnterpriseLogin = async() => {
 }
 
 const handleAdminLogin = async () => {
-  if (!adminForm.username || !adminForm.password) {
+  console.log("adminForm:", adminForm)
+  if (!adminForm.adminUsername || !adminForm.password) {
     ElMessage.error('请输入用户名和密码')
     return
   }
@@ -244,7 +245,7 @@ const handleAdminLogin = async () => {
   const userType = useLocalStorage('admin_userType', '')
   
   const loginData = {
-    username: adminForm.username,
+    username: adminForm.adminUsername,
     password: adminForm.password
   };
   
