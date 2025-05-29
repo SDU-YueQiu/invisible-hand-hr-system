@@ -98,18 +98,18 @@ const routes = [
         component: () => import('../views/enterprise/Dashboard.vue'),
         meta: { requiresAuth: true, userType: 'enterprise' }
       },
-//       {
-//         path: 'profile',
-//         name: 'EnterpriseProfile',
-//         component: () => import('../views/enterprise/Profile.vue'),
-//         meta: { requiresAuth: true, userType: 'enterprise' }
-//       },
-//       {
-//         path: 'jobs',
-//         name: 'EnterpriseJobs',
-//         component: () => import('../views/enterprise/JobList.vue'),
-//         meta: { requiresAuth: true, userType: 'enterprise' }
-//       },
+      {
+        path: 'profile',
+        name: 'EnterpriseProfile',
+        component: () => import('../views/enterprise/Profile.vue'),
+        meta: { requiresAuth: true, userType: 'enterprise' }
+      },
+      {
+        path: 'jobs',
+        name: 'EnterpriseJobs',
+        component: () => import('../views/enterprise/JobList.vue'),
+        meta: { requiresAuth: true, userType: 'enterprise' }
+      },
       {
         path: 'job/create',
         name: 'CreateJob',
@@ -122,24 +122,24 @@ const routes = [
         component: () => import('../views/enterprise/JobForm.vue'),
         meta: { requiresAuth: true, userType: 'enterprise' }
       },
-//       {
-//         path: 'job/:id/applicants',
-//         name: 'JobApplicants',
-//         component: () => import('../views/enterprise/Applicants.vue'),
-//         meta: { requiresAuth: true, userType: 'enterprise' }
-//       },
-//       {
-//         path: 'talents',
-//         name: 'TalentSearch',
-//         component: () => import('../views/enterprise/TalentSearch.vue'),
-//         meta: { requiresAuth: true, userType: 'enterprise' }
-//       },
-//       {
-//         path: 'settings',
-//         name: 'EnterpriseSettings',
-//         component: () => import('../views/enterprise/Settings.vue'),
-//         meta: { requiresAuth: true, userType: 'enterprise' }
-//       }
+      {
+        path: 'job/:id/applicants',
+        name: 'JobApplicants',
+        component: () => import('../views/enterprise/Applicants.vue'),
+        meta: { requiresAuth: true, userType: 'enterprise' }
+      },
+      {
+        path: 'talents',
+        name: 'TalentSearch',
+        component: () => import('../views/enterprise/TalentSearch.vue'),
+        meta: { requiresAuth: true, userType: 'enterprise' }
+      },
+      {
+        path: 'settings',
+        name: 'EnterpriseSettings',
+        component: () => import('../views/enterprise/Settings.vue'),
+        meta: { requiresAuth: true, userType: 'enterprise' }
+      }
      ]
   },
   // 管理员路由
