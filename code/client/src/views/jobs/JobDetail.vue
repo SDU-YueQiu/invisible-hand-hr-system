@@ -139,6 +139,10 @@
 
 <script>
 import axios from 'axios';
+import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import { useUserStore } from '../../stores'; 
+import request from '../../utils/request';
 
 export default {
   name: 'JobDetail',
@@ -149,8 +153,15 @@ export default {
       isLoggedIn: false, // 默认未登录状态，实际应用中需要从vuex或localStorage判断
       userResumes: [], // 用户简历列表
       selectedResumeId: null,
-      applyLoading: false
+      applyLoading: false,
+      baseURL: "http://localhost:8080/api/v1" 
     };
+  },
+  setup() {
+    const userStore = useUserStore(); // 正确的位置，在setup钩子中
+    const router = useRouter();
+    
+    return { userStore, router };
   },
   computed: {
     hasResumes() {
@@ -166,24 +177,40 @@ export default {
       try {
         this.loading = true;
         const jobId = this.$route.params.id;
-        const baseURL = "http://localhost:8080/api/v1";
-        const response = await axios.get(`${baseURL}/jobs/${jobId}`);
-        if (response.data.success) {
-          this.job = response.data;
+        
+        const token = localStorage.getItem('token');
+        const config = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
+        
+        const response = await axios.get(`${this.baseURL}/jobs/${jobId}`, config);
+        console.log('API Response:', response.data);
+        
+        if (response.data && response.data.message) {
+          this.job = response.data.message;
+          
+          // 确保enterpriseInfo存在，避免渲染错误
+          if (!this.job.enterpriseInfo) {
+            this.job.enterpriseInfo = {
+              enterpriseName: '未知企业',
+              industry: '未知行业',
+              scale: '规模未知'
+            };
+          }
+          
+          console.log('Job data processed:', this.job);
         } else {
-          this.$message.error(response.data.message || '获取职位详情失败');
+          throw new Error('获取职位详情失败：数据结构不正确');
         }
       } catch (error) {
         console.error('获取职位详情出错:', error);
-        this.$message.error('获取职位详情失败，请稍后重试');
+        ElMessage.error('获取职位详情失败，请稍后重试');
       } finally {
         this.loading = false;
       }
     },
-    
+
+     
     checkLoginStatus() {
       // 检查用户登录状态的逻辑
-      // 实际应用中需要从vuex或localStorage获取token判断是否登录
       const token = localStorage.getItem('token');
       this.isLoggedIn = !!token;
       
@@ -194,10 +221,13 @@ export default {
     
     async loadUserResumes() {
       try {
-        const baseURL = "http://localhost:8080/api/v1";
-        const response = await axios.get(`${baseURL}/users/me/resumes`);
-        if (response.data.success) {
-          this.userResumes = response.data;
+        const token = localStorage.getItem('token');
+        const config = { headers: { 'Authorization': `Bearer ${token}` } };
+        
+        const response = await axios.get(`${this.baseURL}/users/me/resumes`, config);
+        
+        if (response.data && response.data.data) {
+          this.userResumes = response.data.data;
           if (this.userResumes.length > 0) {
             this.selectedResumeId = this.userResumes[0].resumeId;
           }
@@ -206,48 +236,78 @@ export default {
         console.error('获取简历列表出错:', error);
       }
     },
-    
+
     async applyJob() {
       if (!this.selectedResumeId) {
-        this.$message.warning('请选择要投递的简历');
+        ElMessage.warning('请选择要投递的简历');
         return;
       }
       
       try {
         this.applyLoading = true;
         const jobId = this.$route.params.id;
-        baseURL = "http://localhost:8080/api/v1";
-        const response = await axios.post(`${baseURL}/jobs/${jobId}/apply`, {
-          resumeId: this.selectedResumeId
+        const token = localStorage.getItem('token');
+        
+        const numericJobId = parseInt(jobId, 10);
+        const numericResumeId = parseInt(this.selectedResumeId, 10);
+        
+        console.log('申请职位参数:', { 
+          jobId: numericJobId, 
+          resumeId: numericResumeId 
         });
         
-        if (response.data.success) {
-          this.$message.success('职位申请成功');
+        const config = {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        };
+        
+        const requestBody = {
+          resumeId: numericResumeId
+        };
+        
+        const response = await axios.post(
+          `${this.baseURL}/jobs/${numericJobId}/apply`, 
+          requestBody,
+          config
+        );
+        
+        console.log('申请响应:', response.data);
+        
+        if (response.data) {
+          ElMessage.success('职位申请成功');
         } else {
-          this.$message.error(response.data.message || '职位申请失败');
+          ElMessage.error('职位申请失败');
         }
       } catch (error) {
         console.error('申请职位出错:', error);
-        if (error.response && error.response.status === 409) {
-          this.$message.warning('您已经申请过该职位');
+        
+        if (error.response) {
+          console.log('错误响应数据:', error.response.data);
+          
+          const errorMsg = error.response.data.message || error.response.data || '申请职位失败';
+          ElMessage.error(`申请失败: ${errorMsg}`);
+        } else if (error.response && error.response.status === 409) {
+          ElMessage.warning('您已经申请过该职位');
         } else {
-          this.$message.error('申请职位失败，请稍后重试');
+          ElMessage.error('申请职位失败，请稍后重试');
         }
       } finally {
         this.applyLoading = false;
       }
     },
-    
+
     goToLogin() {
-      this.$router.push('/login');
+      this.router.push('/login');
     },
     
     goToRegister() {
-      this.$router.push('/register');
+      this.router.push('/register');
     },
     
     goToCreateResume() {
-      this.$router.push('/user/resumes/create');
+      this.router.push('/user/resumes/create');
     },
     
     formatDate(dateString) {
