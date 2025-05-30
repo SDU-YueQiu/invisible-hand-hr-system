@@ -293,7 +293,7 @@ const submitForm = async (formEl) => {
           jobCategory: jobForm.jobType,
           workLocation: jobForm.location,
           responsibilities: jobForm.jobDescription,
-          requirements: jobForm.requirements + (jobForm.requiredSkills.length > 0 ? '\n所需技能：' + jobForm.requiredSkills.join('、') : ''),
+          requirements: jobForm.requirements + (jobForm.requiredSkills.length > 0 ? '\n所需技能: ' + jobForm.requiredSkills.join('、') : ''),
           experienceRequired: jobForm.experienceRequired,
           educationRequired: jobForm.educationRequired,
           benefits: jobForm.benefits,
@@ -317,7 +317,8 @@ const submitForm = async (formEl) => {
           res = await axios.post(`${baseURL}/enterprises/me/jobs`, apiData, config)
         }
         
-        if (res.data.success) {
+        if (res.status === 200 || res.status === 201) { 
+          console.log("response",res)
           ElMessage.success(isEdit.value ? '岗位更新成功' : '岗位创建成功')
           router.push('/enterprise/jobs')
         } else {

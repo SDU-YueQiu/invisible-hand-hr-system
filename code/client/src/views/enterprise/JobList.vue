@@ -19,30 +19,25 @@
       <el-card v-for="job in jobs" :key="job.jobId" class="job-card">
         <div class="job-card-content">
           <div class="job-card-header">
-            <h3 class="job-title">{{ job.JobTitle }}</h3>
-            <el-tag :type="getStatusType(job.JobStatus)" effect="plain">
-              {{ getStatusText(job.JobStatus) }}
+            <h3 class="job-title">{{ job.jobTitle }}</h3>
+            <el-tag :type="getStatusType(job.jobStatus)" effect="plain">
+              {{ getStatusText(job.jobStatus) }}
             </el-tag>
           </div>
           
           <div class="job-meta">
             <div class="meta-item">
               <el-icon><Location /></el-icon>
-              {{ job.WorkLocation }}
+              {{ job.workLocation }}
             </div>
             <div class="meta-item">
               <el-icon><Clock /></el-icon>
-              截止：{{ formatDate(job.DeadlineDate) }}
+              截止：{{ formatDate(job.deadlineDate) }}
             </div>
             <div class="meta-item">
               <el-icon><Collection /></el-icon>
-              {{ job.JobCategory }}
+              {{ job.jobCategory }}
             </div>
-          </div>
-          
-          <div class="job-dates">
-            <span>发布时间：{{ formatDate(job.PublishDate) }}</span>
-            <span>最后更新：{{ formatDate(job.UpdateDate) }}</span>
           </div>
         </div>
         
@@ -56,9 +51,8 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="toggleJobStatus(job)">
-                  {{ job.JobStatus === 'Open' ? '关闭岗位' : '重新开放' }}
+                  {{ job.jobStatus === 'Recruiting' ? '关闭岗位' : '重新开放' }}
                 </el-dropdown-item>
-                <el-dropdown-item @click="duplicateJob(job.jobId)">复制岗位</el-dropdown-item>
                 <el-dropdown-item divided @click="confirmDelete(job.jobId)">删除岗位</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -79,11 +73,10 @@ import {
   Collection,
   ArrowDown 
 } from '@element-plus/icons-vue'
-import request from '../../utils/request'
 import { useEnterpriseStore } from '../../stores'
 import axios from 'axios'
 
-
+const enterpriseStore = useEnterpriseStore()
 const router = useRouter()
 const loading = ref(true)
 const jobs = ref([])
@@ -95,11 +88,16 @@ onMounted(async () => {
 const fetchJobs = async () => {
   try {
     loading.value = true
-    const res = await request.get('http://localhost:8080/api/v1/enterprises/me/jobs')
-    if (res.success) {
+    const res = await axios.get('http://localhost:8080/api/v1/enterprises/me/jobs', {
+      headers: {
+        'Authorization': `Bearer ${enterpriseStore.token}`
+      }
+    })
+    console.log("response", res)
+    if (res.status === 200) {
       jobs.value = res.data.map(parseJobData) || []
     } else {
-      ElMessage.error(res.message || '获取岗位列表失败')
+      ElMessage.error(res.data.message || '获取岗位列表失败')
     }
   } catch (error) {
     ElMessage.error('获取岗位列表失败')
@@ -136,7 +134,7 @@ const formatDate = (dateString) => {
 
 const getStatusText = (status) => {
   const statusMap = {
-    'Open': '招聘中',
+    'Recruiting': '招聘中',
     'Closed': '已关闭',
     'Pending': '审核中'
   }
@@ -145,11 +143,42 @@ const getStatusText = (status) => {
 
 const getStatusType = (status) => {
   const typeMap = {
-    'Open': 'success',
+    'Recruiting': 'success',
     'Closed': 'info',
     'Pending': 'warning'
   }
   return typeMap[status] || ''
+}
+
+const createNewJob = () => {
+  router.push('/enterprise/job/create')
+}
+
+const viewJob = (jobId) => {
+  router.push(`/jobs/${jobId}`)
+}
+
+const editJob = (jobId) => {
+  router.push(`/enterprise/job/edit/${jobId}`)
+}
+
+const toggleJobStatus = async (job) => {
+  try {
+    const newStatus = job.jobStatus === 'Recruiting' ? 'Closed' : 'Recruiting'
+    const res = await request.patch(`/enterprises/me/jobs/${job.jobId}`, {
+      jobStatus: newStatus
+    })
+    
+    if (res.success) {
+      job.jobStatus = newStatus
+      ElMessage.success(`岗位状态已更新为${getStatusText(newStatus)}`)
+    } else {
+      ElMessage.error(res.message || '更新岗位状态失败')
+    }
+  } catch (error) {
+    ElMessage.error('更新岗位状态失败')
+    console.error(error)
+  }
 }
 
 const confirmDelete = (jobId) => {
@@ -160,7 +189,7 @@ const confirmDelete = (jobId) => {
     confirmButtonClass: 'el-button--danger'
   }).then(async () => {
     try {
-      const res = await request.delete(`http://localhost:8080/api/v1/enterprises/me/jobs/${jobId}`)
+      const res = await request.delete(`/enterprises/me/jobs/${jobId}`)
       if (res.success) {
         jobs.value = jobs.value.filter(job => job.jobId !== jobId)
         ElMessage.success('岗位已删除')
@@ -250,3 +279,4 @@ const confirmDelete = (jobId) => {
   gap: 8px;
 }
 </style>
+
