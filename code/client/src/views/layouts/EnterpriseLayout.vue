@@ -25,10 +25,6 @@
             <el-icon><document /></el-icon>
             <span>在招岗位</span>
           </el-menu-item>
-          <el-menu-item index="/enterprise/job/create">
-            <el-icon><connection /></el-icon>
-            <span>增加岗位</span>
-          </el-menu-item>
           <el-menu-item index="/enterprise/job/:id/applicants">
             <el-icon><search /></el-icon>
             <span>查看求职申请</span>

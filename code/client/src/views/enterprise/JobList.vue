@@ -189,8 +189,13 @@ const confirmDelete = (jobId) => {
     confirmButtonClass: 'el-button--danger'
   }).then(async () => {
     try {
-      const res = await request.delete(`/enterprises/me/jobs/${jobId}`)
-      if (res.success) {
+      const token = enterpriseStore.token;
+      const res = await axios.delete(`http://localhost:8080/api/v1/enterprises/me/jobs/${jobId}`,{
+        headers: {
+        Authorization: `Bearer ${token}`
+      }
+      });
+      if (res.status === 200) {
         jobs.value = jobs.value.filter(job => job.jobId !== jobId)
         ElMessage.success('岗位已删除')
       } else {
