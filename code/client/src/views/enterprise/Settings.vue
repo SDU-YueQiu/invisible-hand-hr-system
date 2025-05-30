@@ -102,15 +102,15 @@
         <div class="security-info">
           <div class="info-item">
             <span class="label">账号创建时间：</span>
-            <span>{{ formatDate(userInfo.registrationDate) }}</span>
+            <span>{{ formatDate(enterpriseinfo.registrationDate) }}</span>
           </div>
           <div class="info-item">
             <span class="label">最近登录时间：</span>
-            <span>{{ formatDate(userInfo.lastLoginDate) }}</span>
+            <span>{{ formatDate(enterpriseinfo.lastLoginDate) }}</span>
           </div>
           <div class="info-item">
             <span class="label">账号状态：</span>
-            <el-tag type="success" v-if="userInfo.accountStatus === 'Active'">正常</el-tag>
+            <el-tag type="success" v-if="enterpriseinfo.accountStatus === 'Active'">正常</el-tag>
             <el-tag type="danger" v-else>异常</el-tag>
           </div>
         </div>
@@ -144,9 +144,10 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useEnterpriseStore } from '../../stores'
+import axios from 'axios'
 
 const router = useRouter()
-const userStore = useEnterpriseStore()
+const enterpriseStore = useEnterpriseStore()
 
 // 当前激活的标签页
 const activeTab = ref('password')
@@ -165,7 +166,7 @@ const validatePass = (rule, value, callback) => {
   // 密码规则：至少6位，包含字母和数字
   const pattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/
   if (!pattern.test(value)) {
-    callback(new Error('密码至少为6位，且必须包含字母和数字'))
+    callback(new Error('密码至少为6位,且必须包含字母和数字'))
   } else {
     callback()
   }
@@ -208,7 +209,7 @@ const notificationSettings = reactive({
 })
 
 // 账号安全相关
-const userInfo = reactive({
+const enterpriseinfo = reactive({
   registrationDate: '',
   lastLoginDate: '',
   accountStatus: 'Active'
@@ -226,9 +227,15 @@ onMounted(async () => {
 // 获取用户基本信息
 const fetchUserInfo = async () => {
   try {
-    const res = await request.get('/enterprises/me')
-    if (res.success) {
-      Object.assign(userInfo, res.data)
+    const token = enterpriseStore.token
+    const baseURL = "http://localhost:8080/api/v1"
+    const response = await axios.get(`${baseURL}/enterprises/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    if (response.data.success) {
+      Object.assign(enterpriseinfo, response.data.data)
     }
   } catch (error) {
     console.error('获取用户信息失败', error)
@@ -259,19 +266,26 @@ const submitPasswordForm = async (formEl) => {
     if (valid) {
       try {
         passwordLoading.value = true
-        
-        const res = await request.put('/enterprises/me/password', {
+        const token = enterpriseStore.token
+        const baseURL = "http://localhost:8080/api/v1"
+        const response = await axios.put(`${baseURL}/enterprises/me/password`, {
           oldPassword: passwordForm.oldPassword,
           newPassword: passwordForm.newPassword
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         })
-        
-        if (res.success) {
+        console.log('修改密码请求', response)
+        const res = response.data
+        console.log('修改密码响应', res)
+        if (response.status === 200) {
           ElMessage.success('密码修改成功，请重新登录')
           
           // 清除登录状态
           localStorage.removeItem('token')
           localStorage.removeItem('userType')
-          userStore.clearUser()
+          enterpriseStore.clearUser()
           
           // 跳转到登录页
           router.push('/login')
@@ -355,7 +369,7 @@ const deactivateAccount = async () => {
     // 清除登录状态
     localStorage.removeItem('token')
     localStorage.removeItem('userType')
-    userStore.clearUser()
+    enterpriseStore.clearUser()
     
     ElMessage.success('账号已注销')
     router.push('/login')

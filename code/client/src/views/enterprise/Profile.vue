@@ -167,7 +167,7 @@ const rules = reactive({
   ],
   creditCode: [
     { required: true, message: '请输入统一信用代码', trigger: 'blur' },
-    { pattern: /^[0-9A-Z]{18}$/, message: '请输入正确的统一信用代码', trigger: 'blur' }
+    { pattern: /^[0-9a-z]{5}$/, message: '请输入正确的统一信用代码', trigger: 'blur' }
   ],
   contactPerson: [
     { required: true, message: '请输入联系人姓名', trigger: 'blur' }
@@ -347,7 +347,7 @@ const submitForm = async (formEl) => {
       try {
         submitting.value = true
         const res = await axios.put(`/api/v1/enterprises/me`, enterpriseForm)
-        
+        console.log('更新响应:', res)
         if (res.status === 200) {
           ElMessage.success('企业资料更新成功')
           // 重新获取最新数据
