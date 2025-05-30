@@ -1,66 +1,8 @@
 <template>
   <div class="dashboard-container">
     <el-container>
-      <!-- 侧边导航栏 -->
-      <el-aside width="200px" class="aside">
-        <div class="logo">
-          <h3>人才招聘系统</h3>
-        </div>
-        <el-menu 
-          default-active="dashboard"
-          class="el-menu-vertical"
-          router
-          background-color="#304156"
-          text-color="#bfcbd9"
-          active-text-color="#409EFF"
-        >
-          <el-menu-item index="/enterprise/dashboard">
-            <el-icon><icon-menu /></el-icon>
-            <span>企业中心</span>
-          </el-menu-item>
-          <el-menu-item index="/enterprise/profile">
-            <el-icon><user /></el-icon>
-            <span>企业资料</span>
-          </el-menu-item>
-          <el-menu-item index="/enterprise/jobs">
-            <el-icon><document /></el-icon>
-            <span>在招岗位</span>
-          </el-menu-item>
-          <el-menu-item index="/enterprise/job/:id/applicants">
-            <el-icon><connection /></el-icon>
-            <span>收到的申请</span>
-          </el-menu-item>
-          <el-menu-item index="/enterprise/settings">
-            <el-icon><setting /></el-icon>
-            <span>账号设置</span>
-          </el-menu-item>
-        </el-menu>
-        <div class="logout-btn">
-          <el-button type="danger" plain @click="handleLogout">退出登录</el-button>
-        </div>
-      </el-aside>
-      
       <!-- 主内容区 -->
       <el-container>
-        <!-- 顶部栏 -->
-        <el-header height="60px" class="header">
-          <div class="header-title">企业中心</div>
-          <div class="user-info">
-            <el-dropdown>
-              <span class="el-dropdown-link">
-                {{ enterpriseName }}<el-icon class="el-icon--right"><arrow-down /></el-icon>
-              </span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="router.push('/enterprise/profile')">企业资料</el-dropdown-item>
-                  <el-dropdown-item @click="router.push('/enterprise/settings')">账号设置</el-dropdown-item>
-                  <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </el-header>
-        
         <!-- 主内容 -->
         <el-main class="main">
           <!-- 数据统计卡片 -->
