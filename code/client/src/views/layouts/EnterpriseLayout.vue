@@ -29,10 +29,6 @@
             <el-icon><connection /></el-icon>
             <span>增加岗位</span>
           </el-menu-item>
-          <el-menu-item index="/enterprise/job/edit/:id">
-            <el-icon><search /></el-icon>
-            <span>岗位变更</span>
-          </el-menu-item>
           <el-menu-item index="/enterprise/job/:id/applicants">
             <el-icon><search /></el-icon>
             <span>查看求职申请</span>

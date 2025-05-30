@@ -200,15 +200,18 @@ const fetchJobDetails = async () => {
       router.push('/login')
       return
     }
-    
-    const res = await axios.get(`http://localhost:8080/api/v1/enterprises/me/jobs/${jobId.value}`, {
+    const token = enterpriseStore.token
+    const baseURL = "http://localhost:8080/api/v1"
+    console.log("jobid: ",jobId.value)
+    const res = await axios.get(`${baseURL}/enterprises/me/jobs/${jobId.value}`, {
       headers: {
-        'Authorization': `Bearer ${enterpriseStore.token}`
+        Authorization: `Bearer ${token}`
       }
     })
-    
-    if (res.data.success) {
-      const data = res.data.data
+    console.log("response: ",res)
+    console.log("data字段", res.data)
+    if (res.status === 200) {
+      const data = res.data
       // 将API返回的数据映射到表单字段
       Object.assign(jobForm, {
         jobTitle: data.jobTitle || '',

@@ -141,7 +141,7 @@
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { useUserStore } from '../../stores'; 
+import { useUserStore,useEnterpriseStore,useAdminStore } from '../../stores'; 
 import request from '../../utils/request';
 
 export default {
@@ -160,8 +160,10 @@ export default {
   setup() {
     const userStore = useUserStore(); // 正确的位置，在setup钩子中
     const router = useRouter();
+    const enterpriseStore = useEnterpriseStore();
+    const adminStore = useAdminStore();
     
-    return { userStore, router };
+    return { userStore, router, enterpriseStore, adminStore};
   },
   computed: {
     hasResumes() {
@@ -178,13 +180,20 @@ export default {
         this.loading = true;
         const jobId = this.$route.params.id;
         
-        const token = localStorage.getItem('token');
+        let token = localStorage.getItem('token');
+        if(this.userStore.token){
+          token = this.userStore.token;
+        }else if(this.enterpriseStore.token){
+          token = this.enterpriseStore.token;
+        }else if(this.adminStore.token){
+          token = this.adminStore.token;
+        }
         const config = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
         
         const response = await axios.get(`${this.baseURL}/jobs/${jobId}`, config);
         console.log('API Response:', response.data);
         
-        if (response.data && response.data.message) {
+        if (response.status === 200) {
           this.job = response.data.message;
           
           // 确保enterpriseInfo存在，避免渲染错误
