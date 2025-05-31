@@ -1,167 +1,273 @@
 <template>
   <div class="application-container">
     <div class="header">
-      <h2>申请记录管理</h2>
+      <h2>岗位申请管理</h2>
       <div class="filters">
-        <el-select 
-          v-model="filterStatus" 
-          placeholder="筛选状态"
+        <el-select
+          v-model="selectedJobTitle"
+          placeholder="按岗位名称筛选"
+          filterable
           clearable
-          @change="handleFilterChange"
+          @change="handleJobSelect"
         >
           <el-option
-            v-for="status in statusOptions"
-            :key="status.value"
-            :label="status.label"
-            :value="status.value"
+            v-for="job in uniqueJobTitles"
+            :key="job.jobId"
+            :label="job.jobTitle"
+            :value="job.jobId"
           />
         </el-select>
         <el-button 
           type="primary" 
           :icon="Refresh" 
-          @click="refreshApplications"
+          @click="fetchApplications"
+          :disabled="!selectedJobId"
         >
           刷新
         </el-button>
       </div>
     </div>
 
-    <el-table
-      v-loading="loading"
-      :data="applications"
-      style="width: 100%"
-      stripe
-      empty-text="暂无申请记录"
-    >
-      <el-table-column prop="ApplicationID" label="申请ID" width="120" />
-      
-      <el-table-column label="关联信息" width="220">
-        <template #default="scope">
-          <div class="relation-info">
-            <div>用户ID: {{ scope.row.UserID }}</div>
-            <div>企业ID: {{ scope.row.EnterpriseID }}</div>
-            <div>职位ID: {{ scope.row.JobID }}</div>
-          </div>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="时间信息" width="180">
-        <template #default="scope">
-          {{ formatDateTime(scope.row.ApplicationTime) }}
-        </template>
-      </el-table-column>
-
-      <el-table-column label="状态" width="120">
-        <template #default="scope">
-          <el-tag :type="getStatusStyle(scope.row.CurrentStatus)">
-            {{ getStatusText(scope.row.CurrentStatus) }}
-          </el-tag>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="企业备注">
-        <template #default="scope">
-          <el-tooltip 
-            v-if="scope.row.EnterpriseNotes" 
-            :content="scope.row.EnterpriseNotes"
-          >
-            <span class="notes-preview">
-              {{ previewNotes(scope.row.EnterpriseNotes) }}
-            </span>
-          </el-tooltip>
-          <span v-else>--</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="操作" width="150">
-        <template #default="scope">
-          <el-dropdown>
-            <el-button type="primary" link>
-              操作 <el-icon><arrow-down /></el-icon>
-            </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item @click="viewDetail(scope.row)">
-                  <el-icon><View /></el-icon>
-                  查看详情
-                </el-dropdown-item>
-                <el-dropdown-item 
-                  v-if="canCancel(scope.row)" 
-                  @click="cancelApplication(scope.row.ApplicationID)"
-                >
-                  <el-icon><Close /></el-icon>
-                  撤销申请
-                </el-dropdown-item>
-                <el-dropdown-item 
-                  divided 
-                  @click="viewResume(scope.row.ResumeID)"
-                >
-                  <el-icon><Document /></el-icon>
-                  查看简历
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <div class="pagination" v-if="applications.length > 0">
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[10, 20, 50, 100]"
-        layout="total, sizes, prev, pager, next"
-        :total="total"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+    <div v-if="!selectedJobId" class="select-job-prompt">
+      <el-empty description="请先选择岗位"></el-empty>
     </div>
+
+    <div v-else>
+      <el-table
+        v-loading="loading"
+        :data="applications"
+        style="width: 100%"
+        stripe
+        empty-text="该岗位暂无申请记录"
+      >
+        <el-table-column prop="applicationId" label="申请ID" width="100" />
+        
+        <el-table-column label="申请人信息" min-width="220">
+          <template #default="scope">
+            <div class="applicant-info">
+              <div class="name">{{ scope.row.userName || '匿名用户' }}</div>
+              <div class="resume">简历: {{ scope.row.resumeTitle }}</div>
+              <div class="contact">联系方式: {{ scope.row.contactInfo || '未提供' }}</div>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="申请时间" width="180">
+          <template #default="scope">
+            {{ formatDateTime(scope.row.applicationTime) }}
+          </template>
+        </el-table-column>
+
+        <el-table-column label="状态" width="120">
+          <template #default="scope">
+            <el-tag :type="getStatusStyle(scope.row.status)">
+              {{ getStatusText(scope.row.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" width="220">
+          <template #default="scope">
+            <el-button-group>
+              <el-tooltip content="查看完整简历" placement="top">
+                <el-button
+                  type="primary"
+                  size="small"
+                  :icon="Document"
+                  @click="viewResume(scope.row.resumeId)"
+                />
+              </el-tooltip>
+              
+              <el-dropdown trigger="click">
+                <el-button type="primary" size="small">
+                  处理<el-icon class="el-icon--right"><arrow-down /></el-icon>
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item
+                      @click="updateApplicationStatus(scope.row, 'Interviewing')"
+                      :disabled="scope.row.status === 'Interviewing'"
+                    >
+                      <el-icon><ChatDotRound /></el-icon>
+                      {{ scope.row.status === 'Interviewing' ? '已安排面试' : '安排面试' }}
+                    </el-dropdown-item>
+                    <el-dropdown-item
+                      @click="updateApplicationStatus(scope.row, 'Rejected')"
+                      :disabled="scope.row.status === 'Rejected'"
+                    >
+                      <el-icon><Close /></el-icon>
+                      {{ scope.row.status === 'Rejected' ? '已拒绝' : '拒绝申请' }}
+                    </el-dropdown-item>
+                    <el-dropdown-item
+                      @click="updateApplicationStatus(scope.row, 'Hired')"
+                      :disabled="scope.row.status === 'Hired'"
+                    >
+                      <el-icon><CircleCheck /></el-icon>
+                      {{ scope.row.status === 'Hired' ? '已录用' : '录用' }}
+                    </el-dropdown-item>
+                    <el-dropdown-item divided @click="showApplicationDetail(scope.row)">
+                      <el-icon><View /></el-icon>
+                      查看详情
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </el-button-group>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
+    <!-- 申请详情对话框 -->
+    <el-dialog
+      v-model="detailDialogVisible"
+      :title="`申请详情 - ${selectedApplication?.userName || '匿名用户'}`"
+      width="60%"
+    >
+      <div v-if="selectedApplication" class="application-detail">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="申请ID">{{ selectedApplication.applicationId }}</el-descriptions-item>
+          <el-descriptions-item label="申请时间">{{ formatDateTime(selectedApplication.applicationTime) }}</el-descriptions-item>
+          <el-descriptions-item label="当前状态">
+            <el-tag :type="getStatusStyle(selectedApplication.status)">
+              {{ getStatusText(selectedApplication.status) }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="申请岗位">{{ selectedJobTitle }}</el-descriptions-item>
+          <el-descriptions-item label="简历名称">{{ selectedApplication.resumeTitle }}</el-descriptions-item>
+          <el-descriptions-item label="联系方式">{{ selectedApplication.contactInfo || '未提供' }}</el-descriptions-item>
+        </el-descriptions>
+
+        <div class="action-buttons">
+          <el-button
+            type="primary"
+            @click="viewResume(selectedApplication.resumeId)"
+          >
+            查看完整简历
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { 
   Refresh, 
   ArrowDown, 
-  View, 
-  Close, 
-  Document 
+  Document,
+  View,
+  ChatDotRound,
+  Close,
+  CircleCheck
 } from '@element-plus/icons-vue'
 import { useEnterpriseStore } from '../../stores'
+import axios from 'axios'
 
-// 状态定义
+const enterpriseStore = useEnterpriseStore()
 const loading = ref(false)
 const applications = ref([])
-const total = ref(0)
-const currentPage = ref(1)
-const pageSize = ref(10)
-const filterStatus = ref('')
+const jobList = ref([])
+const selectedJobTitle = ref('')
+const selectedJobId = ref('')
+const currentJobInfo = ref(null)
+const detailDialogVisible = ref(false)
+const selectedApplication = ref(null)
 
-// 状态选项配置
-const statusOptions = [
-  { label: '已提交', value: 'Submitted' },
-  { label: '已受理', value: 'Accepted' },
-  { label: '处理中', value: 'Processing' },
-  { label: '已完成', value: 'Completed' },
-  { label: '已取消', value: 'Cancelled' }
-]
+// 计算去重后的岗位名称列表
+const uniqueJobTitles = computed(() => {
+  // 1. 确保数据是数组
+  if (!Array.isArray(jobList.value)) {
+    console.error('jobList 不是数组:', jobList.value)
+    return []
+  }
+  
+  // 2. 使用更安全的方法去重
+  const titles = new Set()
+  const result = []
+  
+  for (const job of jobList.value) {
+    // 3. 验证对象结构
+    if (!job || typeof job !== 'object' || !job.JobTitle || !job.jobId) {
+      console.warn('无效的岗位数据:', job)
+      continue
+    }
+    
+    // 4. 去重逻辑
+    if (!titles.has(job.JobTitle)) {
+      titles.add(job.JobTitle)
+      result.push({
+        jobId: job.jobId,
+        JobTitle: job.JobTitle
+      })
+    }
+  }
+  
+  return result
+})
 
-// 获取申请列表
-const fetchApplications = async () => {
+
+
+// 获取企业所有岗位
+const fetchJobList = async () => {
   try {
     loading.value = true
-    const params = {
-      page: currentPage.value,
-      size: pageSize.value,
-      status: filterStatus.value
+    const res = await axios.get('http://localhost:8080/api/v1/enterprises/me/jobs', {
+      headers: {
+        'Authorization': `Bearer ${enterpriseStore.token}`
+      }
+    })
+    console.log("response", res)
+    let data = []
+    if (res.status === 200&& res.data) {
+      if (Array.isArray(res.data)) {
+        data = res.data
+      } else if (Array.isArray(res.data.items)) {
+        data = res.data.items
+      } else if (Array.isArray(res.data.data)) {
+        data = res.data.data
+      } else {
+        console.warn('API返回的数据结构不符合预期:', res.data)
+      }
     }
+    
+    jobList.value = data
+  } catch (error) {
+    console.error('获取岗位列表失败:', error)
+    jobList.value = [] // 确保出错时也是数组
+    ElMessage.error('加载岗位列表失败')
+  } finally {
+    loading.value = false
+  }
+}
+onMounted(() => {
+  fetchJobList()
+})
+// 处理岗位选择
+const handleJobSelect = (jobId) => {
+  selectedJobId.value = jobId
+  const selectedJob = jobList.value.find(job => job.jobId === jobId)
+  if (selectedJob) {
+    selectedJobTitle.value = selectedJob.JobTitle
+    currentJobInfo.value = selectedJob
+    fetchApplications()
+  }
+}
 
-    const res = await request.get('http://localhost:8080/api/v1/enterprises/me/applicants', { params })
-    if (res.success) {
-      applications.value = res.data.items
-      total.value = res.data.total
+// 获取特定岗位的申请记录
+const fetchApplications = async () => {
+  if (!selectedJobId.value) return
+  
+  try {
+    loading.value = true
+    const res = await axios.get(
+      `/enterprises/me/jobs/${selectedJobId.value}/applicants`
+    )
+    console.log("response", res)
+    if (res.status === 200) {
+      applications.value = res.data
     }
   } catch (error) {
     console.error('获取申请记录失败:', error)
@@ -170,36 +276,34 @@ const fetchApplications = async () => {
   }
 }
 
-// 状态显示转换
-const getStatusText = (status) => {
-  const map = {
-    'Submitted': '已提交',
-    'Accepted': '已受理',
-    'Processing': '处理中',
-    'Completed': '已完成',
-    'Cancelled': '已取消'
+// 更新申请状态
+const updateApplicationStatus = async (applicationId, status) => {
+  try {
+    loading.value = true
+    const res = await axios.put(
+      `/enterprises/me/jobs/${selectedJobId.value}/applicants/${applicationId}/status`,
+      { status }
+    )
+    if (res.status === 200) {
+      fetchApplications() // 刷新列表
+    }
+  } catch (error) {
+    console.error('更新状态失败:', error)
   }
-  return map[status] || status
 }
 
-// 状态样式映射
-const getStatusStyle = (status) => {
-  const typeMap = {
-    'Submitted': 'info',
-    'Accepted': 'primary',
-    'Processing': 'warning',
-    'Completed': 'success',
-    'Cancelled': 'danger'
-  }
-  return typeMap[status] || ''
+// 查看简历
+const viewResume = (resumeId) => {
+  window.open(`/enterprises/me/resumes/${resumeId}`, '_blank')
 }
 
-// 操作权限判断
-const canCancel = (application) => {
-  return ['Submitted', 'Accepted'].includes(application.CurrentStatus)
+// 显示申请详情
+const showApplicationDetail = (application) => {
+  selectedApplication.value = application
+  detailDialogVisible.value = true
 }
 
-// 时间格式化
+// 辅助函数
 const formatDateTime = (datetime) => {
   return new Date(datetime).toLocaleString('zh-CN', {
     year: 'numeric',
@@ -210,56 +314,27 @@ const formatDateTime = (datetime) => {
   })
 }
 
-// 备注预览处理
-const previewNotes = (notes) => {
-  return notes.length > 15 ? notes.substring(0, 15) + '...' : notes
-}
-
-// 分页处理
-const handleSizeChange = (val) => {
-  pageSize.value = val
-  fetchApplications()
-}
-
-const handleCurrentChange = (val) => {
-  currentPage.value = val
-  fetchApplications()
-}
-
-// 筛选条件变化
-const handleFilterChange = () => {
-  currentPage.value = 1
-  fetchApplications()
-}
-
-// 刷新数据
-const refreshApplications = () => {
-  currentPage.value = 1
-  fetchApplications()
-}
-
-// 业务操作
-const viewJobDetail = (jobId) => {
-  router.push(`/jobs/${jobId}`)
-}
-
-const viewResume = (resumeId) => {
-  router.push(`http://localhost:8080/api/v1/enterprises/me/resumes/view${resumeId}`)
-}
-
-const cancelApplication = async (id) => {
-  try {
-    await request.put(`http://localhost:8080/api/v1/enterprises/me/applications/${applicationId}/cancel`)
-    ElMessage.success('撤销申请成功')
-    fetchApplications()
-  } catch (error) {
-    ElMessage.error('撤销申请失败')
+const getStatusText = (status) => {
+  const map = {
+    'Submitted': '已提交',
+    'Viewed': '已查看',
+    'Interviewing': '面试中',
+    'Rejected': '已拒绝',
+    'Hired': '已录用'
   }
+  return map[status] || status
 }
-// 初始化加载
-onMounted(() => {
-  fetchApplications()
-})
+
+const getStatusStyle = (status) => {
+  const typeMap = {
+    'Submitted': 'info',
+    'Viewed': 'primary',
+    'Interviewing': 'warning',
+    'Rejected': 'danger',
+    'Hired': 'success'
+  }
+  return typeMap[status] || ''
+}
 </script>
 
 <style scoped>
@@ -280,23 +355,43 @@ onMounted(() => {
 .filters {
   display: flex;
   gap: 10px;
-  align-items: center;
 }
 
-.relation-info {
+.select-job-prompt {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.current-job-info {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+}
+
+.current-job-info h3 {
+  margin: 0 0 10px 0;
+  color: #303133;
+}
+
+.applicant-info .name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.applicant-info .resume,
+.applicant-info .contact {
   font-size: 13px;
-  line-height: 1.5;
-  color: #666;
+  color: #606266;
+  margin-top: 3px;
 }
 
-.notes-preview {
-  color: #888;
-  cursor: help;
+.application-detail {
+  padding: 10px;
 }
 
-.pagination {
+.action-buttons {
   margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
+  text-align: center;
 }
 </style>
