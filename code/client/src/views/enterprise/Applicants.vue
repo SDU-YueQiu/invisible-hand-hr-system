@@ -4,14 +4,14 @@
       <h2>岗位申请管理</h2>
       <div class="filters">
         <el-select
-          v-model="selectedJobTitle"
+          v-model="selectedJobId"
           placeholder="按岗位名称筛选"
           filterable
           clearable
           @change="handleJobSelect"
         >
           <el-option
-            v-for="job in uniqueJobTitles"
+            v-for="job in jobList"
             :key="job.jobId"
             :label="job.jobTitle"
             :value="job.jobId"
@@ -116,8 +116,30 @@
           </template>
         </el-table-column>
       </el-table>
-    </div>
+       <div class="pagination-container" v-if="applications.length > 0">
 
+        <el-pagination
+
+          v-model:current-page="currentPage"
+
+          v-model:page-size="pageSize"
+
+          :page-sizes="[10, 20, 30, 50]"
+
+          layout="total, sizes, prev, pager, next, jumper"
+
+          :total="totalItems"
+
+          @size-change="handleSizeChange"
+
+          @current-change="handleCurrentChange"
+
+        />
+
+      </div>
+    </div>
+   
+    
     <!-- 申请详情对话框 -->
     <el-dialog
       v-model="detailDialogVisible"
@@ -134,7 +156,7 @@
             </el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="申请岗位">{{ selectedJobTitle }}</el-descriptions-item>
-          <el-descriptions-item label="简历名称">{{ selectedApplication.resumeTitle }}</el-descriptions-item>
+          <el-descriptions-item label="简历名称">{{ selectedApplication.resumeTitle || '未知' }}</el-descriptions-item>
           <el-descriptions-item label="联系方式">{{ selectedApplication.contactInfo || '未提供' }}</el-descriptions-item>
         </el-descriptions>
 
@@ -153,6 +175,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { 
   Refresh, 
@@ -166,7 +189,9 @@ import {
 import { useEnterpriseStore } from '../../stores'
 import axios from 'axios'
 
+const router = useRouter()
 const enterpriseStore = useEnterpriseStore()
+const totalItems = ref(0)
 const loading = ref(false)
 const applications = ref([])
 const jobList = ref([])
@@ -175,41 +200,25 @@ const selectedJobId = ref('')
 const currentJobInfo = ref(null)
 const detailDialogVisible = ref(false)
 const selectedApplication = ref(null)
+const currentPage = ref(1)
+const pageSize = ref(10)
 
-// 计算去重后的岗位名称列表
-const uniqueJobTitles = computed(() => {
-  // 1. 确保数据是数组
-  if (!Array.isArray(jobList.value)) {
-    console.error('jobList 不是数组:', jobList.value)
-    return []
-  }
-  
-  // 2. 使用更安全的方法去重
-  const titles = new Set()
-  const result = []
-  
-  for (const job of jobList.value) {
-    // 3. 验证对象结构
-    if (!job || typeof job !== 'object' || !job.JobTitle || !job.jobId) {
-      console.warn('无效的岗位数据:', job)
-      continue
-    }
-    
-    // 4. 去重逻辑
-    if (!titles.has(job.JobTitle)) {
-      titles.add(job.JobTitle)
-      result.push({
-        jobId: job.jobId,
-        JobTitle: job.JobTitle
-      })
-    }
-  }
-  
-  return result
+const statusOptions = [
+  { label: '全部', value: '' },
+  { label: '已提交', value: 'Submitted' },
+  { label: '已查看', value: 'Viewed' },
+  { label: '面试中', value: 'Interviewing' },
+  { label: '已拒绝', value: 'Rejected' },
+  { label: '已录用', value: 'Hired' }
+]
+
+
+
+// 初始化加载岗位列表
+
+onMounted(async () => {
+  await fetchJobList()
 })
-
-
-
 // 获取企业所有岗位
 const fetchJobList = async () => {
   try {
@@ -242,32 +251,51 @@ const fetchJobList = async () => {
     loading.value = false
   }
 }
-onMounted(() => {
-  fetchJobList()
-})
 // 处理岗位选择
 const handleJobSelect = (jobId) => {
+  console.log("111111")
   selectedJobId.value = jobId
   const selectedJob = jobList.value.find(job => job.jobId === jobId)
+  console.log("selectedJob",selectedJob);
   if (selectedJob) {
     selectedJobTitle.value = selectedJob.JobTitle
+    console.log("jobtiltle ", selectedJobTitle)
     currentJobInfo.value = selectedJob
     fetchApplications()
   }
 }
+onMounted(() => {
 
+  fetchApplications()
+
+})
 // 获取特定岗位的申请记录
 const fetchApplications = async () => {
+  console.log("selectedJobId.value",selectedJobId.value)
   if (!selectedJobId.value) return
   
   try {
     loading.value = true
+    const params = {
+      page: currentPage.value,
+      pageSize: pageSize.value
+    }
+    const baseURL = "http://localhost:8080/api/v1"
     const res = await axios.get(
-      `/enterprises/me/jobs/${selectedJobId.value}/applicants`
+      `${baseURL}/enterprises/me/jobs/${selectedJobId.value}/applicants`,{
+      headers: {
+        'Authorization': `Bearer ${enterpriseStore.token}`
+      },params
+      }
     )
-    console.log("response", res)
-    if (res.status === 200) {
-      applications.value = res.data
+    console.log("response", res.data.data.applicants)
+    if (res.status === 200&& res.data && Array.isArray(res.data.data.applicants)) {
+      
+    applications.value = res.data.data.applicants;
+      totalItems.value = res.data.totalItems || applications.value.length;
+    } else {
+      console.warn('API返回的数据结构不符合预期:', res.data);
+      applications.value = []; // 确保赋值为空数组
     }
   } catch (error) {
     console.error('获取申请记录失败:', error)
@@ -285,7 +313,13 @@ const updateApplicationStatus = async (applicationId, status) => {
       { status }
     )
     if (res.status === 200) {
-      fetchApplications() // 刷新列表
+       const index = applications.value.findIndex(item => item.applicationId === application.applicationId)
+      if (index !== -1) {
+        applications.value[index].status = status
+      }
+      ElMessage.success('状态更新成功')
+    } else {
+      ElMessage.error(res.message || '状态更新失败')
     }
   } catch (error) {
     console.error('更新状态失败:', error)
@@ -294,9 +328,12 @@ const updateApplicationStatus = async (applicationId, status) => {
 
 // 查看简历
 const viewResume = (resumeId) => {
-  window.open(`/enterprises/me/resumes/${resumeId}`, '_blank')
+  if (resumeId) {
+    window.open(`/enterprises/me/resumes/${resumeId}`, '_blank')
+  } else {
+    ElMessage.warning('简历ID无效')
+  }
 }
-
 // 显示申请详情
 const showApplicationDetail = (application) => {
   selectedApplication.value = application
@@ -334,6 +371,36 @@ const getStatusStyle = (status) => {
     'Hired': 'success'
   }
   return typeMap[status] || ''
+}
+// 刷新申请列表
+
+const refreshApplications = () => {
+  fetchApplications()
+}
+
+
+
+// 处理筛选条件变化
+const handleFilterChange = () => {
+  currentPage.value = 1 // 重置为第一页
+  fetchApplications()
+}
+
+
+
+// 处理分页大小变化
+const handleSizeChange = (newSize) => {
+  pageSize.value = newSize
+  fetchApplications()
+}
+
+
+
+// 处理页码变化
+
+const handleCurrentChange = (newPage) => {
+  currentPage.value = newPage
+  fetchApplications()
 }
 </script>
 
