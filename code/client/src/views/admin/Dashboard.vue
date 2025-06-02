@@ -144,7 +144,8 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import request from '../../utils/request'
-
+import { useAdminStore } from '../../stores'
+import axios from 'axios'
 // 统计数据
 const stats = ref({
   userCount: 0,
