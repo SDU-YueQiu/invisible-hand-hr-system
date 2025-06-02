@@ -304,8 +304,7 @@ const resetSearch = () => {
 
 // 查看简历
 const viewResume = (resumeId) => {
-  console.log(`查看简历: ${resumeId}`);
-  window.open(`/enterprise/me/resumes/${resumeId}`, '_blank');
+  router.push(`/user/resume/view/${resumeId}`)
 };
 
 // 分页大小变化
