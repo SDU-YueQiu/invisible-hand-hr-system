@@ -25,22 +25,7 @@
             <el-icon><user /></el-icon>
             <span>企业用户管理</span>
           </el-menu-item>
-          <el-menu-item index="/admin/jobs">
-            <el-icon><document /></el-icon>
-            <span>职位管理</span>
-          </el-menu-item>
-          <el-menu-item index="/admin/feedback">
-            <el-icon><search /></el-icon>
-            <span>反馈系统</span>
-          </el-menu-item>
-          <el-menu-item index="/admin/announcement">
-            <el-icon><search /></el-icon>
-            <span>公告系统</span>
-          </el-menu-item>
-          <el-menu-item index="/admin/settings">
-            <el-icon><setting /></el-icon>
-            <span>账号设置</span>
-          </el-menu-item>
+          
         </el-menu>
         <div class="logout-btn">
           <el-button type="danger" plain @click="handleLogout">退出登录</el-button>
@@ -102,10 +87,6 @@ const pageTitle = computed(() => {
     '/admin/dashboard': '管理员中心',
     '/admin/users': '个人用户管理',
     '/admin/enterprises': '企业用户管理',
-    '/admin/jobs': '职位管理',
-    '/admin/feedback': '反馈系统',
-    '/admin/announcement': '公告系统',
-    '/admin/settings': '账号设置'
   }
   
   return pathMap[route.path] || '管理员中心'
