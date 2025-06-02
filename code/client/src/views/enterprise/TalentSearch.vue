@@ -109,8 +109,7 @@
 
       <div v-for="resume in resumes" :key="resume.resumeId" class="resume-card">
         <div class="resume-header">
-          <div class="resume-title">{{ resume.resumeTitle }}</div>
-          <div class="resume-meta">最后更新: {{ formatDate(resume.lastUpdated) }}</div>
+          <div class="resume-title">{{ resume.resumeId }}</div>
         </div>
 
         <div class="resume-content">
@@ -121,33 +120,9 @@
           <div class="resume-info">
             <div class="resume-info-row">
               <div class="info-label">姓名</div>
-              <div class="info-value">{{ resume.name }}</div>
+              <div class="info-value">{{ resume.userId }}</div>
             </div>
 
-            <div class="resume-info-row">
-              <div class="info-label">工作经验</div>
-              <div class="info-value">{{ resume.experience }} 年</div>
-            </div>
-
-            <div class="resume-info-row">
-              <div class="info-label">学历</div>
-              <div class="info-value">{{ resume.education }}</div>
-            </div>
-
-            <div class="resume-info-row">
-              <div class="info-label">状态</div>
-              <div class="info-value">
-                <el-tag :type="getStatusStyle(resume.status)" size="small">
-                  {{ getStatusText(resume.status) }}
-                </el-tag>
-              </div>
-            </div>
-
-            <div class="skills">
-              <div class="skill-tag" v-for="skill in resume.skills" :key="skill">
-                {{ skill }}
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -274,6 +249,7 @@ const searchResumes = async () => {
     )
     console.log("respone",res)
     if (res.status === 200 ) {
+      console.log("resume",res.data )
       resumes.value = res.data || [];
       totalItems.value = res.data.totalItems || resumes.value.length;
       console.log("resume",res.data )
@@ -304,8 +280,7 @@ const resetSearch = () => {
 
 // 查看简历
 const viewResume = (resumeId) => {
-  console.log(`查看简历: ${resumeId}`);
-  window.open(`/enterprise/me/resumes/${resumeId}`, '_blank');
+  router.push(`/user/resume/view/${resumeId}`)
 };
 
 // 分页大小变化

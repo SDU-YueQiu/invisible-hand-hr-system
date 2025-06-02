@@ -139,6 +139,12 @@ const routes = [
         name: 'EnterpriseSettings',
         component: () => import('../views/enterprise/Settings.vue'),
         meta: { requiresAuth: true, userType: 'enterprise' }
+      },
+      {
+        path:'resumes/:id',
+        name: 'EnterpriseResumes',
+        component: () => import('../views/enterprise/EnterpriseResumeView.vue'),
+        meta: { requiresAuth: true, userType: 'enterprise' }
       }
      ]
   },
