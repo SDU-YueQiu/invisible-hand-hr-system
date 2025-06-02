@@ -161,7 +161,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Download } from '@element-plus/icons-vue'
-import useEnterpriseStore from '../../stores'
+import {useEnterpriseStore} from '../../stores'
 import axios from 'axios'
 //import request from '../../utils/request'
 
@@ -212,14 +212,14 @@ const fetchResumeDetails = async () => {
   try {
     loading.value = true
     
-    const baseURL = "http://localhost:8080/api/v1" 
-    const axios = require('axios').create({
-      baseURL: baseURL,
-      headers: {
-        'Authorization': `Bearer ${enterpriseStore.token}`
-      }
-    })
-    const res = await axios.get(`/users/me/resumes/${resumeId}`)
+    const baseURL = "http://localhost:8080/api/v1"
+    const config = {
+      //params,
+      headers: {}
+    };
+    config.headers['Authorization'] = `Bearer ${enterpriseStore.token}`; 
+    const res = await axios.get(`${baseURL}/users/me/resumes/${resumeId}`,
+    config)
     console.log('获取简历详情:', res)
     if (res.success) {
       console.log('简历详情:', res.data)
@@ -285,9 +285,9 @@ const getSkillTagType = (level) => {
   return levelMap[level] || ''
 }
 
-const editResume = () => {
-  router.push(`/user/resume/edit/${resumeId}`)
-}
+//const editResume = () => {
+ // router.push(`/user/resume/edit/${resumeId}`)
+//}
 
 const downloadPdf = () => {
   // 实际项目中，这里需要调用接口生成PDF并下载

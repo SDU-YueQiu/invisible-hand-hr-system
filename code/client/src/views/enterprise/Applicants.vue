@@ -59,71 +59,16 @@
           </template>
         </el-table-column> -->
         
-
-        <el-table-column label="操作" width="220">
-          <template #default="scope">
-            <el-button-group>
-              <el-tooltip content="查看完整简历" placement="top">
-                <el-button
-                  type="primary"
-                  size="small"
-                  :icon="Document"
-                  @click="viewResume(scope.row.resumeId)"
-                />
-              </el-tooltip>
-              
-              <el-dropdown trigger="click">
-                <el-button type="primary" size="small">
-                  处理<el-icon class="el-icon--right"><arrow-down /></el-icon>
-                </el-button>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item
-                      @click="updateApplicationStatus(scope.row, 'Interviewing')"
-                      :disabled="scope.row.status === 'Interviewing'"
-                    >
-                      <el-icon><ChatDotRound /></el-icon>
-                      {{ scope.row.status === 'Interviewing' ? '已安排面试' : '安排面试' }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      @click="updateApplicationStatus(scope.row, 'Rejected')"
-                      :disabled="scope.row.status === 'Rejected'"
-                    >
-                      <el-icon><Close /></el-icon>
-                      {{ scope.row.status === 'Rejected' ? '已拒绝' : '拒绝申请' }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      @click="updateApplicationStatus(scope.row, 'Hired')"
-                      :disabled="scope.row.status === 'Hired'"
-                    >
-                      <el-icon><CircleCheck /></el-icon>
-                      {{ scope.row.status === 'Hired' ? '已录用' : '录用' }}
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </el-button-group>
-          </template>
-        </el-table-column>
       </el-table>
        <div class="pagination-container" v-if="applications.length > 0">
-
         <el-pagination
-
           v-model:current-page="currentPage"
-
           v-model:page-size="pageSize"
-
           :page-sizes="[10, 20, 30, 50]"
-
           layout="total, sizes, prev, pager, next, jumper"
-
           :total="totalItems"
-
           @size-change="handleSizeChange"
-
           @current-change="handleCurrentChange"
-
         />
 
       </div>
@@ -161,7 +106,7 @@ const selectedApplication = ref(null)
 const currentPage = ref(1)
 const pageSize = ref(10)
 
-const statusOptions = [
+const status= [
   { label: '全部', value: '' },
   { label: '已提交', value: 'Submitted' },
   { label: '已查看', value: 'Viewed' },
@@ -173,7 +118,6 @@ const statusOptions = [
 
 
 // 初始化加载岗位列表
-
 onMounted(async () => {
   await fetchJobList()
 })
@@ -262,31 +206,44 @@ const fetchApplications = async () => {
 }
 
 // 更新申请状态
-const updateApplicationStatus = async (applicationId, status) => {
+const updateApplicationStatus = async (application, status) => {
   try {
-    loading.value = true
     const res = await axios.put(
-      `/enterprises/me/jobs/${selectedJobId.value}/applicants/${applicationId}/status`,
+      `/api/v1/enterprises/me/jobs/${selectedJobId.value}/applicants/${application.applicationId}/status`,
       { status }
-    )
+    );
     if (res.status === 200) {
-       const index = applications.value.findIndex(item => item.applicationId === application.applicationId)
-      if (index !== -1) {
-        applications.value[index].status = status
-      }
-      ElMessage.success('状态更新成功')
+      application.status = status;
+      ElMessage.success('状态已更新');
     } else {
-      ElMessage.error(res.message || '状态更新失败')
+      ElMessage.error('更新状态失败');
     }
   } catch (error) {
-    console.error('更新状态失败:', error)
+    console.error('更新状态失败:', error);
+    ElMessage.error('网络错误，请重试');
   }
-}
-
+};
+const scheduleInterview = async (application) => {
+  try {
+    const res = await axios.post(
+      `/api/v1/enterprises/me/jobs/${selectedJobId.value}/applicants/${application.applicationId}/schedule-interview`,
+      {}
+    );
+    if (res.status === 200) {
+      ElMessage.success('面试已安排');
+      application.status = 'Interviewing';
+    } else {
+      ElMessage.error('安排面试失败');
+    }
+  } catch (error) {
+    console.error('安排面试失败:', error);
+    ElMessage.error('网络错误，请重试');
+  }
+};
 // 查看简历
 const viewResume = (resumeId) => {
   if (resumeId) {
-    router.push(`/user/resume/view/${resumeId}`)
+    router.push(`/enterprise/resumes/${resumeId}`)
   } else {
     ElMessage.warning('简历ID无效')
   }
