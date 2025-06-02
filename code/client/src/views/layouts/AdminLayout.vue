@@ -15,7 +15,7 @@
         >
           <el-menu-item index="/admin/dashboard">
             <el-icon><icon-menu /></el-icon>
-            <span>个人中心</span>
+            <span>管理员中心</span>
           </el-menu-item>
           <el-menu-item index="/admin/users">
             <el-icon><user /></el-icon>
@@ -99,7 +99,7 @@ const activeMenu = computed(() => route.path)
 
 const pageTitle = computed(() => {
   const pathMap = {
-    '/admin/dashboard': '个人中心',
+    '/admin/dashboard': '管理员中心',
     '/admin/users': '个人用户管理',
     '/admin/enterprises': '企业用户管理',
     '/admin/jobs': '职位管理',
@@ -108,7 +108,7 @@ const pageTitle = computed(() => {
     '/admin/settings': '账号设置'
   }
   
-  return pathMap[route.path] || '个人中心'
+  return pathMap[route.path] || '管理员中心'
 })
 
 const handleLogout = () => {
