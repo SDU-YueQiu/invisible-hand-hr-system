@@ -13,7 +13,7 @@
         >
           <el-menu-item index="/admin/dashboard">
             <el-icon><icon-menu /></el-icon>
-            <span>个人中心</span>
+            <span>管理员中心</span>
           </el-menu-item>
           <el-menu-item index="/admin/users">
             <el-icon><user /></el-icon>
@@ -47,7 +47,7 @@
 
       <el-container>
         <el-header height="60px" class="header">
-          <div class="header-title">管理员仪表盘</div>
+          <div class="header-title">管理员中心</div>
           <div class="user-info">
             <el-dropdown>
               <span class="el-dropdown-link">
