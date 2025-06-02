@@ -142,58 +142,58 @@ const routes = [
       }
      ]
   },
-  // 管理员路由
-//   {
-//     path: '/admin',
-//     component: () => import('../views/layouts/AdminLayout.vue'),
-//     children: [
-//       {
-//         path: 'dashboard',
-//         name: 'AdminDashboard',
-//         component: () => import('../views/admin/Dashboard.vue'),
-//         meta: { requiresAuth: true, userType: 'admin' }
-//       },
-//       {
-//         path: 'users',
-//         name: 'UserManagement',
-//         component: () => import('../views/admin/UserManagement.vue'),
-//         meta: { requiresAuth: true, userType: 'admin' }
-//       },
-//       {
-//         path: 'enterprises',
-//         name: 'EnterpriseManagement',
-//         component: () => import('../views/admin/EnterpriseManagement.vue'),
-//         meta: { requiresAuth: true, userType: 'admin' }
-//       },
-//       {
-//         path: 'jobs',
-//         name: 'JobManagement',
-//         component: () => import('../views/admin/JobManagement.vue'),
-//         meta: { requiresAuth: true, userType: 'admin' }
-//       },
-//       {
-//         path: 'feedback',
-//         name: 'FeedbackManagement',
-//         component: () => import('../views/admin/FeedbackManagement.vue'),
-//         meta: { requiresAuth: true, userType: 'admin' }
-//       },
-//       {
-//         path: 'announcements',
-//         name: 'AnnouncementManagement',
-//         component: () => import('../views/admin/AnnouncementManagement.vue'),
-//         meta: { requiresAuth: true, userType: 'admin' }
-//       },
-//       {
-//         path: 'settings',
-//         name: 'AdminSettings',
-//         component: () => import('../views/admin/Settings.vue'),
-//         meta: { requiresAuth: true, userType: 'admin' }
-//       }
-//     ]
-//   }
-//]
-// }
+   //管理员路由
+   {
+     path: '/admin',
+     component: () => import('../views/layouts/AdminLayout.vue'),
+     children: [
+       {
+         path: 'dashboard',
+         name: 'AdminDashboard',
+         component: () => import('../views/admin/Dashboard.vue'),
+         meta: { requiresAuth: true, userType: 'admin' }
+       },
+       {
+         path: 'users',
+         name: 'UserManagement',
+         component: () => import('../views/admin/User.vue'),
+         meta: { requiresAuth: true, userType: 'admin' }
+       },
+       {
+         path: 'enterprises',
+         name: 'EnterpriseManagement',
+         component: () => import('../views/admin/Enterprises.vue'),
+         meta: { requiresAuth: true, userType: 'admin' }
+       },
+       {
+         path: 'jobs',
+         name: 'JobManagement',
+         component: () => import('../views/admin/Jobs.vue'),
+         meta: { requiresAuth: true, userType: 'admin' }
+       },
+       {
+         path: 'feedback',
+         name: 'FeedbackManagement',
+         component: () => import('../views/admin/Feedback.vue'),
+         meta: { requiresAuth: true, userType: 'admin' }
+       },
+       {
+         path: 'announcements',
+         name: 'AnnouncementManagement',
+         component: () => import('../views/admin/Announcement.vue'),
+         meta: { requiresAuth: true, userType: 'admin' }
+       },
+       {
+         path: 'settings',
+         name: 'AdminSettings',
+         component: () => import('../views/admin/Settings.vue'),
+         meta: { requiresAuth: true, userType: 'admin' }
+       }
+     ]
+   },
 ]
+ 
+
 
 const router = createRouter({
   history: createWebHistory(),
