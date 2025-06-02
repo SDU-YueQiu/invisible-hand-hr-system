@@ -274,8 +274,9 @@ const searchResumes = async () => {
     )
     console.log("respone",res)
     if (res.status === 200 ) {
-      resumes.value = res.data.resumes || [];
-      totalItems.value = res.data.totalItems || resumes.value.length;;
+      resumes.value = res.data || [];
+      totalItems.value = res.data.totalItems || resumes.value.length;
+      console.log("resume",res.data )
     } else {
       ElMessage.error(res.message || '搜索失败');
     }
