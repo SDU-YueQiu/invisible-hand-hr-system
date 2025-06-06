@@ -137,14 +137,14 @@ namespace Router
                 return;
             }
 
-            // 验证简历归属
-            if (resume.UserID != std::stoi(userId))
-            {
-                response.code = 403;
-                response.write(crow::json::wvalue{{"message", "无权访问该简历"}}.dump());
-                response.end();
-                return;
-            }
+            // // 验证简历归属
+            // if (resume.UserID != std::stoi(userId))
+            // {
+            //     response.code = 403;
+            //     response.write(crow::json::wvalue{{"message", "无权访问该简历"}}.dump());
+            //     response.end();
+            //     return;
+            // }
 
             // 构建响应JSON
             crow::json::wvalue result;
