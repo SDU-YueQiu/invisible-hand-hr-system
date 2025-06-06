@@ -311,7 +311,7 @@ components:
           example: "2023-10-20T15:00:00Z"
         visibilityStatus:
           type: string
-          enum: ["PublicToAll", "PublicToApplied", "Private"]
+          enum: ["Public", "PublicToApplied", "Private"]
           example: "Private"
     ResumeBasicInfo:
       type: object
@@ -414,7 +414,7 @@ components:
           example: "A highly motivated and experienced software engineer..."
         visibilityStatus:
           type: string
-          enum: ["PublicToAll", "PublicToApplied", "Private"]
+          enum: ["Public", "PublicToApplied", "Private"]
           default: "Private"
           example: "Private"
         attachmentPath:

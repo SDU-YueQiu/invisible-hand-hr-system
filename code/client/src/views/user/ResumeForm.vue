@@ -231,7 +231,7 @@
       <h3>简历可见性</h3>
       <el-form-item>
         <el-radio-group v-model="resumeForm.visibilityStatus">
-          <el-radio label="PublicToAll">公开给所有企业</el-radio>
+          <el-radio label="Public">公开给所有企业</el-radio>
           <el-radio label="PublicToApplied">仅对申请企业公开</el-radio>
           <el-radio label="Private">完全私密</el-radio>
         </el-radio-group>

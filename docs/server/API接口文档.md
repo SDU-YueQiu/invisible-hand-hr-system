@@ -307,7 +307,7 @@ API将使用标准的HTTP状态码来指示请求的结果：
           "userId": "integer",
           "resumeTitle": "string",
           "lastUpdateTime": "datetime string (ISO 8601)",
-          "visibilityStatus": "string ('PublicToAll', 'PublicToApplied', 'Private')"
+          "visibilityStatus": "string ('Public', 'PublicToApplied', 'Private')"
         }
         // ... more resumes
       ],

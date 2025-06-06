@@ -3,7 +3,7 @@
  * @brief 数据库初始化脚本
  * @author SDU-YueQiu
  * @date 2025/5/12
- * @version 1.1
+ * @version 1.2
 */
 
 -- 创建个人用户表
@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS IndividualUsers (
     UserID INTEGER PRIMARY KEY AUTOINCREMENT,
     Username TEXT UNIQUE NOT NULL,
     PasswordHash TEXT NOT NULL,
-    PhoneNumber TEXT UNIQUE,
-    Email TEXT UNIQUE,
+    PhoneNumber TEXT,
+    Email TEXT,
     RegistrationDate TEXT DEFAULT CURRENT_TIMESTAMP,
     LastLoginDate TEXT,
     AccountStatus TEXT NOT NULL DEFAULT 'Active',
@@ -25,14 +25,14 @@ CREATE TABLE IF NOT EXISTS EnterpriseUsers (
     LoginUsername TEXT UNIQUE NOT NULL,
     PasswordHash TEXT NOT NULL,
     EnterpriseName TEXT NOT NULL,
-    CreditCode TEXT UNIQUE NOT NULL,
+    CreditCode TEXT NOT NULL,
     Description TEXT,
     Industry TEXT,
     Scale TEXT,
     Address TEXT,
     ContactPerson TEXT,
-    ContactPhone TEXT UNIQUE,
-    ContactEmail TEXT UNIQUE,
+    ContactPhone TEXT,
+    ContactEmail TEXT,
     LogoURL TEXT,
     LicenseImageURL TEXT NOT NULL,
     RegistrationDate TEXT DEFAULT CURRENT_TIMESTAMP,

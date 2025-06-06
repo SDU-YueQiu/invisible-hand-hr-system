@@ -260,7 +260,7 @@ const formatDateRange = (dateRange) => {
 
 const getVisibilityText = (status) => {
   const statusMap = {
-    'PublicToAll': '公开给所有企业',
+    'Public': '公开给所有企业',
     'PublicToApplied': '仅对申请企业公开',
     'Private': '私密'
   }
@@ -269,7 +269,7 @@ const getVisibilityText = (status) => {
 
 const getVisibilityTagType = () => {
   const statusMap = {
-    'PublicToAll': 'success',
+    'Public': 'success',
     'PublicToApplied': 'warning',
     'Private': 'info'
   }

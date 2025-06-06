@@ -54,7 +54,7 @@
         <el-form class="settings-form">
           <el-form-item label="简历默认可见性">
             <el-select v-model="privacySettings.defaultResumeVisibility">
-              <el-option label="公开给所有企业" value="PublicToAll" />
+              <el-option label="公开给所有企业" value="Public" />
               <el-option label="仅对申请企业公开" value="PublicToApplied" />
               <el-option label="完全私密" value="Private" />
             </el-select>

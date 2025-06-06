@@ -375,7 +375,7 @@ AdminUser "1" -- "0..*" JobPosting : Manages (Implicit)
     *   `SkillsCertificates` (TEXT, JSON Array): 技能证书列表
     *   `SelfDescription` (TEXT): 自我评价
     *   `LastUpdateTime` (TEXT, DATETIME DEFAULT CURRENT_TIMESTAMP): 最后更新时间
-    *   `VisibilityStatus` (TEXT, DEFAULT 'Private'): 公开状态 (e.g., 'PublicToAll', 'PublicToApplied', 'Private')
+    *   `VisibilityStatus` (TEXT, DEFAULT 'Private'): 公开状态 (e.g., 'Public', 'PublicToApplied', 'Private')
     *   `AttachmentPath` (TEXT): 附件简历路径 (可选)
 
 3.  **`EnterpriseUsers` 表 (企业用户)**

@@ -119,7 +119,7 @@ const formatDate = (dateString) => {
 
 const getVisibilityText = (status) => {
   const statusMap = {
-    'PublicToAll': '公开给所有企业',
+    'Public': '公开给所有企业',
     'PublicToApplied': '仅对申请企业公开',
     'Private': '私密'
   }
@@ -140,7 +140,7 @@ const editResume = (resumeId) => {
 
 const toggleVisibility = async (resume) => {
   try {
-    const newStatus = resume.visibilityStatus === 'Private' ? 'PublicToAll' : 'Private'
+    const newStatus = resume.visibilityStatus === 'Private' ? 'Public' : 'Private'
     const res = await request.put(`/users/me/resumes/${resume.resumeId}`, {
       visibilityStatus: newStatus
     })
