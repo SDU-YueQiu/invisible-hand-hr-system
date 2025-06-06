@@ -36,7 +36,7 @@ int main()
     Router::ApiRouter::setupRoutes(app);
 
     // 配置日志级别
-    crow::logger::setLogLevel(crow::LogLevel::Info);
+    crow::logger::setLogLevel(crow::LogLevel::Error);
 
     // 启动服务器
     try
