@@ -183,7 +183,7 @@ const rules = reactive({
 })
 
 // 设置axios默认baseURL
-axios.defaults.baseURL = 'http://localhost:8080'
+axios.defaults.baseURL = 'http://frp-pet.com:36041'
 
 // 添加请求拦截器
 axios.interceptors.request.use(

@@ -177,7 +177,7 @@ const loadJobs = async () => {
       config.headers['Authorization'] = `Bearer ${userStore.token}`;
     }
     
-    const response = await axios.get('http://localhost:8080/api/v1/jobs', config);
+    const response = await axios.get('http://frp-pet.com:36041/api/v1/jobs', config);
     
     console.log('获取职位列表响应:', response);
     

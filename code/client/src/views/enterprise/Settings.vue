@@ -228,7 +228,7 @@ onMounted(async () => {
 const fetchUserInfo = async () => {
   try {
     const token = enterpriseStore.token
-    const baseURL = "http://localhost:8080/api/v1"
+    const baseURL = "http://frp-pet.com:36041/api/v1"
     const response = await axios.get(`${baseURL}/enterprises/me`, {
       headers: {
         Authorization: `Bearer ${token}`
@@ -267,7 +267,7 @@ const submitPasswordForm = async (formEl) => {
       try {
         passwordLoading.value = true
         const token = enterpriseStore.token
-        const baseURL = "http://localhost:8080/api/v1"
+        const baseURL = "http://frp-pet.com:36041/api/v1"
         const response = await axios.put(`${baseURL}/enterprises/me/password`, {
           oldPassword: passwordForm.oldPassword,
           newPassword: passwordForm.newPassword

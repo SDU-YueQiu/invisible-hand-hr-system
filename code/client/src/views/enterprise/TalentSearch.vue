@@ -239,7 +239,7 @@ const searchResumes = async () => {
       page: currentPage.value,
       pageSize: pageSize.value
     };
-     const baseURL = "http://localhost:8080/api/v1"
+     const baseURL = "http://frp-pet.com:36041/api/v1"
     const res = await axios.get(
       `${baseURL}/enterprises/me/resumes/search`,{
       headers: {

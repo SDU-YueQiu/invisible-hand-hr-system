@@ -4,7 +4,7 @@ info:
   version: v1.0
   description: 本文档详细描述了“无形大手 人才招聘系统”前后端之间交互的RESTful API接口。
 servers:
-  - url: http://localhost:8080/api/v1
+  - url: http://frp-pet.com:36041/api/v1
     description: Development server
 
 components:

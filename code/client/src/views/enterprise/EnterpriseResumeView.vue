@@ -212,7 +212,7 @@ const fetchResumeDetails = async () => {
   try {
     loading.value = true
     
-    const baseURL = "http://localhost:8080/api/v1"
+    const baseURL = "http://frp-pet.com:36041/api/v1"
     const config = {
       //params,
       headers: {}

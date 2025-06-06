@@ -88,7 +88,7 @@ onMounted(async () => {
 const fetchJobs = async () => {
   try {
     loading.value = true
-    const res = await axios.get('http://localhost:8080/api/v1/enterprises/me/jobs', {
+    const res = await axios.get('http://frp-pet.com:36041/api/v1/enterprises/me/jobs', {
       headers: {
         'Authorization': `Bearer ${enterpriseStore.token}`
       }
@@ -190,7 +190,7 @@ const confirmDelete = (jobId) => {
   }).then(async () => {
     try {
       const token = enterpriseStore.token;
-      const res = await axios.delete(`http://localhost:8080/api/v1/enterprises/me/jobs/${jobId}`,{
+      const res = await axios.delete(`http://frp-pet.com:36041/api/v1/enterprises/me/jobs/${jobId}`,{
         headers: {
         Authorization: `Bearer ${token}`
       }

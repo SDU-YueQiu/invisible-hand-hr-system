@@ -56,7 +56,7 @@ const fetchUsers = async () => {
     const headers = {
       Authorization: `Bearer ${token}` 
     }
-    const baseURL = "http://localhost:8080/api/v1"; 
+    const baseURL = "http://frp-pet.com:36041/api/v1"; 
     const res = await axios.get(`${baseURL}/admin/users`, {
       params: { 
         page: currentPage.value,
@@ -81,7 +81,7 @@ const updateUserStatus = async (userId, newStatus) => {
   try {
     const token = adminStore.token;
     const headers = { Authorization: `Bearer ${token}` };
-    const baseURL = "http://localhost:8080/api/v1";
+    const baseURL = "http://frp-pet.com:36041/api/v1";
 
     const res = await axios.put(
       `${baseURL}/admin/users/${userId}/status`, 

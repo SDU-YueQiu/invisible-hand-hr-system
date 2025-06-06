@@ -65,7 +65,7 @@ const fetchEnterprises = async () => {
   try {
     const token = adminStore.token;
     const headers = { Authorization: `Bearer ${token}` };
-    const baseURL = "http://localhost:8080/api/v1";
+    const baseURL = "http://frp-pet.com:36041/api/v1";
 
     const res = await axios.get(`${baseURL}/admin/enterprises`, { headers });
     
@@ -94,7 +94,7 @@ const approveEnterprise = async (id) => {
   try {
     const token = adminStore.token;
     const headers = { Authorization: `Bearer ${token}` };
-    const baseURL = "http://localhost:8080/api/v1";
+    const baseURL = "http://frp-pet.com:36041/api/v1";
 
     const enterprise = enterprises.value.find(e => e.id === id);
     if (!enterprise) return;
@@ -134,7 +134,7 @@ const confirmReject = async () => {
   try {
     const token = adminStore.token;
     const headers = { Authorization: `Bearer ${token}` };
-    const baseURL = "http://localhost:8080/api/v1";
+    const baseURL = "http://frp-pet.com:36041/api/v1";
 
     const enterprise = enterprises.value.find(e => e.id === currentEnterpriseId.value);
     if (!enterprise) return;

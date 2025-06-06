@@ -154,7 +154,7 @@ export default {
       userResumes: [], // 用户简历列表
       selectedResumeId: null,
       applyLoading: false,
-      baseURL: "http://localhost:8080/api/v1" 
+      baseURL: "http://frp-pet.com:36041/api/v1" 
     };
   },
   setup() {

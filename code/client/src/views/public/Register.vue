@@ -196,7 +196,7 @@ export default {
         if (this.form.email) {
           registerData.email = this.form.email;
         }
-        const baseURL = 'http://localhost:8080/api/v1';
+        const baseURL = 'http://frp-pet.com:36041/api/v1';
         
         // 发送注册请求
         const response = await axios.post(`${baseURL}/auth/individual/register`, registerData);

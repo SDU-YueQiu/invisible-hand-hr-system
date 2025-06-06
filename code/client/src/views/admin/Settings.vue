@@ -128,7 +128,7 @@ const fetchAdminInfo = async () => {
   try {
     const token = adminStore.token
     const headers = { Authorization: `Bearer ${token}` }
-    const baseURL = "http://localhost:8080/api/v1"
+    const baseURL = "http://frp-pet.com:36041/api/v1"
     
     const res = await axios.get(`${baseURL}/admin/me`, { headers })
     
@@ -155,7 +155,7 @@ const submitPasswordForm = async (formEl) => {
         
         const token = adminStore.token
         const headers = { Authorization: `Bearer ${token}` }
-        const baseURL = "http://localhost:8080/api/v1"
+        const baseURL = "http://frp-pet.com:36041/api/v1"
         
         const res = await axios.put(
           `${baseURL}/admin/me/password`,
@@ -205,7 +205,7 @@ const logout = async () => {
     
     const token = adminStore.token
     const headers = { Authorization: `Bearer ${token}` }
-    const baseURL = "http://localhost:8080/api/v1"
+    const baseURL = "http://frp-pet.com:36041/api/v1"
     
     await axios.post(`${baseURL}/auth/logout`, {}, { headers })
     

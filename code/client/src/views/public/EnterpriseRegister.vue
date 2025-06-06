@@ -196,7 +196,7 @@ export default {
       },
       licenseFile: null,
       isSubmitting: false,
-      baseURL: 'http://localhost:8080/api/v1'
+      baseURL: 'http://frp-pet.com:36041/api/v1'
     };
   },
   methods: {

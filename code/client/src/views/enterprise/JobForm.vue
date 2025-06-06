@@ -201,7 +201,7 @@ const fetchJobDetails = async () => {
       return
     }
     const token = enterpriseStore.token
-    const baseURL = "http://localhost:8080/api/v1"
+    const baseURL = "http://frp-pet.com:36041/api/v1"
     console.log("jobid: ",jobId.value)
     const res = await axios.get(`${baseURL}/enterprises/me/jobs/${jobId.value}`, {
       headers: {
@@ -313,7 +313,7 @@ const submitForm = async (formEl) => {
         }
         
         let res
-        const baseURL = 'http://localhost:8080/api/v1'
+        const baseURL = 'http://frp-pet.com:36041/api/v1'
         if (isEdit.value) {
           res = await axios.put(`${baseURL}/enterprises/me/jobs/${jobId.value}`, apiData, config)
         } else {

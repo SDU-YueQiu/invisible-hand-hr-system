@@ -10,6 +10,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src')
     }
   },
+  server: {
+    host: true, // 允许外部访问
+    port: 5173, // 确保端口与内网穿透配置一致
+    allowedHosts: [
+      'frp-pet.com' // 添加允许访问的域名
+    ]
+  }
   // server: {
   //   proxy: {
   //     '/api/v1': {
