@@ -318,7 +318,8 @@ const parseResumeData = (data) => {
     'skillsCertificates',
     'lastUpdateTime',
     'resumeTitle',
-    'selfDescription'
+    'selfDescription',
+    'visibilityStatus'
   ]
   fieldsToParse.forEach(field => {
     if (data[field] && typeof data[field] === 'string') {
