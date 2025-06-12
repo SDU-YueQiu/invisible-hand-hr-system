@@ -13,10 +13,10 @@
           text-color="#bfcbd9"
           active-text-color="#409EFF"
         >
-          <el-menu-item index="/enterprise/dashboard">
+          <!-- <el-menu-item index="/enterprise/dashboard">
             <el-icon><icon-menu /></el-icon>
             <span>企业中心</span>
-          </el-menu-item>
+          </el-menu-item> -->
           <el-menu-item index="/enterprise/profile">
             <el-icon><user /></el-icon>
             <span>企业资料</span>

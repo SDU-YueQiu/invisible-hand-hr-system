@@ -220,7 +220,7 @@ const handleEnterpriseLogin = async() => {
       })
       
       ElMessage.success('登录成功')
-      router.push('/enterprise/dashboard')
+      router.push('/enterprise/profile')
     } else {
       ElMessage.error(response.message)
     }

@@ -15,10 +15,6 @@
       <div class="hero-section">
         <h2>找到您理想的工作</h2>
         <p>海量职位，等您来选</p>
-        <div class="search-box">
-          <input type="text" placeholder="搜索职位关键词...">
-          <button>搜索</button>
-        </div>
       </div>
       
       <div class="features">
